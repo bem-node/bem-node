@@ -1,38 +1,39 @@
-/**
- * @mustDeps i-bem, i-router, i-command
- */
-BEM.decl('i-server', null, {
+BEM.decl({name: 'i-www-server', baseBlock: 'i-server'}, null, {
 
     /**
      * Starts HTTP server and loads priv.js
      */
     init: function () {
         var cluster = require('cluster'),
-            socket = this.getCommandArg('socket');
+            socket = BEM.blocks['i-command'].get('socket'),
+            number;
 
         if (!socket) {
             console.error('Socket not specified');
             return 1;
         }
+        number = Number(socket);
+        socket = !isNaN(number) ? number : socket;
 
         this.__base();
 
         if (cluster.isMaster) {
             this.prepairSocket(socket);
         } else {
-            this._startHTTP();
+            this._startHTTP(socket);
             require(process.argv[1].replace('server.js', 'priv.js'));
         }
     },
 
-    _startHTTP: function () {
+    _startHTTP: function (socket) {
         var http = require('http'),
             _this = this,
-            router = BEM.blocks['i-router'],
-            httpServer = http.createServer(router.onRequest.bind(router)),
-            socket = this.getCommandArg('socket');
+            httpServer = http.createServer(function (req, res) {
+                _this._getRequestHandler()(req, res);
+            });
 
         httpServer.listen(socket);
+
         //handling uncaught exception
         process.on('uncaughtException', function (err) {
             if (err.stack) {
@@ -87,15 +88,21 @@ BEM.decl('i-server', null, {
      */
     prepairSocket: function (socket) {
         var fs = require('fs'),
-            cluster = require('cluster');
+            cluster = require('cluster'),
+            isNumber = typeof socket === 'number';
+        
+        if (!isNumber) {
+            try {
+                fs.unlinkSync(socket);
+            } catch (err) {}
+        }
 
-        try {
-            fs.unlinkSync(socket);
-        } catch (err) {}
         if (cluster) {
             cluster.on('listening', function (worker, address) {
                 console.log('A worker is now connected to ' + address.address);
-                fs.chmod(socket, '777');
+                if (!isNumber) {
+                    fs.chmod(socket, '777');
+                }
             });
         }
     }

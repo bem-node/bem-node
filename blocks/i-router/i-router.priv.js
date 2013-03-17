@@ -11,6 +11,17 @@
     BEM.decl('i-router', null, {
 
         /**
+         * Init i-router
+         */
+        init: function () {
+            try {
+                BEM.blocks['i-www-server'].setRequestHandler(this._onRequest.bind(this));
+            } catch (ex) {
+                throw new Error('Unable to init router: invalid server specified?');
+            }
+        },
+
+        /**
          * Handles 50x page
          *
          * @note will be called from domain
@@ -47,7 +58,7 @@
          * @param {http.ServerRequest} req
          * @param {http.ServerResponse} res
          */
-        onRequest: function (req, res) {
+        _onRequest: function (req, res) {
             var routeInfo = this._getRoute(url.parse(req.url).pathname, req.method),
                 reqDomain = domain.create(),
                 _this = this;

@@ -1,14 +1,7 @@
 ({
-    "mustDeps": [
-        {
-            "block": "i-bem"
-        },
-        {
-            "block": "i-router"
-        },
-        {
-            "block": "i-command"
-        }
-    ],
-    "origin": {}
+    mustDeps: [
+        {block: 'i-console'},
+        {block: 'i-command'},
+        {block: 'i-bem'},
+    ]
 })

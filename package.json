@@ -1,0 +1,22 @@
+{
+    "name": "bem-node",
+    "version": "0.0.1",
+    "description": "",
+    "keywords": [
+        "bem",
+        "node"
+    ],
+    "author": {
+        "name": "Evgeniy Filatov"
+    },
+    "dependencies": {
+        "vow": ">= 0.2.0",
+        "bem": "0.5.26"
+    },
+    "devDependencies": {
+    },
+    "main": "index",
+    "engines": {
+        "node": ">= 0.8.0"
+    }
+}
