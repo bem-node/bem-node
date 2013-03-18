@@ -4,7 +4,7 @@ var INHERIT = require('inherit'),
 exports.Tech = INHERIT(BaseTech, {
 
     getBuildResultChunk: function (relPath, path) {
-        return 'require("' + path + '");\n';
+        return 'require("' + relPath + '");\n';
     },
 
     getSuffixes: function () {

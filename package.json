@@ -10,6 +10,7 @@
         "name": "Evgeniy Filatov"
     },
     "dependencies": {
+        "bem-json": ">= 0.1.1",
         "vow": ">= 0.2.0",
         "bem": "0.5.26"
     },

@@ -1,1 +1,1 @@
-../../../vow/lib/vow.js
+../../node_modules/vow/lib/vow.js

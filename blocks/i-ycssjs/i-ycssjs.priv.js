@@ -7,7 +7,9 @@
         
         init: function (matches, req, res) {
             var path = projectPath + matches[0],
-                suffix = matches[1];
+                suffix = matches[1],
+                fileDir = path.replace(/[^\/]+$/, '');
+
             fs.readFile(path, 'utf8', function (err, source) {
                 var result;
 
@@ -17,7 +19,13 @@
                 }
 
                 result = source.replace(/include\(['"](.+)['"]\);?/g, function (p, p1) {
-                    return fs.readFileSync(p1, 'utf8');
+                    var path = p1[0] === '/' ? p1 : (fileDir + p1);
+
+                    try {
+                        return fs.readFileSync(path, 'utf8');
+                    } catch (e) {
+                        return e.stack;
+                    }
                 });
 
                 res.writeHead(200, {
