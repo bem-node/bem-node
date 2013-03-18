@@ -12,7 +12,7 @@ BEM.decl('i-page', null, {
      * @return {Vow.promise}
      */
     update: function (matchers) {
-        return Vow.fulfill();
+        return this.init.apply(this, arguments);
     },
 
     /**
@@ -22,6 +22,24 @@ BEM.decl('i-page', null, {
      */
     destruct: function () {
         return Vow.fulfill();
+    },
+
+    /**
+     * Process bemjson and bemhtml then update `b-content` with generated html
+     *
+     * @override
+     * @param {String|Object|Array} json
+     * @return {Vow.promise}
+     */
+    out: function (json) {
+        return this.html(json).then(function (html) {
+            try {
+                BEM.DOM.update(
+                    jQuery('.b-content'),
+                    html
+                );
+            } catch (ex) { console.error(ex); }
+        });
     }
 
 });

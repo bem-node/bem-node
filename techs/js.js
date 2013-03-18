@@ -7,6 +7,10 @@ exports.Tech = INHERIT(BaseTech, {
         return 'include("' + relPath + '");\n';
     },
 
+    appendBefore: function () {
+        return ['bemhtml'];
+    },
+
     getSuffixes: function () {
         return ['common.js', 'js'];
     }

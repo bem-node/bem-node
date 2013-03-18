@@ -1,5 +1,10 @@
 (function () {
     var fs = require('fs'),
+        normalize = require('path').normalize,
+        replacement = {
+            js: /include\(['"](.+)['"]\);?/g,
+            css: /@import\s+url\((.+)\);?/g
+        },
         projectPath = process.argv[1].replace(/[\w\.]+\/[\w\.]+\/[\w\.]+$/, '');
 
     BEM.blocks['i-router'].define('GET', /^[\w\/]+\.(js|css)$/, 'i-ycssjs');
@@ -18,12 +23,15 @@
                     return res.end();
                 }
 
-                result = source.replace(/include\(['"](.+)['"]\);?/g, function (p, p1) {
+                result = source.replace(replacement[suffix], function (p, p1) {
                     var path = p1[0] === '/' ? p1 : (fileDir + p1);
+                    path = normalize(path);
 
                     try {
                         return fs.readFileSync(path, 'utf8');
+                        console.log('qwdas');
                     } catch (e) {
+                        console.log(e.message);
                         return e.stack;
                     }
                 });
