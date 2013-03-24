@@ -1,5 +1,5 @@
 var INHERIT = require('inherit'),
-    BaseTech = require('./js.js').Tech;
+    BaseTech = require('./tech').Tech;
 
 exports.Tech = INHERIT(BaseTech, {
 

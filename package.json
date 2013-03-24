@@ -1,6 +1,7 @@
 {
     "name": "bem-node",
     "version": "0.0.1",
+    "preferGlobal": "false",
     "description": "",
     "keywords": [
         "bem",
@@ -12,7 +13,11 @@
     "dependencies": {
         "bem-json": ">= 0.1.1",
         "vow": ">= 0.2.0",
-        "bem": "0.5.26"
+        "cookies": "0.3.0",
+        "request": "2.12.0",
+        "bem": "0.5.26",
+        "inherit": "*",
+        "bem-bl": "git://github.com/bem/bem-bl.git"
     },
     "devDependencies": {
     },

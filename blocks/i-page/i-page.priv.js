@@ -1,5 +1,5 @@
 BEM.decl('i-page', null, {
-
+    
     /**
      * Process bemjson and bemhtml then output generated html
      * @override
@@ -7,19 +7,25 @@ BEM.decl('i-page', null, {
      */
     out: function (json) {
         var res = BEM.blocks['i-router'].get('res');
-        
-        return this.html({
-            block: 'b-page',
-            content: [
-                {block: 'b-head', content: 'head'},
-                {block: 'b-content', content: json},
-                {block: 'b-foot', content: 'foot'}
-            ],
-            head: [
-
-            ]
-        }).then(function (html) {
+        return this.html(this.getJson(json)).then(function (html) {
             res.end(html);
         });
+    },
+    
+
+    /**
+     * Default bemjson for all pages
+     *
+     * @param {Mixed} json
+     * 
+     * @return {Object} bemjson
+     */
+    getJson: function (json) {
+        return {
+            block: 'b-page',
+            content: [
+                {block: 'b-content', content: json},
+            ]
+        }
     }
 });

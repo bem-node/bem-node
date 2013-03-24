@@ -1,0 +1,1 @@
+../../../node_modules/bem-bl/blocks-common/i-jquery/__is-empty-object/i-jquery__is-empty-object.js

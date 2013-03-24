@@ -4,7 +4,7 @@
  * @abstract
  */
 BEM.decl('i-page', null, {
-
+    
     /**
      * Called when page params changed
      *

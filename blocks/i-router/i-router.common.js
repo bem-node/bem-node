@@ -2,7 +2,6 @@
  * Defines request handlers
  *  associates request path with i-block's method
  *
- * @see http://wiki.yandex-team.ru/users/mdidkivskyi/tv/i-router
  */
 BEM.decl('i-router', null, BEM.blocks['i-state'].initNs('i-router'));
 BEM.decl('i-router', null, {

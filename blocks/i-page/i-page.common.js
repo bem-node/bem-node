@@ -6,13 +6,14 @@
 BEM.decl('i-page', null, {
 
     /**
-     * Initialize page
+     * Called when route on page was changed
      *
-     * @abstract
      * @param {Array} matchers matched params from path
      * @return {Vow.promise}
      */
-    init: function (matchers) {},
+    init: function () {
+        return this.out('');
+    },
     
     /**
      * Process bemjson and bemhtml then output generated html
