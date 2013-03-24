@@ -1,6 +1,6 @@
 {
     "name": "bem-node",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "preferGlobal": "false",
     "description": "",
     "keywords": [
@@ -10,6 +10,10 @@
     "author": {
         "name": "Evgeniy Filatov"
     },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/wtfil/bem-node.git"
+    },
     "dependencies": {
         "bem-json": ">= 0.1.1",
         "vow": ">= 0.2.0",
@@ -18,8 +22,6 @@
         "bem": "0.5.26",
         "inherit": "*",
         "bem-bl": "git://github.com/bem/bem-bl.git"
-    },
-    "devDependencies": {
     },
     "main": "index",
     "engines": {
