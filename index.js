@@ -1,5 +1,4 @@
-var extend = require('bem/lib/util').extend,
-    cwd = process.cwd(),
+var cwd = process.cwd(),
     techFolder = __dirname + '/techs/';
 
 // level.js
@@ -19,17 +18,17 @@ exports.getTechs = function() {
 // level.js
 exports.getConfig = function() {
 
-    return extend({}, this.__base() || {}, {
+    return {
 
-        bundleBuildLevels: this.resolvePaths([
+        bundleBuildLevels: [
             __dirname + '/node_modules/bem-bl/blocks-common',
             __dirname + '/node_modules/bem-bl/blocks-desktop',
             __dirname + '/node_modules/bem-json',
             __dirname + '/blocks',
             cwd + '/blocks'
-        ])
+        ]
 
-    });
+    };
 
 };
 

@@ -16,6 +16,15 @@
         _apiHostConfigKey: 'api',
 
         /**
+         * @abstruct
+         */
+        _apiHost: undefined,
+
+        setHost: function (host) {
+            this._apiHost = host;
+        },
+
+        /**
          * Define request headers
          */
         _getRequestHeaders: function (hostname) {
@@ -78,10 +87,21 @@
          *  @return {Vow.Promise}
          */
         _request: function (method, resource, data) {
-            var parse = url.parse(resource);
+            var path, parse;
+            
+            if (resource.indexOf('http') !== 0) {
+                if (!this._apiHost) {
+                    return Vow.reject(new Error('_apiHost is not specified; Use .setHost(<host>) or ._apiHost=<host> to set it'));
+                }
+                path = this._apiHost + resource;
+            } else {
+                path = resource;
+            }
+            console.log(path);
+            parse = url.parse(path);
 
             return this._resolveApiParams(parse).then(function (apiParams) {
-                return this._requestApi(apiParams, method, resource, data);
+                return this._requestApi(apiParams, method, path, data);
             }.bind(this));
         },
 
