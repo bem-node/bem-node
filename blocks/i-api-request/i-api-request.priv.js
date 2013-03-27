@@ -20,10 +20,6 @@
          */
         _apiHost: undefined,
 
-        setHost: function (host) {
-            this._apiHost = host;
-        },
-
         /**
          * Define request headers
          */
@@ -91,7 +87,7 @@
             
             if (resource.indexOf('http') !== 0) {
                 if (!this._apiHost) {
-                    return Vow.reject(new Error('_apiHost is not specified; Use .setHost(<host>) or ._apiHost=<host> to set it'));
+                    return Vow.reject(new Error('_apiHost is not specified; Define ._apiHost on your level first'));
                 }
                 path = this._apiHost + resource;
             } else {

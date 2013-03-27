@@ -18,14 +18,14 @@ checkout test project
 
     git clone https://github.com/wtfil/bem-node-test.git app_name
 
-this is test project and you should remove all else blocks
+this is test project and you should remove all other blocks
 
     cd app_name
     rm -rf blocks/*
     
 finaly you should install bem-node
 
-because of issue with symlinks in ``npm install``` you should run this (its temporary)
+because of issue with symlinks in ```npm install``` you should run this (its temporary)
     
     git clone https://github.com/wtfil/bem-node.git node_modules/bem-node
     cd node_modules/bem-node && npm install
@@ -57,21 +57,9 @@ BEM.decl({block: 'i-page-test', baseBlock: 'i-page'}, null, {
 
 });
 ```
-```BEM.blocks['i-router'].define``` function  allow to subscribe url changing
+```BEM.blocks['i-router'].define``` function  allows to subscribe url changing
 
-its jsdoc is something like this
-```
-/**
- * Define handler or list of handlers
- *
- * @param [{String|Array} [reqMethod] request method: 'get', 'post', 'get,post', 'delete' etc. or list of arguments
- *  To assign more than one method list with comma]
- * @param {String|RegExp} reqPath request path matcher
- * @param {String} pageName block name
- */
-```
-
-the ```this.out()```  argument is what you will see as result.
+the ```.out```  argument is what you will see as the result.
 
 It can be bemjson or string
 
@@ -90,13 +78,15 @@ every page is module with thee mandatory methods
 
 ```init``` will calls after url matches first time
 
-```update``` will calls if same url is matching with new matchers (on client-sise)
+```update``` will be called if same url is matching with new matchers (on client-side)
 
-```destruct``` will calls for previous page before ```update``` of new page will calling
+```destruct``` will be called for previous page before update of new page is called.
 
-all this methods are retuns promises and implemented in base block
+```update``` and ```destruct``` methods should be defined in ```js``` (not ```common.js```) file
 
-note: every page are inherit base page. Its name is ```i-page```. Dont forget to add it to dependencies
+all this methods are return promises and implemented in base block
+
+note: every page is inherit base page. The name is ```i-page```. Dont forget to add it to dependencies
 
     open blocks/i-page-test/i-page-test.deps.js
 
@@ -111,11 +101,31 @@ and add dependencies
 
 add this page to bemdecl
 
-    vim pages/index/index.bemdecl.js
+    open pages/index/index.bemdecl.js
 
 You can see few rows in ```bem-node``` part. Dont remove its:) ``user part``` is your own. Crean it and add
 ```
 {block: 'i-page-test'}
+```
+
+API
+---------------
+subscribe ```i-page-name``` to handle /qwe url
+
+url can be regular expression
+```
+BEM.blocks['i-router'].define('GET|POST', '/qwe', 'i-page-name')
+``` 
+
+set path to '/foo' (redirect on server)
+```
+BEM.blocks['i-router'].setPath('/foo')
+``` 
+
+geting resource from api (retuns promise)
+``` 
+BEM.blocks['i-api-request'].get('http://nodejs.org/api/index.json')
+BEM.blocks['i-api-request'].get('index.json') // if .apiHost sets to "http://nodejs.org/api" on your level
 ```
 
 Building
