@@ -1,1 +1,0 @@
-../../../node_modules/bem-bl/blocks-common/i-jquery/__observable/i-jquery__observable.js
