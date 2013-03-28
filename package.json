@@ -1,7 +1,6 @@
 {
     "name": "bem-node",
     "version": "0.0.2",
-    "preferGlobal": "false",
     "description": "",
     "keywords": [
         "bem",
@@ -13,6 +12,9 @@
     "repository": {
         "type": "git",
         "url": "https://github.com/wtfil/bem-node.git"
+    },
+    "scripts": {
+        "postinstall": "./bin/install.sh"
     },
     "dependencies": {
         "bem-json": ">= 0.1.1",

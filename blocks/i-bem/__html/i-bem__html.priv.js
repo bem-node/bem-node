@@ -1,1 +1,0 @@
-../../../node_modules/bem-json/i-bem/__html/i-bem__html.js

@@ -1,1 +1,0 @@
-../../../node_modules/bem-bl/blocks-common/i-jquery/__identify/i-jquery__identify.js
