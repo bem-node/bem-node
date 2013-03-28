@@ -23,12 +23,9 @@ this is test project and you should remove all other blocks
     cd app_name
     rm -rf blocks/*
     
-finaly you should install bem-node
+finaly you should install bem-node (bem-node already in dependencies)
 
-because of issue with symlinks in ```npm install``` you should run this (its temporary)
-    
-    git clone https://github.com/wtfil/bem-node.git node_modules/bem-node
-    cd node_modules/bem-node && npm install
+    npm install
 
 
 Creating new page
