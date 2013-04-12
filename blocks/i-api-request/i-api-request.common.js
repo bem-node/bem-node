@@ -27,15 +27,20 @@ BEM.decl('i-api-request', null, {
     },
 
     /**
-     * Pass parsed json to promise resolve
-     * @param {Vow.promise}
-     * @param {Sting} result
-     * @param {String} [format]
+     * Get json string of body
      */
-    _parse: function (promise, result, format) {
-        if (format === 'string') {
-            return promise.fulfill(result);
+    _normalizeBody: function (body) {
+        if (typeof body === 'object') {
+            return JSON.stringify(body);
+        } else {
+            return String(body);
         }
+    },
+
+    /**
+     * Pass parsed json to promise resolve
+     */
+    _parse: function (promise, result) {
         try {
             promise.fulfill(JSON.parse(result));
         } catch (err) {
@@ -54,11 +59,69 @@ BEM.decl('i-api-request', null, {
         return error instanceof this._HttpError;
     },
 
+
     /**
-     * Http get
+     * serialize request and get cache key
+     */
+    _getCacheKey: function (resource, data) {
+        //TODO: find faster method
+        return resource + '?' + (data && Object.keys(data).sort().map(function (dataKey) {
+            var dataValue = data[dataKey];
+            if (typeof dataValue === 'object') {
+                dataValue = JSON.stringify(dataValue);
+            }
+            return dataKey + '=' + dataValue;
+        }).join('&'));
+    },
+
+    _requestCache: BEM.blocks['i-state'].initNs('i-api-request.requestCache'),
+
+    /**
+     *  Create cache storage for every block based on i-api-request
+     */
+    _getCacheStorage: function () {
+        // TODO this._name
+        var cache = this._requestCache.get(this._name);
+        if (!cache) {
+            cache = {};
+            this._requestCache.set(this._name, cache);
+        }
+        return cache;
+    },
+
+
+    /**
+     * Saves key/value for request/session
+     */
+    _setCache: function (key, value) {
+        this._getCacheStorage()[key] = value;
+    },
+
+    /**
+     * Get saved key/values for request/session
+     */
+    _getCache: function (key) {
+        return this._getCacheStorage()[key];
+    },
+
+    /**
+     * Drop request cache of current block
+     */
+    dropCache: function () {
+        this._requestCache.set(this._name, {});
+    },
+
+    /**
+     * Http get with cache
      */
     get: function (resource, data) {
-        return this._request('get', resource, data);
+        var cacheKey = this._getCacheKey(resource, data),
+            promise = this._getCache(cacheKey);
+        if (!promise) {
+            promise = this._request('get', resource, data);
+            this._setCache(cacheKey, promise);
+        }
+        return promise;
     }
 
 });
