@@ -23,6 +23,10 @@ BEM.decl('i-page', null, {
     destruct: function () {
         return Vow.fulfill();
     },
+    
+    getUpdateNode: function () {
+        return jQuery('.b-content');
+    },
 
     /**
      * Process bemjson and bemhtml then update `b-content` with generated html
@@ -35,11 +39,11 @@ BEM.decl('i-page', null, {
         return this.html(json).then(function (html) {
             try {
                 BEM.DOM.update(
-                    jQuery('.b-content'),
+                    this.getUpdateNode(),
                     html
                 );
             } catch (ex) { console.error(ex); }
-        });
+        }.bind(this));
     }
 
 });

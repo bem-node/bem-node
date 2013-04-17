@@ -23,6 +23,9 @@ exports.Tech = INHERIT(BaseTech, {
                 (_this.appendBefore() || []).forEach(function (tech) {
                     res.unshift(_this.getBuildResultChunk(_this.getPath(outputName, tech)));
                 });
+                (_this.appendAfter() || []).forEach(function (tech) {
+                    res.push(_this.getBuildResultChunk(_this.getPath(outputName, tech)));
+                });
 
                 return res;
             });

@@ -28,7 +28,7 @@
                     }
                 });
 
-                jQuery(window).bind('popstate', function (e) {
+                jQuery(window).bind('popstate', function () {
                     if (wasChanged || location.href !== initialUrl) {
                         _this._onPathChange();
                     }
@@ -41,8 +41,9 @@
          * Changing windlow.location
          * @override
          * @param {String} path
+         * @param {Boolean} [allowFallback = false] change path with page reload
          */
-        setPath: function (path) {
+        setPath: function (path, allowFallback) {
             if (this.get('path') === path) {
                 return true;
             }
@@ -51,7 +52,11 @@
                 this._onPathChange(path);
                 history.pushState(undefined, undefined, path);
             } catch (ex) {
-                console.error(ex);
+                if (allowFallback) {
+                    window.location.href = path;
+                } else {
+                    console.error(ex);
+                }
                 return false;
             }
             wasChanged = true;

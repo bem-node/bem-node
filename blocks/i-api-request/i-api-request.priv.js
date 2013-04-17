@@ -93,7 +93,6 @@
             } else {
                 path = resource;
             }
-            console.log(path);
             parse = url.parse(path);
 
             return this._resolveApiParams(parse).then(function (apiParams) {
@@ -130,8 +129,7 @@
         _requestApi: function (apiParams, method, resource, data) {
             var promise = Vow.promise(),
                 _this = this,
-                query = data && data.params, 
-                // TODO _resolveApiParams()
+                query = data && data.params,
                 requestUri = this._getUri(resource, query),
                 start = Date.now(),
                 requestOptions = {
@@ -142,12 +140,14 @@
                     headers: apiParams.headers,
                     timeout: apiParams.timeout
                 };
-
+            if (data && data.body) {
+                requestOptions.body = this._normalizeBody(data.body);
+            }
             request(requestOptions, function (err, res, encodedBody) {
                 if (err) {
                     if (err.code === 'ETIMEDOUT') {
-                        console.error(['Timeout', this._timeout, requestUri].join(' '));
-                        promise.reject(_this._HttpError(500, 'ETIMEDOUT'));
+                        console.error(['Timeout', this._timeout, logUri].join(' '));
+                        promise.reject(new _this._HttpError(500, 'ETIMEDOUT'));
                     } else {
                         promise.reject(err);
                     }
@@ -161,15 +161,16 @@
                                     res.statusCode,
                                     body
                                 ));
-                            } else if (data && data.output === 'string') {
+                            } else if (data && data.requestSource === 'ajax') {
                                 promise.fulfill(body);
                             } else {
-                                 _this._parse(promise, body);
+                                _this._parse(promise, body);
                             }
                         }
                     });
                 }
             });
+
             return promise;
         }
     });
