@@ -43,16 +43,20 @@ BEM.decl('i-ajax-proxy', {}, {
                 console.error(err);
                 data.params = {};
             }
-            //do not parse json
-            data.output = 'string';
+            //do not parse json and check secret key
+            data.requestSource = 'ajax';
             return BEM.blocks[blockName][methodName](
                 data.resource,
                 data
             ).then(function (json) {
                 BEM.blocks['i-response'].json(json);
             }).fail(function (err) {
-                console.error(err);
-                BEM.blocks['i-response'].error(err);
+                if (BEM.blocks['i-api-request'].isHttpError(err)) {
+                    BEM.blocks['i-response'].send(err.status, err.message);
+                } else {
+                    BEM.blocks['i-response'].error(err);
+                    throw err;
+                }
             });
         } else {
             BEM.blocks['i-response'].missing();

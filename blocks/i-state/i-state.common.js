@@ -17,7 +17,14 @@ BEM.decl('i-state', null, {
                 return _this.get(ns + (path ? '.' + path : ''));
             },
             set: function (path, data) {
-                _this.set(ns + (path ? '.' + path : ''), data);
+                var _self = this;
+                if (!data && typeof path === 'object') {
+                    Object.keys(path).forEach(function (key) {
+                        _self.set(key, path[key]);
+                    });
+                } else {
+                    _this.set(ns + (path ? '.' + path : ''), data);
+                }
                 return this;
             }
         };
@@ -29,7 +36,7 @@ BEM.decl('i-state', null, {
      * @abstract
      * @param {String} path
      */
-    get: function get(path) {},
+    get: function get() {},
 
     /**
      * Set data to store

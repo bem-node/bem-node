@@ -115,7 +115,7 @@ BEM.decl('i-router', null, {
      * @param {String} blockName block name
      * @return {Mixed} request handler
      */
-    _createHandler: function (blockName) {},
+    _createHandler: function () {},
 
     /**
      * Execute route handler
@@ -123,6 +123,6 @@ BEM.decl('i-router', null, {
      * @abstract
      * @param {Mixed} reqHandler request handler created by i-router._createHandler
      */
-    _execHandler: function (reqHandler) {}
+    _execHandler: function () {}
 
 });

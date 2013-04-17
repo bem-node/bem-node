@@ -1,2 +1,12 @@
 bem-bl
 node_modules
+blocks/i-bem/__html/
+blocks/i-bem/__json/_async/
+blocks/i-bem/__json/i-bem__json.priv.js
+blocks/i-bem/i-bem.server.js
+blocks/i-jquery/__identify/
+blocks/i-jquery/__inherit/i-jquery__inherit.server.js
+blocks/i-jquery/__is-empty-object/
+blocks/i-jquery/__observable/
+blocks/i-jquery/_dummy/
+blocks/i-promise/i-promise.js

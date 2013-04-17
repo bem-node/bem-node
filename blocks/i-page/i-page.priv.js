@@ -6,9 +6,8 @@ BEM.decl('i-page', null, {
      * @param {Mixed} json
      */
     out: function (json) {
-        var res = BEM.blocks['i-router'].get('res');
         return this.html(this.getJson(json)).then(function (html) {
-            res.end(html);
+            BEM.blocks['i-response'].send(200, html, 'text/html');
         });
     },
     

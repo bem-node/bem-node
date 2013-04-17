@@ -4,8 +4,9 @@ var INHERIT = require('inherit'),
 exports.Tech = INHERIT(BaseTech, {
 
     getBuildResultChunk: function (relPath, path) {
+        relPath = /^\w/.test(relPath) ? ('./' + relPath) : relPath;
         return (relPath.indexOf('bemhtml') !== -1) ?
-            'BEMHTML = require(\'./' + relPath + '\').BEMHTML;\n' : 'require("' + relPath + '");\n';
+            'BEMHTML = require(\'' + relPath + '\').BEMHTML;\n' : 'require("' + relPath + '");\n';
     },
 
     appendBefore: function () {

@@ -59,7 +59,7 @@ BEM.decl({name: 'i-www-server', baseBlock: 'i-server'}, null, {
      * @param {http.ServerRequest} params.req
      * @param {http.ServerResponse} params.res
      */
-    _requestHandler: function (params) {
+    _requestHandler: function () {
         throw new Error('Method [_requestHandler] must be set.');
     },
 

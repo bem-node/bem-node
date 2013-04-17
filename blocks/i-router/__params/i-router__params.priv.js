@@ -12,6 +12,13 @@
 
         MAX_POST_BODY_SIZE: 1024 * 1024,
 
+        _escapeHTML: function (html) {
+            return String(html)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        },
+
         _execHandler: function (handler) {
             var base = this.__base,
                 _this = this,
@@ -19,7 +26,12 @@
 
             this.set('uri', 'http://' + req.headers.host + req.url);
             this._readCookies();
-            this._readRequestParams(function () {
+            this._readRequestParams(function (params) {
+                var escapedParams = Object.keys(params).reduce(function (escapedParams, key) {
+                    escapedParams[key] = _this._escapeHTML(params[key]);
+                    return escapedParams;
+                }, {});
+                _this.set('params', escapedParams);
                 base.call(_this, handler);
             });
         },
@@ -46,8 +58,7 @@
             this.set('params', {});
 
             if (req.method === 'GET') {
-                this.set('params', url.parse(req.url, true).query);
-                callback();
+                callback(url.parse(req.url, true).query);
             } else if (req.method === 'POST') {
                 req.on('data', BEM.blocks['i-state'].bind(function (chunk) {
                     body += chunk.toString();
@@ -59,8 +70,7 @@
                     }
                 }));
                 req.on('end', BEM.blocks['i-state'].bind(function () {
-                    _this.set('params', qs.parse(body));
-                    callback();
+                    callback(qs.parse(body));
                 }));
             }
         }
