@@ -29,7 +29,6 @@
          */
         _error: function (err) {
             var routeInfo = this._getRoute('500');
-
             if (routeInfo) {
                 this._execHandler(routeInfo.handler);
             } else {
@@ -42,7 +41,7 @@
          *
          * @note will be called from domain
          */
-        _missing: function () {
+        missing: function () {
             var routeInfo = this._getRoute('404');
 
             if (routeInfo) {
@@ -78,11 +77,11 @@
                 if (routeInfo) {
                     _this._execHandler(routeInfo.handler);
                 } else {
-                    _this._missing();
+                    _this.missing();
                 }
             });
         },
-        
+
         /**
          * Changing path
          *
