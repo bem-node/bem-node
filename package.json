@@ -17,8 +17,8 @@
         "postinstall": "./bin/install.sh"
     },
     "dependencies": {
-        "bem-json": ">= 0.1.1",
-        "vow": ">= 0.2.0",
+        "bem-json": "0.1.6",
+        "vow": "0.3.0",
         "cookies": "0.3.0",
         "request": "2.12.0",
         "bem": "0.5.26",

@@ -28,9 +28,7 @@
         var ctx = this;
         wait.call(ctx);
         promise.fail(function (err) {
-            if (err && err.message) {
-                console.error(err);
-            }
+            ctx._declErrorHandler(err);
             ctx.remove();
         }).always(function () {
             resume.call(ctx);
