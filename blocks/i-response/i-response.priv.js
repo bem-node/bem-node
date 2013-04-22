@@ -3,7 +3,7 @@
  *
  */
 BEM.decl('i-response', null, {
-    
+
     STATUS_CODES: require('http').STATUS_CODES,
 
     /**
@@ -15,14 +15,21 @@ BEM.decl('i-response', null, {
      */
     send: function (status, body, contentType) {
         var res = this._getResponse();
-        contentType = contentType || 'text/plain';
-        try {
-            res.writeHead(status, {
-                'Content-Type': contentType + '; charset=utf-8'
-            });
-            res.end(body);
-        } catch (err) {
-            console.error(err);
+
+        if (res.finished) {
+            console.log('Cannot finish response. It is already finished.');
+        } else {
+            contentType = contentType || 'text/plain';
+            try {
+                res.writeHead(status, {
+                    'Content-Type': contentType + '; charset=utf-8',
+                    'X-Content-Type-Options': 'nosniff',
+                    'X-Frame-Options': 'DENY'
+                });
+                res.end(body);
+            } catch (err) {
+                console.error(err);
+            }
         }
     },
 
@@ -70,7 +77,7 @@ BEM.decl('i-response', null, {
         var res = this._getResponse(),
             statusCode = err.status || 503,
             message = err.message || this.STATUS_CODES[statusCode];
-
+        console.error(err);
         res.writeHead(statusCode, message);
         res.end();
     },
