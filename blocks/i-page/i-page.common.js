@@ -20,6 +20,6 @@ BEM.decl({block: 'i-page', baseBlock: 'i-content'}, null, {
      * @abstract
      * @param {Mixed} json
      */
-    out: function () {},
+    out: function () {}
 
 });
