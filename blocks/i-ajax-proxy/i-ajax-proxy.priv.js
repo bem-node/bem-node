@@ -21,6 +21,19 @@ BEM.decl('i-ajax-proxy', {}, {
         }
     },
 
+    _parseJSONParam: function (str) {
+        try {
+            if (str) {
+                return JSON.parse(decodeURIComponent(BEM.blocks['i-router'].unescapeHTML(str)));
+            } else {
+                return {};
+            }
+        } catch (err) {
+            console.error(err);
+            return {};
+        }
+    },
+
     /**
      * Response with json
      *
@@ -37,11 +50,9 @@ BEM.decl('i-ajax-proxy', {}, {
             data &&
             data.resource
         ) {
-            try {
-                data.params = data.params ? JSON.parse(decodeURIComponent(data.params)) : {};
-            } catch (err) {
-                console.error(err);
-                data.params = {};
+            data.params = this._parseJSONParam(data.params);
+            if (data.resource) {
+                data.resource = BEM.blocks['i-router'].unescapeHTML(data.resource);
             }
             //do not parse json and check secret key
             data.requestSource = 'ajax';

@@ -12,11 +12,36 @@
 
         MAX_POST_BODY_SIZE: 1024 * 1024,
 
-        _escapeHTML: function (html) {
+        /**
+         * Escape html special chars
+         *
+         * @param {String} html
+         * @return {String} text
+         */
+        escapeHTML: function (html) {
             return String(html)
                 .replace(/&/g, '&amp;')
                 .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;');
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#x27;')
+                .replace(/\//g, '&#x2F;');
+        },
+
+        /**
+         * Unescape html special chars
+         *
+         * @param {String} text
+         * @return {String} html
+         */
+        unescapeHTML: function (text) {
+            return String(text)
+                .replace(/&amp;/g, '&')
+                .replace(/&lt;/g, '<')
+                .replace(/&gt;/g, '>')
+                .replace(/&quot;/g, '"')
+                .replace(/&#x27;/g, '\'')
+                .replace(/&#x2F;/g, '/');
         },
 
         _execHandler: function (handler) {
@@ -28,7 +53,7 @@
             this._readCookies();
             this._readRequestParams(function (params) {
                 var escapedParams = Object.keys(params).reduce(function (escapedParams, key) {
-                    escapedParams[key] = _this._escapeHTML(params[key]);
+                    escapedParams[key] = _this.escapeHTML(params[key]);
                     return escapedParams;
                 }, {});
                 _this.set('params', escapedParams);
