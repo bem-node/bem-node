@@ -146,8 +146,8 @@
             request(requestOptions, function (err, res, encodedBody) {
                 if (err) {
                     if (err.code === 'ETIMEDOUT') {
-                        console.error(['Timeout', this._timeout, logUri].join(' '));
-                        promise.reject(new _this._HttpError(500, 'ETIMEDOUT'));
+                        console.error(['ETIMEDOUT', method, requestUri].join(' '));
+                        promise.reject(new _this._HttpError(500, ['ETIMEDOUT', method, requestUri].join(' ')));
                     } else {
                         promise.reject(err);
                     }
@@ -157,9 +157,10 @@
                             promise.reject(err);
                         } else {
                             if (res.statusCode !== 200) {
+                                console.error([res.statusCode, method, requestUri].join(' '));
                                 promise.reject(new _this._HttpError(
                                     res.statusCode,
-                                    body
+                                    [method, requestUri].join(' ')
                                 ));
                             } else if (data && data.requestSource === 'ajax') {
                                 promise.fulfill(body);

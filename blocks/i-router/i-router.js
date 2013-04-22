@@ -55,7 +55,7 @@
                 if (allowFallback) {
                     window.location.href = path;
                 } else {
-                    console.error(ex);
+                    console.log(ex);
                 }
                 return false;
             }
