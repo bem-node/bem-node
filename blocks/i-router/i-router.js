@@ -69,7 +69,9 @@
          * @todo-mdidkivskyi: display 404 page .. ?
          */
         missing: function () {
-            location.reload();
+            setTimeout(function () {
+                location.reload();
+            });
         },
 
         /**
