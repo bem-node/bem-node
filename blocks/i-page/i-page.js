@@ -24,6 +24,10 @@ BEM.decl('i-page', null, {
         return Vow.fulfill();
     },
     
+    /**
+     * What node will be updated after page is changed
+     * @return {jQuery} node
+     */
     getUpdateNode: function () {
         return jQuery('.b-content');
     },
@@ -44,6 +48,7 @@ BEM.decl('i-page', null, {
                 );
             } catch (ex) { console.error(ex); }
         }.bind(this));
+        jQuery('body').scrollTop(0);
     }
 
 });

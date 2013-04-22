@@ -12,6 +12,9 @@ BEM.decl('i-content', null, {
      * @return {Vow.promise|String}
      */
     html: function (bemJson, isSync) {
+        if (!Array.isArray(bemJson)) {
+            bemJson = [bemJson];
+        }
         return (isSync) ? this._htmlSync(bemJson) : this._htmlAsync(bemJson);
     },
 
