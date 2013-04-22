@@ -68,8 +68,8 @@
          *
          * @todo-mdidkivskyi: display 404 page .. ?
          */
-        _missing: function () {
-            throw new Error('Page not fouund.');
+        missing: function () {
+            location.reload();
         },
 
         /**
@@ -85,7 +85,7 @@
             if (handler) {
                 this._execHandler(handler);
             } else {
-                this._missing();
+                this.missing();
             }
         },
 
