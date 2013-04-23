@@ -29,8 +29,8 @@ BEM.decl('i-ajax-proxy', {}, {
                 return {};
             }
         } catch (err) {
-            console.error(err);
-            return {};
+            console.log(err);
+            return false;
         }
     },
 
@@ -48,9 +48,9 @@ BEM.decl('i-ajax-proxy', {}, {
             BEM.blocks[blockName] &&
             typeof BEM.blocks[blockName][methodName] === 'function' &&
             data &&
-            data.resource
+            data.resource &&
+            (data.params = this._parseJSONParam(data.params))
         ) {
-            data.params = this._parseJSONParam(data.params);
             if (data.resource) {
                 data.resource = BEM.blocks['i-router'].unescapeHTML(data.resource);
             }
@@ -71,7 +71,7 @@ BEM.decl('i-ajax-proxy', {}, {
             });
         } else {
             BEM.blocks['i-response'].missing();
-            return this.__base.apply(this, arguments);
+            return Vow.fulfill('');
         }
     }
 
