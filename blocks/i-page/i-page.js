@@ -47,8 +47,8 @@ BEM.decl('i-page', null, {
                     html
                 );
             } catch (ex) { console.error(ex); }
+            jQuery('body, html').scrollTop(0);
         }.bind(this));
-        jQuery('body').scrollTop(0);
     }
 
 });
