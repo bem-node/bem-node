@@ -5,8 +5,7 @@
     var cwd = process.cwd(),
         prefix = process.argv[1].replace(/(\.\w+)+$/, '')
             .replace(cwd, '')
-            .replace(/(\w+)$/, '_$1');
-
+            .replace(/(\w+)$/, '_$1'),
         push = [].push;
 
     /**
