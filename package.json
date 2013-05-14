@@ -23,6 +23,7 @@
         "request": "2.12.0",
         "bem": "0.5.26",
         "inherit": "*",
+        "borschik": "0.3.0",
         "bem-bl": "git://github.com/bem/bem-bl.git"
     },
     "main": "index",
