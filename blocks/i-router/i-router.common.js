@@ -70,7 +70,8 @@ BEM.decl('i-router', null, {
      */
     _getRoute: function (path, method) {
         var route,
-            matchers = [];
+            matchers = [],
+            pathNorm = path.replace(/\/{2,}/g, '/');
 
         this._routeList.some(function (r) {
             if (method && r.reqMethod) {
@@ -80,11 +81,11 @@ BEM.decl('i-router', null, {
             }
 
             if (typeof (r.reqPath) === 'string') {
-                if (path === r.reqPath) {
+                if (pathNorm === r.reqPath) {
                     route = r;
                     return true;
                 }
-            } else if ((matchers = path.match(r.reqPath))) {
+            } else if ((matchers = pathNorm.match(r.reqPath))) {
                 route = r;
                 return true;
             }
