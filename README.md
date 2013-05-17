@@ -33,7 +33,7 @@ Creating new page
 
 create new block in the root of project
 
-    bem create block -l blocks -t coomon.js -t deps.js i-page-test
+    bem create block -l blocks -t common.js -t deps.js i-page-test
 
 note: ```i-page-test``` is page name
 
