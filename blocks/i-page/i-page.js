@@ -48,6 +48,7 @@ BEM.decl('i-page', null, {
                 );
             } catch (ex) { console.error(ex); }
             jQuery('body, html').scrollTop(0);
+            return html;
         }.bind(this));
     }
 
