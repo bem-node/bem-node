@@ -1,0 +1,19 @@
+{
+    "name": "",
+    "version": "0.0.1",
+    "description": "",
+    "keywords": [
+        "bem",
+        "node",
+        "bem-node"
+    ],
+    "author": {
+        "name": ""
+    },
+    "dependencies": {
+        "bem-node": "*"
+    },
+    "engines": {
+        "node": ">= 0.8.0"
+    }
+}
