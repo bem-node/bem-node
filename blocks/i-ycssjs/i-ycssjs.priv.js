@@ -10,7 +10,12 @@
             'js': 'application/x-javascript',
             'png': 'image/png',
             'gif': 'image/gif',
-            'jpg': 'image/jpg'
+            'jpg': 'image/jpg',
+            'svg': 'image/svg+xml',
+            'ttf': 'application/x-font-ttf',
+            'otf': 'application/x-font-opentype',
+            'woff': 'application/x-font-woff',
+            'eot': 'application/vnd.ms-fontobject'
         },
         route = new RegExp('^.*\\.(' + Object.keys(CONTENT_TYPES).join('|') + ')$');
 
