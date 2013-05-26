@@ -11,7 +11,6 @@ BEM.decl('i-server', null, {
             workers = Number(BEM.blocks['i-command'].get('workers'));
 
         if (!workers) {
-            console.log('Workers number not specified; 1 worker by default');
             workers = 1;
         }
 

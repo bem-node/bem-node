@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 var args = process.argv.slice(2),
     bemNodeFolder = require.resolve('bem-node'),
-    emptyApp = bemNodeFolder.replace(/[^\/]+$/, 'empty-app'),
+    emptyApp = bemNodeFolder.replace(/[^\/]+$/, 'lib/empty-app'),
     ncp = require('ncp').ncp,
     fs = require('fs'),
     cwd = process.cwd();
@@ -34,11 +34,12 @@ function createApp(name, destination) {
 }
 
 function run() {
-    var develop = require('../develop');
+    var develop = require('../lib/develop');
     develop.start({
         watcherFolders: ['blocks'],
         rebuildCommand: 'bem make',
         runPort: 3000,
+        appPort: 3001,
         runCommand: 'node pages/index/index.server.js --socket 3001',
         restartFileMatch: /(common|priv|server)\.js$/,
         rebuildFileMatch: /deps\.js/
@@ -60,6 +61,9 @@ function test(onSuccess) {
     })
 }
 
+if (!args[0]) {
+    return test(run);
+}
 
 switch(args[0]) {
     case 'create':
@@ -67,5 +71,5 @@ switch(args[0]) {
         break;
     
     default:
-        test(run);
+        console.error('Method "' + args[0] + '" is not supported');
 }

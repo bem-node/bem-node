@@ -16,14 +16,20 @@
     "scripts": {
         "postinstall": "./bin/install.sh"
     },
+    "bin": {
+        "bem-node": "./bin/bem-node.js"
+    },
+    "preferGlobal": true,
     "dependencies": {
-        "bem-json": "0.1.6",
-        "vow": "0.3.0",
+        "borschik": "*",
+        "bem-json": ">= 0.1.1",
+        "vow": ">= 0.2.0",
         "cookies": "0.3.0",
         "request": "2.12.0",
         "bem": "0.5.26",
         "inherit": "*",
-        "borschik": "0.3.0",
+        "ncp": "*",
+        "watch": "*",
         "bem-bl": "git://github.com/bem/bem-bl.git"
     },
     "main": "index",
