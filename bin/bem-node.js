@@ -4,7 +4,34 @@ var args = process.argv.slice(2),
     emptyApp = bemNodeFolder.replace(/[^\/]+$/, 'lib/empty-app'),
     ncp = require('ncp').ncp,
     fs = require('fs'),
-    cwd = process.cwd();
+    cwd = process.cwd(),
+    optionRegExp = /^\-{1,2}/,
+    options = {
+        page: 'index',
+        rebuild: 'bem make',
+        port: 3000
+    },
+    i, option;
+
+for (i = 0; i < args.length; i++) {
+    if (optionRegExp.test(args[i])) {
+        option = args[i].replace(optionRegExp, '');
+        if (typeof options[option] === 'boolean') {
+            options[option] = true; 
+            args.splice(i, 1);
+            i--;
+        } else {
+
+            options[option] = args[i + 1];
+            if (!isNaN(Number(options[option]))) {
+                options[option] = Number(options[option]);
+            }
+
+            args.splice(i, 2);
+            i -= 2;
+        }
+    }
+}
 
 function help() {
     console.log('help');
@@ -26,43 +53,53 @@ function createApp(name, destination) {
                 if (err) {
                     throw err;
                 }
-                console.log('run:');
+                console.log('Done. Now run:');
                 console.log('$ cd', name, '&& npm install');   
             }
         );
     });
 }
 
-function run() {
+function runApp() {
     var develop = require('../lib/develop');
     develop.start({
         watcherFolders: ['blocks'],
-        rebuildCommand: 'bem make',
-        runPort: 3000,
-        appPort: 3001,
-        runCommand: 'node pages/index/index.server.js --socket 3001',
+        rebuildCommand: options.rebuild,
+        runPort: options.port,
+        appPort: options.port + 1,
+        runCommand: 'node ' + options.folder + '/' + options.page + '/' + options.page + '.server.js --socket ' + (options.port + 1),
         restartFileMatch: /(common|priv|server)\.js$/,
         rebuildFileMatch: /deps\.js/
     });
 }
 
 
-function test(onSuccess) {
-    fs.readFile(cwd + '/pages/index/index.bemdecl.js', function (err) {
+function run() {
+    if (options.folder) {
+        return runApp();
+    }
+    fs.readdir(cwd, function (err, dirs) {
+        var pagesFolder;
+
         if (err) {
-            return console.log('move into bem-node project folder');
+            return console.error(err);
         }
-        fs.readFile(cwd + '/pages/index/index.server.js', function (err) {
-            if (err) {
-                return console.log('run "bem make" first');
-            }
-            onSuccess();
-        });
-    })
+
+        pagesFolder = dirs.filter(function (dirName) {
+            return /pages/.test(dirName);
+        })[0];
+        
+        if (!pagesFolder) {
+            return console.error('move into bem-node project folder');
+        }
+
+        options.folder = pagesFolder;
+        runApp();
+    });
 }
 
 if (!args[0]) {
-    return test(run);
+    return run();
 }
 
 switch(args[0]) {
