@@ -1,5 +1,6 @@
 ({
     mustDeps: [
+        {block: 'i-state'},
         {block: 'i-content'}
     ],
     shouldDeps: [

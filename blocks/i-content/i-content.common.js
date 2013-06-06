@@ -18,38 +18,6 @@ BEM.decl('i-content', null, {
         return (isSync) ? this._htmlSync(bemJson) : this._htmlAsync(bemJson);
     },
 
-    /**
-     * Set html title for page
-     *
-     * @abstract
-     * @param {String} title page title
-     * @return {i-content}
-     */
-    setTitle: function () {
-        throw new Error('Method "setTitle" should be implemented.');
-    },
-
-    /**
-     * Set html description meta tag for page
-     *
-     * @param {String} text description content
-     * @return {i-content}
-     */
-    setDescription: function () {
-        return this;
-    },
-
-    /**
-     * Set content for meta tag
-     *
-     * @param {String} name name of a meta tag
-     * @param {String} content content for given meta tag
-     * @return {i-content}
-     */
-    setMeta: function () {
-        return this;
-    },
-
     _htmlSync: function (json) {
         return BEMHTML.call(BEM.JSON.build(json));
     },

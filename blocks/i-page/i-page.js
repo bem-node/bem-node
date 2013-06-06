@@ -4,7 +4,7 @@
  * @abstract
  */
 BEM.decl('i-page', null, {
-    
+
     /**
      * Called when page params changed
      *
@@ -23,7 +23,28 @@ BEM.decl('i-page', null, {
     destruct: function () {
         return Vow.fulfill();
     },
-    
+
+    /**
+     * Set html title for page
+     *
+     * @override
+     * @param {String} title page title
+     * @return {i-page}
+     */
+    setTitle: function (title) {
+        var oldTitleNode = jQuery('title'),
+            newTitle = jQuery('<title>' + title + '</title>');
+
+        if (oldTitleNode) {
+            newTitle.insertBefore(oldTitleNode);
+            oldTitleNode.remove();
+        } else {
+            newTitle.prependTo('head');
+        }
+
+        return this;
+    },
+
     /**
      * What node will be updated after page is changed
      * @return {jQuery} node
