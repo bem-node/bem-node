@@ -60,6 +60,7 @@ BEM.decl('i-response', null, {
     },
 
     /**
+     * @todo move to i-router
      * Response 404
      */
     missing: function () {
