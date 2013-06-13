@@ -98,6 +98,13 @@
                     callback(qs.parse(body));
                 }));
             }
+        },
+        /**
+         * Return current i-router params as query string
+         * @returns {String} something like "?bla=1&name=blabla"
+         */
+        encodedParams: function () {
+            return '?' + qs.stringify(BEM.blocks['i-router'].get('params'));
         }
 
     });

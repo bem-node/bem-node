@@ -1,5 +1,5 @@
 /**
- * Read get params from location
+ * Read get and set params from\to location
  *
  */
 BEM.decl('i-router', null, {
@@ -25,6 +25,32 @@ BEM.decl('i-router', null, {
                     return urlParamsObj;
                 }, {})
         );
+    },
+    /**
+     * Set params to current page url
+     * @param {Object} params
+     * @param {Boolean} [allowFallback=false]
+     * @param {Boolean} [extend=false] will extend current params
+     * @returns {*}
+     */
+    setParams: function (params, allowFallback, extend) {
+        var search = '?';
+        if (extend) {
+            jQuery.extend(params, this.get('params'));
+        }
+        search += jQuery.param(params);
+        if (location.search === search) {
+            return;
+        }
+        this.set('params', params);
+        return this.setPath(location.pathname + search, allowFallback);
+    },
+    /**
+     * Return current i-router params as query string
+     * @returns {String} something like "?bla=1&name=blabla"
+     */
+    encodedParams: function () {
+        return location.search;
     }
 
 });

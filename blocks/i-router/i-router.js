@@ -55,7 +55,8 @@
                 if (allowFallback) {
                     window.location.href = path;
                 } else {
-                    console.log(ex);
+                    console.log(ex.message);
+                    console.log(ex.stack);
                 }
                 return false;
             }
