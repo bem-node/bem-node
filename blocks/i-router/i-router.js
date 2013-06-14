@@ -36,21 +36,37 @@
                 });
             }
         },
-
+        /**
+         * Set path to url with history.pushState
+         * @param {String} path
+         * @param {Boolean} [allowFallback = false] change path with page reload
+         */
+        setPath: function (path, allowFallback) {
+            return this._changePath.call(this, 'push', path, allowFallback);
+        },
+        /**
+         * Replace current path with history.replaceState
+         * @param {String} path
+         * @param {Boolean}  [allowFallback = false] change path with page reload
+         */
+        replacePath: function (path, allowFallback) {
+            return this._changePath.call(this, 'replace', path, allowFallback);
+        },
         /**
          * Changing windlow.location
          * @override
          * @param {String} path
          * @param {Boolean} [allowFallback = false] change path with page reload
+         * @private
          */
-        setPath: function (path, allowFallback) {
+        _changePath: function (method, path, allowFallback) {
             if (this.get('path') === path) {
                 return true;
             }
 
             try {
                 this._onPathChange(path);
-                history.pushState(undefined, undefined, path);
+                history[method + 'State'](undefined, undefined, path);
             } catch (ex) {
                 if (allowFallback) {
                     window.location.href = path;
