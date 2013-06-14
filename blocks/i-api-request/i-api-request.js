@@ -3,15 +3,48 @@
  */
 
 BEM.decl('i-api-request', null, {
+    /** Abort one request identified by argument
+     * @protected
+     * @param {Vow} request. Vow promise, that defines xhr to abort
+     */
+    _abortOneRequest: function (request) {
+        var i,
+            xhrPromisePair;
+        for (i = 0; i < this._activeXhrs.length; i++) {
+            if (this._activeXhrs[i].promise === request) {
+                xhrPromisePair = this._activeXhrs[i];
+                this._activeXhrs.splice(i, 1);
+                break;
+            }
+        }
+        if (xhrPromisePair) {
+            xhrPromisePair.xhr.abort();
+        }
+    },
 
     /**
-     *  Aborts all active requests
+     *  Aborts request(s) defined by argument
+     *  @param {undefined | Vow | Array<Vow>} requests
+     *  if requests is undefined abort all requests
+     *  if requests is Vow promise -- abort corresponding request
+     *  if request is array of Vow promises, abort their corresponding requests
      */
-    abort: function () {
-        if (this._activeXhrs) {
+    abort: function (requests) {
+        var i;
+        if (!this._activeXhrs) {
+            return;
+        }
+        if (!requests) {
+            //short path for aborting all requests
             while (this._activeXhrs.length) {
-                this._activeXhrs.pop().abort();
+                this._activeXhrs.pop().xhr.abort();
             }
+        } else if (requests instanceof Array) {
+            for (i = 0; i < requests.length; i++) {
+                this._abortOneRequest(requests[i]);
+            }
+        } else {
+            this._abortOneRequest(requests);
         }
     },
 
@@ -49,25 +82,28 @@ BEM.decl('i-api-request', null, {
         }
         this._activeXhrs = this._activeXhrs || [];
         BEM.channel('i-api-request').trigger('beforerequest');
-        this._activeXhrs.push(jQuery.ajax({
-            type: data.body ? 'POST' : 'GET',
-            url: '/ajax/' + this._name + '/' + method,
-            data: data,
-            complete: function (xhr) {
-                var error;
-                if (xhr.status === 200) {
-                    _this._parse(promise, xhr.responseText);
-                } else {
-                    error = new _this._HttpError(xhr.status, xhr.statusText, xhr.responseText);
-                    BEM.channel('i-api-request').trigger('error', error);
-                    promise.reject(error);
+        this._activeXhrs.push({
+            promise: promise,
+            xhr: jQuery.ajax({
+                type: data.body ? 'POST' : 'GET',
+                url: '/ajax/' + this._name + '/' + method,
+                data: data,
+                complete: function (xhr) {
+                    var error;
+                    if (xhr.status === 200) {
+                        _this._parse(promise, xhr.responseText);
+                    } else {
+                        error = new _this._HttpError(xhr.status, xhr.statusText, xhr.responseText);
+                        BEM.channel('i-api-request').trigger('error', error);
+                        promise.reject(error);
+                    }
+                    _this._activeXhrs = _this._activeXhrs.filter(function (xhrItem) {
+                        return xhr !== xhrItem.xhr;
+                    });
+                    BEM.channel('i-api-request').trigger('afterrequest');
                 }
-                _this._activeXhrs = _this._activeXhrs.filter(function (xhrItem) {
-                    return xhr !== xhrItem;
-                });
-                BEM.channel('i-api-request').trigger('afterrequest');
-            }
-        }));
+            })
+        });
 
         return promise;
     }
