@@ -54,6 +54,9 @@ BEM.decl('i-ajax-proxy', {}, {
             if (data.resource) {
                 data.resource = BEM.blocks['i-router'].unescapeHTML(data.resource);
             }
+            if (data.body) {
+                data.body = BEM.blocks['i-router'].unescapeHTML(data.body);
+            }
             //do not parse json and check secret key
             data.requestSource = 'ajax';
             return BEM.blocks[blockName][methodName](
