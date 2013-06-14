@@ -47,10 +47,11 @@ BEM.decl('i-router', null, {
     },
     /**
      * Return current i-router params as query string
+     * @param {Array} allowedParams
      * @returns {String} something like "?bla=1&name=blabla"
      */
-    encodedParams: function () {
-        return location.search;
+    encodedParams: function (allowedParams) {
+        return jQuery.param(this._allowedParams(allowedParams));
     }
 
 });
