@@ -101,10 +101,11 @@
         },
         /**
          * Return current i-router params as query string
+         * @param {Array} allowedParams
          * @returns {String} something like "?bla=1&name=blabla"
          */
-        encodedParams: function () {
-            return '?' + qs.stringify(BEM.blocks['i-router'].get('params'));
+        encodedParams: function (allowedParams) {
+            return qs.stringify(this._allowedParams(allowedParams));
         }
 
     });
