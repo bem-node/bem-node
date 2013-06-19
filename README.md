@@ -1,5 +1,7 @@
 Tiny framefork for single-page applycations with NodeJS and BEM
 
+[API](https://github.com/wtfil/bem-node/wiki/API)
+
 Getting Started
 ---------------
 
