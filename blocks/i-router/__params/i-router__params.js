@@ -53,11 +53,12 @@ BEM.decl('i-router', null, {
      * @returns {*}
      */
     _changeParams: function (method, params, allowFallback, extend) {
-        var search = '';
+        var search = '',
+            newParams = params;
         if (extend) {
-            jQuery.extend(params, this.get('params'));
+            newParams = jQuery.extend({}, this.get('params'), params);
         }
-        search += jQuery.param(params);
+        search += jQuery.param(newParams);
         if (location.search === ('?' + search)) {
             return;
         }
