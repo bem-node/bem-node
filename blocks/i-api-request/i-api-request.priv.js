@@ -13,13 +13,16 @@
 
     BEM.decl('i-api-request', null, {
 
-        _apiHostConfigKey: 'api',
-
         /**
          * @abstruct
          */
         _apiHost: undefined,
-
+        
+        /**
+         * Default api timeout time in ms
+         */
+        _timeout: 5000,
+        
         /**
          * Define request headers
          */
@@ -33,17 +36,13 @@
             };
         },
 
-        // TODO setConfig
-        _config: {},
-
         /**
          * Resolve ip and set defaults for requests
          */
         _resolveApiParams: function (parse) {
             var promise = Vow.promise(),
                 _this = this,
-                host = parse.hostname,
-                apiHost;
+                host = parse.hostname;
 
             if (apiResolveCache[host]) {
                 promise.fulfill(apiResolveCache[host]);
@@ -56,7 +55,7 @@
                         apiParams = {
                             headers: _this._getRequestHeaders(host),
                             host: host,
-                            timeout: _this._config.timeout || 5000,
+                            timeout: _this._timeout,
                             uri: url.format({
                                 protocol: parse.protocol,
                                 hostname: ipArr[0],
@@ -131,7 +130,6 @@
                 _this = this,
                 query = data && data.params,
                 requestUri = this._getUri(resource, query),
-                start = Date.now(),
                 requestOptions = {
                     uri: requestUri,
                     method: method,
@@ -140,6 +138,7 @@
                     headers: apiParams.headers,
                     timeout: apiParams.timeout
                 };
+
             if (data && data.body) {
                 requestOptions.body = this._normalizeBody(data.body);
             }
