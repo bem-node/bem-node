@@ -3,7 +3,36 @@
  */
 
 BEM.decl('i-api-request', null, {
-    /** Abort one request identified by argument
+
+    /**
+     * Enables/disables caching of get requests
+     *
+     * @var {Boolean}
+     */
+    _cache: true,
+
+    /**
+     * Http get request
+     *
+     * @override {i-api-request}
+     * @param {String} resource
+     * @param {Object} [options] request options
+     * @param {Object} [options.params] request params
+     * @param {Object} [options.cache] if false, will disable request caching
+     * @returns {Vow.promise}
+     */
+    get: function (resource, options) {
+        var cache = options && options.hasOwnProperty('cache') ? options.cache : this._cache;
+
+        if (cache === false) {
+            return this._get(resource, options);
+        }
+
+        return this.__base.apply(this, arguments);
+    },
+
+    /**
+     * Abort one request identified by argument
      * @protected
      * @param {Vow} request. Vow promise, that defines xhr to abort
      */
