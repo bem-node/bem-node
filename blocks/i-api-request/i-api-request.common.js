@@ -59,6 +59,16 @@ BEM.decl('i-api-request', null, {
         return error instanceof this._HttpError;
     },
 
+    /**
+     * Makes http get request
+     *
+     * @param {String} resource
+     * @param {Object} [options] request options
+     * @returns {Vow.promise}
+     */
+    _get: function (resource, options) {
+        return this._request('get', resource, options);
+    },
 
     /**
      * serialize request and get cache key
@@ -89,7 +99,6 @@ BEM.decl('i-api-request', null, {
         return cache;
     },
 
-
     /**
      * Saves key/value for request/session
      */
@@ -112,15 +121,24 @@ BEM.decl('i-api-request', null, {
     },
 
     /**
-     * Http get with cache
+     * Http get request with cache
+     * Will take request promise from cache,
+     * otherwise send http get request and put promise into cache
+     *
+     * @param {String} resource
+     * @param {Object} [options] request options
+     * @param {Object} [options.params] request params
+     * @returns {Vow.promise}
      */
-    get: function (resource, data) {
-        var cacheKey = this._getCacheKey(resource, data),
+    get: function (resource, options) {
+        var cacheKey = this._getCacheKey(resource, options),
             promise = this._getCache(cacheKey);
+
         if (!promise) {
-            promise = this._request('get', resource, data);
+            promise = this._get(resource, options);
             this._setCache(cacheKey, promise);
         }
+
         return promise;
     }
 
