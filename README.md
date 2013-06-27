@@ -1,4 +1,4 @@
-Tiny framefork for single-page applycations with NodeJS and BEM
+Tiny framefork for single-page applications with NodeJS and BEM
 
 [API](https://github.com/wtfil/bem-node/wiki/API)
 
