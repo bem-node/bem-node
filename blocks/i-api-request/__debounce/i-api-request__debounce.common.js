@@ -27,7 +27,7 @@ BEM.decl('i-api-request', null, {
         var debounceData = jQuery.extend({}, data);
         debounceData.params = jQuery.extend({}, debounceData.params);
         delete debounceData.params[debounceParam];
-        return this._getCacheKey(resource, debounceData);
+        return 'debounce:' + this._getCacheKey(resource, debounceData);
     },
 
 
