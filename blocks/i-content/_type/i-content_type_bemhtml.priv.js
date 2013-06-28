@@ -1,4 +1,11 @@
 var script = process.argv[1],
-    bemhtml = script.replace('server.js', 'bemhtml.js');
+    base = script.replace('server.js', '');
 
-BEMHTML = require(bemhtml).BEMHTML;
+['bemhtml.js', 'bemhtml'].some(function (suffix) {
+    try {
+        BEMHTML = require(base + suffix).BEMHTML;
+        return true;
+    } catch (e) {
+        return false;
+    }
+});
