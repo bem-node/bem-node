@@ -15,14 +15,18 @@ BEM.decl('i-api-request', null, {
         }
     },
 
-    /**
-     * Drop request cache of current block
-     *
-     * @abstract
-     * @name dropCache
-     * @type Function
-     */
-
+    _prepareData: function (resource, data) {
+        data = data || {};
+        data.resource = this._normalizeResource(resource);
+        data.ncrd = Date.now();
+        if (data.params) {
+            data.params = JSON.stringify(data.params);
+        }
+        if (data && data.body) {
+            data.body = this._normalizeBody(data.body);
+        }
+        return data;
+    },
     /**
      *  Http request rest api
      *
@@ -35,15 +39,7 @@ BEM.decl('i-api-request', null, {
     _request: function (method, resource, data) {
         var promise = Vow.promise(),
             _this = this;
-        data = data || {};
-        data.resource = this._normalizeResource(resource);
-        data.ncrd = Date.now();
-        if (data.params) {
-            data.params = JSON.stringify(data.params);
-        }
-        if (data && data.body) {
-            data.body = this._normalizeBody(data.body);
-        }
+        data = this._prepareData(resource, data);
         if (method !== 'get') {
             this.dropCache();
         }

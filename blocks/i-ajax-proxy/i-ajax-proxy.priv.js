@@ -33,7 +33,37 @@ BEM.decl('i-ajax-proxy', {}, {
             return false;
         }
     },
-
+    /**
+     * Create and send response to client
+     * @param data
+     * @param json
+     * @private
+     */
+    _successResponse: function (json) {
+        BEM.blocks['i-response'].json(json);
+    },
+    /**
+     * Handle error
+     * @param err
+     * @private
+     */
+    _failureResponse: function (err) {
+        if (BEM.blocks['i-api-request'].isHttpError(err)) {
+            BEM.blocks['i-response'].send(err.status, err.message);
+        } else {
+            BEM.blocks['i-response'].error(err);
+            throw err;
+        }
+    },
+    /**
+     * Handle missing handler
+     * @returns {*}
+     * @private
+     */
+    _missingResponse: function () {
+        BEM.blocks['i-response'].missing();
+        return Vow.fulfill('');
+    },
     /**
      * Response with json
      *
@@ -59,19 +89,10 @@ BEM.decl('i-ajax-proxy', {}, {
             return BEM.blocks[blockName][methodName](
                 data.resource,
                 data
-            ).then(function (json) {
-                BEM.blocks['i-response'].json(json);
-            }).fail(function (err) {
-                if (BEM.blocks['i-api-request'].isHttpError(err)) {
-                    BEM.blocks['i-response'].send(err.status, err.message);
-                } else {
-                    BEM.blocks['i-response'].error(err);
-                    throw err;
-                }
-            });
+            ).then(this._successResponse.bind(this))
+             .fail(this._failureResponse.bind(this));
         } else {
-            BEM.blocks['i-response'].missing();
-            return Vow.fulfill('');
+            return this._missingResponse();
         }
     }
 
