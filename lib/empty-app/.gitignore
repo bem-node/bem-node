@@ -1,0 +1,4 @@
+!*.bemdecl.js
+!pages/.bem
+node_modules
+.bem/cache
