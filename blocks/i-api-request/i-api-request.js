@@ -22,13 +22,22 @@ BEM.decl('i-api-request', null, {
      * @returns {Vow.promise}
      */
     get: function (resource, options) {
-        var cache = options && options.hasOwnProperty('cache') ? options.cache : this._cache;
+        var cache = options && options.hasOwnProperty('cache') ? options.cache : this._cache,
+            _this = this,
+            promise;
 
         if (cache === false) {
             return this._get(resource, options);
         }
 
-        return this.__base.apply(this, arguments);
+        promise = this.__base.apply(this, arguments);
+
+        // If promise was failed, we can reset cache (only on client-side)
+        promise.fail(function () {
+            delete _this._getCacheStorage()[this._getCacheKey(resource, options)];
+        });
+
+        return promise;
     },
 
     /**
@@ -134,3 +143,4 @@ BEM.decl('i-api-request', null, {
     }
 
 });
+
