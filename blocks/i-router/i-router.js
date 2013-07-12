@@ -52,6 +52,32 @@
         replacePath: function (path, allowFallback) {
             return this._changePath.call(this, 'replace', path, allowFallback);
         },
+    
+        /**
+         * Falback for changing location if browser not support history.pushState or then error was occur while pach is changed
+         *
+         * @param {Boolean} allowFallback
+         * @param {String} path
+         * @return {Boolean}
+         */
+        _falback: function (allowFallback, path) {
+            if (allowFallback) {
+                window.location.href = path;
+            }
+            return false;
+        },
+        
+        /**
+         * Calls when error while routing was occur
+         * May be useful for better describing errors
+         *
+         * @param {Error} ex
+         */
+        _onError: function (ex) {
+            console.log(ex.message);
+            console.log(ex.stack);
+        },
+
         /**
          * Changing windlow.location
          * @override
@@ -64,18 +90,17 @@
                 return true;
             }
 
+            if (!history || typeof history[method + 'State'] !== 'function') {
+                return this._falback(allowFallback, path);
+            }
+
             try {
                 this._onPathChange(path);
-                history[method + 'State'](undefined, undefined, path);
             } catch (ex) {
-                if (allowFallback) {
-                    window.location.href = path;
-                } else {
-                    console.log(ex.message);
-                    console.log(ex.stack);
-                }
-                return false;
+                this._onError(ex);
+                return this._falback(allowFallback, path);
             }
+            history[method + 'State'](undefined, undefined, path);
             wasChanged = true;
             return true;
         },
