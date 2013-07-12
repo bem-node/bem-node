@@ -7,9 +7,48 @@ BEM.decl('i-page', null, {
      * @param {Mixed} json
      */
     out: function (json) {
-        return this.html(this.getJson(json)).then(function (html) {
-            BEM.blocks['i-response'].send(200, html, 'text/html');
+        var _this = this;
+        return _this._runDeferred().then(function () {
+            var bemJson = _this.getPageJson(json);
+
+            return Vow.fulfill(_this.extendPageJson(bemJson)).then(function (bemJson) {
+                return _this.html(bemJson).then(function (html) {
+                    BEM.blocks['i-response'].send(200, html, 'text/html');
+                });
+            });
         });
+    },
+
+    _deferred: [],
+
+    /**
+     * Run defered functions before page rendering
+     */
+    _runDeferred: function () {
+        return Vow.all(this._deferred.map(function (fun) {
+            return fun();
+        }));
+    },
+
+    /**
+     * Set function that will be callen before render ony page
+     *
+     * @param {Function} fun
+     * @return {i-page}
+     */
+    beforeOut: function (fun) {
+        this._deferred.push(fun);
+        return this;
+    },
+
+    /**
+     * Extending page json by adding params like "head" "meta" etc
+     *
+     * @param {Object} json
+     * @return {Vow.promise|Object}
+     */
+    extendPageJson: function (json) {
+        return jQuery.extend(this._getPageParams(), json);
     },
 
     /**
@@ -19,13 +58,17 @@ BEM.decl('i-page', null, {
      *
      * @return {Object} bemjson
      */
-    getJson: function (json) {
-        return jQuery.extend(this._getParams(), {
+    getPageJson: function (json) {
+        if (this.hasOwnProperty('getJson')) {
+            console.log('getJson method of block "i-page" is deprecated. Rename it to getPageJson');
+            return this.getJson(json);
+        }
+        return {
             block: 'b-page',
             content: [
-                {block: 'b-content', content: json},
+                {block: 'b-content', content: json}
             ]
-        });
+        };
     },
 
     /**
@@ -36,7 +79,7 @@ BEM.decl('i-page', null, {
      * @return {i-page}
      */
     setTitle: function (title) {
-        this._setParams('title', title);
+        this._setPageParams('title', title);
         return this;
     },
 
@@ -60,7 +103,7 @@ BEM.decl('i-page', null, {
      * @return {i-page}
      */
     setMeta: function (name, content) {
-        var params = this._getParams(),
+        var params = this._getPageParams(),
             meta = params && params.meta || [],
             tag;
 
@@ -81,17 +124,30 @@ BEM.decl('i-page', null, {
                     content: content
                 }
             });
-            this._setParams('meta', meta);
+            this._setPageParams('meta', meta);
         }
 
         return this;
     },
 
-    _getParams: function () {
+    /**
+     * Add tag into head of page
+     *
+     * @param {Object|String} bemjson or tag in string
+     * @return {i-page}
+     */
+    addToHead: function (elem) {
+        var head = this._getPageParams().head || [];
+        head.push(elem);
+        this._setPageParams('head', head);
+        return this;
+    },
+
+    _getPageParams: function () {
         return this.get('b-page') || {};
     },
 
-    _setParams: function (name, value) {
+    _setPageParams: function (name, value) {
         if (value === undefined) {
             this.set('b-page', name);
         } else {
