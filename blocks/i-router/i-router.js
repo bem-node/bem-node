@@ -60,7 +60,7 @@
          * @param {String} path
          * @return {Boolean}
          */
-        _falback: function (allowFallback, path) {
+        _fallback: function (allowFallback, path) {
             if (allowFallback) {
                 window.location.href = path;
             }
@@ -91,14 +91,14 @@
             }
 
             if (!history || typeof history[method + 'State'] !== 'function') {
-                return this._falback(allowFallback, path);
+                return this._fallback(allowFallback, path);
             }
 
             try {
                 this._onPathChange(path);
             } catch (ex) {
                 this._onError(ex);
-                return this._falback(allowFallback, path);
+                return this._fallback(allowFallback, path);
             }
             history[method + 'State'](undefined, undefined, path);
             wasChanged = true;
