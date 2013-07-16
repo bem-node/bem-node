@@ -119,7 +119,8 @@
         },
 
         _getUri: function (uri, query) {
-            return uri + (query ? ((uri.indexOf('?') !== -1 ? '&' : '?') + querystring.stringify(query)) : '');
+            var stringQuery = query && querystring.stringify(query);
+            return uri + (stringQuery ? ((uri.indexOf('?') !== -1 ? '&' : '?') + stringQuery) : '');
         },
 
         /**
