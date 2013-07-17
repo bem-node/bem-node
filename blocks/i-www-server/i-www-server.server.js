@@ -31,7 +31,15 @@ BEM.decl({name: 'i-www-server', baseBlock: 'i-server'}, null, {
             httpServer = http.createServer(function (req, res) {
                 _this._getRequestHandler()(req, res);
             });
-
+        
+        httpServer.on('error', function (err) {
+            if (err.code === 'EADDRINUSE') {
+                console.error('Socket "%s" is in use by another process', socket);
+                process.exit();
+            } else {
+                throw err;
+            }
+        })
         httpServer.listen(socket);
 
         //handling uncaught exception
