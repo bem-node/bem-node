@@ -70,15 +70,19 @@ BEM.decl('i-api-request', null, {
      * Http get, with debounce
      */
     get: function (resource, data) {
-        var debounceParamsKeys = this._findDebounceParams(data),
-            cacheKey, cacheStorage,
-            __base = this.__base.bind(this),
+        var __base = this.__base.bind(this),
             _this = this,
+            cacheKey, cacheStorage,
+            debounceParamsKeys,
             debounceParams,
             debounceParamsStr,
             debounceQuery;
 
-        if (debounceParamsKeys && debounceParamsKeys.length) {
+        if (
+            (data || {}).requestSource !== 'ajax' &&
+            (debounceParamsKeys = this._findDebounceParams(data)) &&
+            debounceParamsKeys.length
+        ) {
 
             debounceParams = debounceParamsKeys.reduce(function (obj, key) {
                 obj[key] = data.params[key];
