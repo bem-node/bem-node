@@ -37,6 +37,9 @@ BEM.decl('i-page', null, {
      * @return {i-page}
      */
     beforeOut: function (fun) {
+        if (this._name !== 'i-page') {
+            throw new Error("BEM.blocks['" + this._name + "'].beforeOut is not allowed; Use BEM.blocks['i-page'].beforeOut instead");
+        }
         this._deferred.push(fun);
         return this;
     },
