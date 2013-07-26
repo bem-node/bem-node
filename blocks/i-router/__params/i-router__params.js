@@ -18,12 +18,9 @@ BEM.decl('i-router', null, {
                 .reduce(function (urlParamsObj, keyValue) {
                     var keyValueAr = keyValue.split('=');
                     if (keyValueAr.length === 2) {
-                        urlParamsObj[keyValueAr[0]] = BEM.blocks['i-router']
-                            .escapeHTML(
-                                decodeURIComponent(
-                                    keyValueAr[1].replace(/\+/g, ' ')
-                                )
-                            );
+                        urlParamsObj[keyValueAr[0]] = decodeURIComponent(
+                            keyValueAr[1].replace(/\+/g, ' ')
+                        );
                     }
                     return urlParamsObj;
                 }, {})
