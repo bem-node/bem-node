@@ -20,11 +20,7 @@
             this.set('uri', 'http://' + req.headers.host + req.url);
             this._readCookies();
             this._readRequestParams(function (params) {
-                var escapedParams = Object.keys(params).reduce(function (escapedParams, key) {
-                    escapedParams[key] = _this.escapeHTML(params[key]);
-                    return escapedParams;
-                }, {});
-                _this.set('params', escapedParams);
+                _this.set('params', params);
                 base.call(_this, handler);
             });
         },
