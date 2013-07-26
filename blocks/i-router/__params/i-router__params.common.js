@@ -11,12 +11,12 @@ BEM.decl('i-router', null, {
     */
     escapeHTML: function (html) {
         return String(html)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#x27;')
-        .replace(/\//g, '&#x2F;');
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#x27;')
+            .replace(/\//g, '&#x2F;');
     },
 
     /**
@@ -27,12 +27,12 @@ BEM.decl('i-router', null, {
     */
     unescapeHTML: function (text) {
         return String(text)
-        .replace(/&amp;/g, '&')
-        .replace(/&lt;/g, '<')
-        .replace(/&gt;/g, '>')
-        .replace(/&quot;/g, '"')
-        .replace(/&#x27;/g, '\'')
-        .replace(/&#x2F;/g, '/');
+            .replace(/&amp;/g, '&')
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&quot;/g, '"')
+            .replace(/&#x27;/g, '\'')
+            .replace(/&#x2F;/g, '/');
     }
 
 });
