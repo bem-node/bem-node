@@ -100,12 +100,21 @@ BEM.decl('i-router', null, {
     },
 
     /**
-     * Changing path
+     * Add new path
      *
      * @abstract
      * @param {String} page
      */
     setPath: function () {
+        throw new Error('Not implemented');
+    },
+    /**
+     * Replace current path
+     *
+     * @abstract
+     * @param {String} page
+     */
+    replacePath: function () {
         throw new Error('Not implemented');
     },
 

@@ -93,6 +93,17 @@
         },
 
         /**
+         * Just execute this.setPath because
+         * on server we don't have history's methods
+         *
+         * @override
+         * @param {String} path
+         */
+        replacePath: function (path) {
+            return this.setPath(path);
+        },
+
+        /**
          * Create route handler
          *
          * @override
