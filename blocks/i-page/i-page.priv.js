@@ -147,7 +147,12 @@ BEM.decl('i-page', null, {
     },
 
     _getPageParams: function () {
-        return this.get('b-page') || {};
+        var params = this.get('b-page');
+        if (!params) {
+            params = {};
+            this.set('b-page', params);
+        }
+        return params;
     },
 
     _setPageParams: function (name, value) {
