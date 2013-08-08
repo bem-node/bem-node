@@ -6,8 +6,8 @@
         normalize = require('path').normalize,
         borschik = require('borschik').api,
         CONTENT_TYPES = {
-            'css': 'text/css',
-            'js': 'application/x-javascript',
+            'css': 'text/css;charset=utf-8',
+            'js': 'application/x-javascript;charset=utf-8',
             'png': 'image/png',
             'gif': 'image/gif',
             'jpg': 'image/jpg',
