@@ -29,7 +29,7 @@ BEM.decl('i-router', null, {
      * @param {String|RegExp} reqPath request path matcher
      * @param {String} blockName block name
      */
-    define: function (reqMethod, reqPath, blockName) {
+    define: function (reqMethod, reqPath, blockName, options) {
         if (Array.isArray(reqMethod) && !reqPath) {
             reqMethod.forEach(function (routeDefn) {
                 this.define.apply(this, routeDefn);
@@ -38,7 +38,12 @@ BEM.decl('i-router', null, {
             return;
         }
 
-        if (blockName) {
+        if (reqMethod instanceof RegExp) {
+            options = blockName;
+            blockName = reqPath;
+            reqPath = reqMethod;
+            reqMethod = false;
+        } else {
             reqMethod = reqMethod.toUpperCase();
             reqMethod.split(',').every(function (method) {
                 if (-1 === this.REQUEST_METHODS.indexOf(method)) {
@@ -46,16 +51,13 @@ BEM.decl('i-router', null, {
                 }
                 return true;
             }, this);
-        } else {
-            blockName = reqPath;
-            reqPath = reqMethod;
-            reqMethod = false;
         }
 
         this._routeList.push({
             reqMethod: reqMethod,
             reqPath: reqPath,
-            reqHandler: this._createHandler(blockName)
+            reqHandler: this._createHandler(blockName),
+            reqOptions: options
         });
     },
 
@@ -94,7 +96,7 @@ BEM.decl('i-router', null, {
         });
 
         return route ? {
-            handler: route.reqHandler,
+            route: route,
             matchers: matchers || []
         } : null;
     },

@@ -30,7 +30,7 @@
         _error: function (err) {
             var routeInfo = this._getRoute('500');
             if (routeInfo) {
-                this._execHandler(routeInfo.handler);
+                this._execHandler(routeInfo);
             } else {
                 BEM.blocks['i-response'].error(err);
             }
@@ -45,7 +45,7 @@
             var routeInfo = this._getRoute('404');
 
             if (routeInfo) {
-                this._execHandler(routeInfo.handler);
+                this._execHandler(routeInfo);
             } else {
                 BEM.blocks['i-response'].missing();
             }
@@ -65,7 +65,8 @@
             reqDomain.run(function () {
                 _this.set('matchers', (routeInfo) ? routeInfo.matchers : [])
                     .set('req', req)
-                    .set('res', res);
+                    .set('res', res)
+                    .set('options', routeInfo.route.reqOptions);
 
                 reqDomain.on('error', function (err) {
                     _this._error(err);
@@ -75,7 +76,7 @@
                 });
 
                 if (routeInfo) {
-                    _this._execHandler(routeInfo.handler);
+                    _this._execHandler(routeInfo);
                 } else {
                     _this.missing();
                 }
@@ -126,8 +127,8 @@
          *
          * @param {Function} reqHandler route handler
          */
-        _execHandler: function (reqHandler) {
-            reqHandler();
+        _execHandler: function (routeInfo) {
+            routeInfo.route.reqHandler();
         }
 
     });
