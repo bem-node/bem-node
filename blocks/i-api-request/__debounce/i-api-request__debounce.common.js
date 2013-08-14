@@ -83,7 +83,10 @@ BEM.decl('i-api-request', null, {
             (debounceParamsKeys = this._findDebounceParams(data)) &&
             debounceParamsKeys.length
         ) {
-
+             
+            //copy input argument, to avoid changes in
+            //original value
+            data = jQuery.extend(true, {}, data);
             debounceParams = debounceParamsKeys.reduce(function (obj, key) {
                 obj[key] = data.params[key];
                 return obj;
