@@ -7,9 +7,9 @@ Getting Started
 
 You should have NodeJS >= 0.8, Node Package Manager (npm) and bem tools installed
 
-To install bem tools run following
+To install enb tools run following
 
-    sudo npm install -g bem
+    sudo npm install -g enb
 
 Creation new project
 ---------------
@@ -133,13 +133,7 @@ You should run this command in the root of project
 
 after creating / removing of new blocks / files / dependencies
 
-    bem make
-
-or
-
-    bem make --force
-
-if something is going wrong
+    enb make
 
 Run
 ---------------
