@@ -18,7 +18,7 @@
         init: function () {
             var _this = this;
 
-            this._lastHandler = this._prepearRoute();
+            this._lastHandler = this._prepearRoute().reqHandler;
             if (history.pushState) {
                 jQuery(document).delegate('a', 'click', function (e) {
                     if (!e.metaKey && !e.ctrlKey && this.protocol === location.protocol && this.host === location.host) {
@@ -123,11 +123,11 @@
          * @param {String} path new path to route
          */
         _onPathChange: function (path) {
-            var handler = this._prepearRoute(path);
+            var routeInfo = this._prepearRoute(path);
 
             BEM.channel('i-router').trigger('update', {path: path});
-            if (handler) {
-                this._execHandler(handler);
+            if (routeInfo) {
+                this._execHandler(routeInfo);
             } else {
                 this.missing();
             }
@@ -147,10 +147,10 @@
                 routeInfo = this._getRoute(pathName);
 
             this.set('matchers', (routeInfo) ? routeInfo.matchers : [])
-                .set('path', routePath)
+                .set('path', routePath).set('options', routeInfo.route.reqOptions)
                 ._readParams(pathAndSearch[1] || '');
 
-            return routeInfo && routeInfo.handler;
+            return routeInfo;
         },
 
         /**
@@ -181,7 +181,8 @@
          *
          * @param {Object} handler route handler
          */
-        _execHandler: function (handler) {
+        _execHandler: function (routeInfo) {
+            var handler = routeInfo.route.reqHandler;
             if (handler !== this._lastHandler) {
                 if (this._lastHandler) {
                     this._lastHandler.leave();
