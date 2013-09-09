@@ -98,6 +98,11 @@ BEM.decl('i-api-request', null, {
         }
         return data;
     },
+
+    _createAjaxUrl: function (method) {
+        return '/ajax/' + this._name + '/' + method;
+    },
+
     /**
      *  Http request rest api
      *
@@ -110,17 +115,20 @@ BEM.decl('i-api-request', null, {
     _request: function (method, resource, data) {
         var promise = Vow.promise(),
             _this = this;
+
         data = this._prepareData(resource, data);
+
         if (method !== 'get') {
             this.dropCache();
         }
+
         this._activeXhrs = this._activeXhrs || [];
         BEM.channel('i-api-request').trigger('beforerequest');
         this._activeXhrs.push({
             promise: promise,
             xhr: jQuery.ajax({
                 type: data.body ? 'POST' : 'GET',
-                url: '/ajax/' + this._name + '/' + method,
+                url: this._createAjaxUrl(method),
                 data: data,
                 complete: function (xhr) {
                     var error;

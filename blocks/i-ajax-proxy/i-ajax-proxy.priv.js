@@ -64,6 +64,30 @@ BEM.decl('i-ajax-proxy', {}, {
         BEM.blocks['i-response'].missing();
         return Vow.fulfill('');
     },
+
+    _checkMethod: function (blockName, methodName) {
+        
+        return this._blockList.indexOf(blockName) !== -1 &&
+            BEM.blocks[blockName] &&
+            typeof BEM.blocks[blockName][methodName] === 'function';
+    },
+
+    _runMethod: function (blockName, methodName, data) {
+        //do not parse json and check secret key
+        data.requestSource = 'ajax';
+        data.params = this._parseJSONParam(data.params);
+        data.resource = BEM.blocks['i-router'].unescapeHTML(data.resource);
+
+        if (data.body) {
+            data.body = BEM.blocks['i-router'].unescapeHTML(data.body);
+        }
+
+        return BEM.blocks[blockName][methodName](
+            data.resource,
+            data
+        );
+    },
+
     /**
      * Response with json
      *
@@ -73,27 +97,11 @@ BEM.decl('i-ajax-proxy', {}, {
         var blockName = matchers[1],
             methodName = matchers[2],
             data = BEM.blocks['i-router'].get('params');
-        if (
-            this._blockList.indexOf(blockName) !== -1 &&
-            BEM.blocks[blockName] &&
-            typeof BEM.blocks[blockName][methodName] === 'function' &&
-            data &&
-            data.resource &&
-            (data.params = this._parseJSONParam(data.params))
-        ) {
-            if (data.resource) {
-                data.resource = BEM.blocks['i-router'].unescapeHTML(data.resource);
-            }
-            if (data.body) {
-                data.body = BEM.blocks['i-router'].unescapeHTML(data.body);
-            }
-            //do not parse json and check secret key
-            data.requestSource = 'ajax';
-            return BEM.blocks[blockName][methodName](
-                data.resource,
-                data
-            ).then(this._successResponse.bind(this))
-             .fail(this._failureResponse.bind(this));
+
+        if (this._checkMethod(blockName, methodName, data)) {
+            return this._runMethod(blockName, methodName, data)
+                .then(this._successResponse.bind(this))
+                .fail(this._failureResponse.bind(this));
         } else {
             return this._missingResponse();
         }
