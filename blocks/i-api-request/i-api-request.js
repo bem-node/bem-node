@@ -85,7 +85,14 @@ BEM.decl('i-api-request', null, {
             this._abortOneRequest(requests);
         }
     },
-
+    
+    /**
+     * Modifying request params before maing ajax request
+     *
+     * @param {String} resource
+     * @param {Object} data will be modefied after calling
+     * @return {Object} data
+     */
     _prepareData: function (resource, data) {
         data = data || {};
         data.resource = this._normalizeResource(resource);
@@ -98,9 +105,27 @@ BEM.decl('i-api-request', null, {
         }
         return data;
     },
-
+    
+    /**
+     * Creating pathname for ajax query
+     *
+     * @param {String} method
+     * @return {String}
+     */
     _createAjaxUrl: function (method) {
         return '/ajax/' + this._name + '/' + method;
+    },
+    
+    /**
+     * Checking if cache should be droped before request
+     *
+     * @param {String} method
+     * @param {String} [resource]
+     * @param {Object} [data]
+     * @return {Boolean}
+     */
+    _checkDropCache: function (method) {
+        return method !== 'get';
     },
 
     /**
@@ -118,7 +143,7 @@ BEM.decl('i-api-request', null, {
 
         data = this._prepareData(resource, data);
 
-        if (method !== 'get') {
+        if (this._checkDropCache(method, resource, data)) {
             this.dropCache();
         }
 
