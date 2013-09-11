@@ -14,7 +14,8 @@
         "url": "https://github.com/wtfil/bem-node.git"
     },
     "scripts": {
-        "postinstall": "./bin/install.sh"
+        "postinstall": "./bin/install.sh",
+        "test": "node test.js && enb make && find pages -name '*tests.js' | xargs mocha"
     },
     "dependencies": {
         "bem-json": "0.1.6",

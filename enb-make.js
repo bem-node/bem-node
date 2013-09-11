@@ -9,7 +9,7 @@ var build = require('enb/lib/build-flow'),
     ],
     bemhtml = true,
     pages = 'pages/*',
-    js, priv, server;
+    js, priv, server, tests;
 
 function getLevels(config) {
     return defaultLevels
@@ -56,6 +56,13 @@ server = build.create()
     .builder(makeRequires)
     .createTech();
 
+tests = build.create()
+    .name('tests.js')
+    .target('target', '?.tests.js')
+    .useFileList('tests.js')
+    .builder(makeRequires)
+    .createTech();
+
 function enbMake(config) {
 
     if (bemhtml) {
@@ -74,7 +81,8 @@ function enbMake(config) {
             require('enb/techs/css'),
             server,
             priv,
-            js
+            js,
+            tests
         ]);
 
 
@@ -82,7 +90,8 @@ function enbMake(config) {
             '?.server.js',
             '?.priv.js',
             '?.js',
-            '?.css'
+            '?.css',
+            '?.tests.js'
         ]);
 
         if (bemhtml) {

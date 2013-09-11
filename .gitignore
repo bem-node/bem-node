@@ -10,3 +10,7 @@ blocks/i-jquery/__is-empty-object/
 blocks/i-jquery/__observable/
 blocks/i-jquery/_dummy/
 blocks/i-promise/i-promise.js
+
+.bem/tmp
+pages/*
+!pages/.gitignore
