@@ -115,8 +115,10 @@
                 var state = _this.get();
                 BEM.blocks[blockName].init(state.matchers, state.req, state.res)
                     .fail(function (err) {
-                        console.log('Error while routing page ' + state.req.url);
-                        console.error(err);
+                        if (typeof err !== 'undefined') {
+                            console.log('Error while routing page ' + state.req.url);
+                            BEM.blocks['i-response'].error(err);
+                        }
                     }).done();
             };
         },
