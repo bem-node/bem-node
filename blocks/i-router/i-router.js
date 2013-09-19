@@ -13,13 +13,20 @@
     BEM.decl('i-router', null, {
 
         /**
+         * check if history state is supported
+         */
+        _historyStateSupported: function () {
+            return Boolean(history && history.pushState);
+        },
+
+        /**
          * Init i-router
          */
         init: function () {
             var _this = this;
 
             this._lastHandler = this._prepearRoute();
-            if (history.pushState) {
+            if (this._historyStateSupported()) {
                 jQuery(document).delegate('a', 'click', function (e) {
                     if (!e.metaKey && !e.ctrlKey && this.protocol === location.protocol && this.host === location.host) {
                         if (_this.setPath(this.pathname + this.search)) {
@@ -52,7 +59,7 @@
         replacePath: function (path, allowFallback) {
             return this._changePath.call(this, 'replace', path, allowFallback);
         },
-    
+
         /**
          * Falback for changing location if browser not support history.pushState or then error was occur while pach is changed
          *
@@ -66,7 +73,7 @@
             }
             return false;
         },
-        
+
         /**
          * Calls when error while routing was occur
          * May be useful for better describing errors
@@ -90,7 +97,7 @@
                 return true;
             }
 
-            if (!history || typeof history[method + 'State'] !== 'function') {
+            if (!this._historyStateSupported()) {
                 return this._fallback(allowFallback, path);
             }
 
