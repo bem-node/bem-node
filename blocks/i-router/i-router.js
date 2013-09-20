@@ -134,7 +134,9 @@
 
             BEM.channel('i-router').trigger('update', {path: path});
             if (handler) {
-                this._execHandler(handler);
+                this._execHandler(handler)
+                    .fail(this.missing)
+                    .done();
             } else {
                 this.missing();
             }
@@ -172,13 +174,13 @@
 
             return {
                 enter: function () {
-                    BEM.blocks[blockName].init(_this.get('matchers')).done();
+                    return BEM.blocks[blockName].init(_this.get('matchers'));
                 },
                 update: function () {
-                    BEM.blocks[blockName].update(_this.get('matchers')).done();
+                    return BEM.blocks[blockName].update(_this.get('matchers'));
                 },
                 leave: function () {
-                    BEM.blocks[blockName].destruct().done();
+                    return BEM.blocks[blockName].destruct();
                 }
             };
         },
@@ -190,13 +192,15 @@
          */
         _execHandler: function (handler) {
             if (handler !== this._lastHandler) {
-                if (this._lastHandler) {
-                    this._lastHandler.leave();
-                }
-                handler.enter();
+                var before = this._lastHandler ?
+                    Vow.promise(this._lastHandler.leave()) :
+                    Vow.fulfill();
+
                 this._lastHandler = handler;
+                return before.then(handler.enter);
+
             } else {
-                handler.update();
+                return handler.update();
             }
         }
 
