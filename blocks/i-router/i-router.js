@@ -113,14 +113,19 @@
         },
 
         /**
-         * Handles 404 page
-         *
-         * @todo-mdidkivskyi: display 404 page .. ?
+         * Reloading page
          */
-        missing: function () {
+        reload: function () {
             setTimeout(function () {
                 location.reload();
             });
+        },
+
+        /**
+         * Handles 404 page
+         */
+        missing: function () {
+            return this.reload();
         },
 
         /**
@@ -135,7 +140,7 @@
             BEM.channel('i-router').trigger('update', {path: path});
             if (handler) {
                 this._execHandler(handler)
-                    .fail(this.missing)
+                    .fail(this.reaload)
                     .done();
             } else {
                 this.missing();
