@@ -3,7 +3,7 @@
  *
  * @abstract
  */
-BEM.decl({block: 'i-page', baseBlock: 'i-content'}, null, {
+BEM.decl({block: 'i-page'}, null, {
 
     /**
      * Called when route on page was changed
@@ -52,6 +52,17 @@ BEM.decl({block: 'i-page', baseBlock: 'i-content'}, null, {
      * @abstract
      * @param {Mixed} json
      */
-    out: function () {}
+    out: function () {},
+
+    /**
+     * Process given bemjson to html
+     *
+     * @param {String|Object|Array} bemJson
+     * @param {Boolean} [isSync] if true, method will perform synchronous BEM.JSON.build and return a html string
+     * @return {Vow.promise|String}
+     */
+    html: function () {
+        return BEM.blocks['i-content'].html.apply(BEM.blocks['i-content'], arguments);
+    }
 
 });
