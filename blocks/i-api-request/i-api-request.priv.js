@@ -156,7 +156,7 @@
                         if (err) {
                             promise.reject(err);
                         } else {
-                            if (res.statusCode !== 200) {
+                            if (res.statusCode < 200 || res.statusCode > 299) {
                                 console.error([res.statusCode, method, requestUri].join(' '));
                                 promise.reject(new _this._HttpError(
                                     res.statusCode,
