@@ -1,7 +1,6 @@
 /**
  * Request json api from browser
  */
-
 BEM.decl('i-api-request', null, {
 
     /**
@@ -127,6 +126,20 @@ BEM.decl('i-api-request', null, {
     _checkDropCache: function (method) {
         return method !== 'get';
     },
+    
+    /**
+     * Calls when http status is not equal to 200
+     *
+     * @param {XMLHttpRequest} xhr of request
+     * @param {String} method Http method
+     * @param {String} resource
+     * @param {Object} data
+     *
+     * @returns {Vow.promise} if fulfilled then retry will be occur
+     */
+    _shouldRetry: function () {
+        return Vow.reject();
+    },
 
     /**
      *  Http request rest api
@@ -138,9 +151,6 @@ BEM.decl('i-api-request', null, {
      *  @return {Vow.Promise}
      */
     _request: function (method, resource, data) {
-        var promise = Vow.promise(),
-            _this = this;
-
         data = this._prepareData(resource, data);
 
         if (this._checkDropCache(method, resource, data)) {
@@ -148,6 +158,21 @@ BEM.decl('i-api-request', null, {
         }
 
         this._activeXhrs = this._activeXhrs || [];
+        return this._makeAjax(method, resource, data);
+    },
+    
+    /**
+     * Making ajax qeury with jQuery
+     *
+     *  @param {String} method Http method
+     *  @param {String} resource
+     *  @param {Object} data
+     *  @return {Vow.Promise}
+     */
+    _makeAjax: function retry(method, resource, data) {
+        var promise = Vow.promise(),
+            _this = this;
+
         BEM.channel('i-api-request').trigger('beforerequest');
         this._activeXhrs.push({
             promise: promise,
@@ -156,13 +181,28 @@ BEM.decl('i-api-request', null, {
                 url: this._createAjaxUrl(method),
                 data: data,
                 complete: function (xhr) {
-                    var error;
                     if (xhr.status === 200) {
                         _this._parse(promise, xhr.responseText);
                     } else {
-                        error = new _this._HttpError(xhr.status, xhr.statusText, xhr.responseText);
-                        BEM.channel('i-api-request').trigger('error', error);
-                        promise.reject(error);
+                        _this._shouldRetry(xhr, method, resource, data)
+                            .then(function () {
+                                retry.call(_this, method, resource, data)
+                                    .then(
+                                        promise.fulfill.bind(promise),
+                                        promise.reject.bind(promise)
+                                    )
+                                    .done();
+
+                            })
+                            .fail(function (e) {
+                                var error = e || new this._HttpError(
+                                    xhr.status,
+                                    xhr.statusText,
+                                    xhr.responseTex
+                                );
+                                BEM.channel('i-api-request').trigger('error', error);
+                                promise.reject(error);
+                            });
                     }
                     _this._activeXhrs = _this._activeXhrs.filter(function (xhrItem) {
                         return xhr !== xhrItem.xhr;
