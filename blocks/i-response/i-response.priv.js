@@ -7,6 +7,20 @@ BEM.decl('i-response', null, {
     STATUS_CODES: require('http').STATUS_CODES,
 
     /**
+     * Default response headers
+     * @param {Number} status
+     * @param {String|Buffer} body
+     * @param {String} contentType
+     */
+    _getResponseHeaders: function (status, body, contentType) {
+        return {
+            'Content-Type': contentType + '; charset=utf-8',
+            'X-Content-Type-Options': 'nosniff',
+            'X-Frame-Options': 'DENY'
+        };
+    },
+
+    /**
      * Send arbitary response
      *
      * @param {Number} status
@@ -21,11 +35,7 @@ BEM.decl('i-response', null, {
         } else {
             contentType = contentType || 'text/plain';
             try {
-                res.writeHead(status, {
-                    'Content-Type': contentType + '; charset=utf-8',
-                    'X-Content-Type-Options': 'nosniff',
-                    'X-Frame-Options': 'DENY'
-                });
+                res.writeHead(status, this._getResponseHeaders.apply(this, arguments));
                 res.end(body);
             } catch (err) {
                 console.error(err);
