@@ -1,0 +1,12 @@
+{
+    "evil": true,
+    "boss": true,
+    "eqnull": true,
+    "strict": false,
+    // Custom globals.
+    "predef" : [
+        "Vow",
+        "BH",
+        "BEM"
+    ]
+}

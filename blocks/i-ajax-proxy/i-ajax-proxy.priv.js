@@ -2,7 +2,7 @@
  * Proxy ajax calls on i-blocks
  */
 
-BEM.blocks['i-router'].define('GET,POST', /^\/ajax\/(i[\w\-]+)\/([^_][\w]+)/, 'i-ajax-proxy');
+BEM.blocks['i-router'].define('GET,POST', /^\/ajax\/([\w\-]+)\/([^_][\w]+)/, 'i-ajax-proxy');
 
 BEM.decl('i-ajax-proxy', {}, {
 
@@ -14,11 +14,7 @@ BEM.decl('i-ajax-proxy', {}, {
      * @param {String} blockName
      */
     allowBlock: function (blockName) {
-        if (blockName.match(/^i/)) {
-            this._blockList.push(blockName);
-        } else  {
-            throw new Error('Only i-blocks allowed to proxy');
-        }
+        this._blockList.push(blockName);
     },
 
     _parseJSONParam: function (str) {
@@ -66,7 +62,7 @@ BEM.decl('i-ajax-proxy', {}, {
     },
 
     _checkMethod: function (blockName, methodName) {
-        
+
         return this._blockList.indexOf(blockName) !== -1 &&
             BEM.blocks[blockName] &&
             typeof BEM.blocks[blockName][methodName] === 'function';
