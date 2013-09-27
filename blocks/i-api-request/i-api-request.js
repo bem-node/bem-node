@@ -195,14 +195,15 @@ BEM.decl('i-api-request', null, {
 
                             })
                             .fail(function (e) {
-                                var error = e || new this._HttpError(
+                                var error = e || new _this._HttpError(
                                     xhr.status,
                                     xhr.statusText,
                                     xhr.responseTex
                                 );
                                 BEM.channel('i-api-request').trigger('error', error);
                                 promise.reject(error);
-                            });
+                            })
+                            .done();
                     }
                     _this._activeXhrs = _this._activeXhrs.filter(function (xhrItem) {
                         return xhr !== xhrItem.xhr;
