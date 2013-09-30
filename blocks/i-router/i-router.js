@@ -140,7 +140,7 @@
             BEM.channel('i-router').trigger('update', {path: path});
             if (handler) {
                 this._execHandler(handler)
-                    .fail(this.reaload)
+                    .fail(this.reload)
                     .done();
             } else {
                 this.missing();
