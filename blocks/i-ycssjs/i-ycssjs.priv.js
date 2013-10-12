@@ -12,10 +12,14 @@
             'gif': 'image/gif',
             'jpg': 'image/jpg',
             'svg': 'image/svg+xml',
+            'ico': 'image/x-icon',
             'ttf': 'application/x-font-ttf',
             'otf': 'application/x-font-opentype',
             'woff': 'application/x-font-woff',
-            'eot': 'application/vnd.ms-fontobject'
+            'eot': 'application/vnd.ms-fontobject',
+            'txt': 'text/plain',
+            'html': 'text/html',
+            'json': 'application/json'
         },
         route = new RegExp('^.*\\.(' + Object.keys(CONTENT_TYPES).join('|') + ')$');
 
