@@ -108,32 +108,20 @@ BEM.decl('i-page', null, {
     setMeta: function (name, content) {
         var params = this._getPageParams(),
             head = params && params.head || [],
-            meta, tag;
+            meta;
 
         head.some(function (item) {
-            if (item.elem === 'meta') {
+            if (item.elem === 'meta' && item.attrs.name === name) {
                 meta = item;
                 return true;
             }
         });
 
-        if (!meta) {
-            meta = [];
-            head.push(meta);
+        if (meta) {
+            meta.attrs.content = content;
         } else {
-            meta.some(function (t) {
-                if (t.attrs.name === name) {
-                    tag = t;
-                    return true;
-                }
-            });
-        }
-
-        if (tag) {
-            tag.attrs.content = content;
-        } else {
-            meta.push({
-                tag: 'meta',
+            head.push({
+                elem: 'meta',
                 attrs: {
                     name: name,
                     content: content
