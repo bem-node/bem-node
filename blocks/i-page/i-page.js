@@ -46,6 +46,18 @@ BEM.decl('i-page', null, {
     },
 
     /**
+     * Set html description meta tag for page
+     *
+     * @override
+     * @param {String} text description content
+     * @return {i-content}
+     */
+    setDescription: function (text) {
+        jQuery('meta[name=description]').attr('content', text);
+        return this;
+    },
+
+    /**
      * What node will be updated after page is changed
      * @return {jQuery} node
      */
