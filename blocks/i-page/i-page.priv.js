@@ -107,15 +107,27 @@ BEM.decl('i-page', null, {
      */
     setMeta: function (name, content) {
         var params = this._getPageParams(),
-            meta = params && params.meta || [],
-            tag;
+            head = params && params.head || [],
+            meta, tag;
 
-        meta.some(function (t) {
-            if (t.attrs.name === name) {
-                tag = t;
+        head.some(function (item) {
+            if (item.elem === 'meta') {
+                meta = item;
                 return true;
             }
         });
+
+        if (!meta) {
+            meta = [];
+            head.push(meta);
+        } else {
+            meta.some(function (t) {
+                if (t.attrs.name === name) {
+                    tag = t;
+                    return true;
+                }
+            });
+        }
 
         if (tag) {
             tag.attrs.content = content;
@@ -127,7 +139,7 @@ BEM.decl('i-page', null, {
                     content: content
                 }
             });
-            this._setPageParams('meta', meta);
+            this._setPageParams('head', head);
         }
 
         return this;
