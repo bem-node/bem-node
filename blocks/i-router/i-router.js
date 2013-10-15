@@ -207,7 +207,16 @@
             } else {
                 return handler.update();
             }
+        },
+
+        /**
+         * Get current host name.
+         * @returns {String}
+         */
+        getHost: function () {
+            return location.host;
         }
+        
 
     });
 
