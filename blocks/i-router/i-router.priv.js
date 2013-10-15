@@ -130,6 +130,16 @@
          */
         _execHandler: function (reqHandler) {
             reqHandler();
+        },
+        
+        /**
+         * Get host name for current request.
+         * Hostname is taken from HOST header
+         * @returns {String|undefined} reuturn hostname or undefined,
+         * if HOST header is missing
+         */
+        getHost: function () {
+            return this.get('req').headers.host;
         }
 
     });
