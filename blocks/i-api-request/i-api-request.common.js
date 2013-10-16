@@ -131,7 +131,7 @@ BEM.decl('i-api-request', null, {
      * @returns {Vow.promise}
      */
     get: function (resource, options) {
-        var cacheKey = this._getCacheKey(resource, options),
+        var cacheKey = options && options.cacheKey || this._getCacheKey(resource, options),
             promise = this._getCache(cacheKey);
 
         if (!promise) {

@@ -29,11 +29,13 @@ BEM.decl('i-api-request', null, {
             return this._get(resource, options);
         }
 
+        options = options || {};
+        options.cacheKey = this._getCacheKey(resource, options);
         promise = this.__base.apply(this, arguments);
 
         // If promise was failed, we can reset cache (only on client-side)
         promise.fail(function () {
-            delete _this._getCacheStorage()[this._getCacheKey(resource, options)];
+            delete _this._getCacheStorage()[options.cacheKey];
         });
 
         return promise;
