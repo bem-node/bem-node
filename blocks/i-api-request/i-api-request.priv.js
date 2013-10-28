@@ -21,7 +21,7 @@
         /**
          * Default api timeout time in ms
          */
-        _timeout: 5000,
+        TIMEOUT: 5000,
         
         /**
          * Define request headers
@@ -35,40 +35,51 @@
                 'Connection': 'keep-alve'
             };
         },
+        
+        /**
+         * @see http://nodejs.org/api/dns.html#dns_dns_resolve_domain_rrtype_callback
+         */
+        _resolveMethods: ['resolve4', 'resolve6'],
+
+        /**
+         * Resolve ip address
+         * @param {String} host
+         * @return {Vow.promise}
+         */
+        _dnsResolve: function (host) {
+            return Vow.any(this._resolveMethods.map(function (method) {
+                var promise = Vow.promise();
+                dns[method](host, BEM.blocks['i-state'].bind(function (err, ipArr) {
+                    if (err) {
+                        return promise.reject(err);
+                    }
+                    promise.fulfill(ipArr[0]);
+                }));
+                return promise;
+            }));
+        },
 
         /**
          * Resolve ip and set defaults for requests
          */
         _resolveApiParams: function (parse) {
-            var promise = Vow.promise(),
-                _this = this,
+            var _this = this,
                 host = parse.hostname;
 
             if (apiResolveCache[host]) {
-                promise.fulfill(apiResolveCache[host]);
-            } else {
-                dns.resolve(host, BEM.blocks['i-state'].bind(function (err, ipArr) {
-                    var apiParams;
-                    if (err) {
-                        promise.reject(err);
-                    } else {
-                        apiParams = {
-                            headers: _this._getRequestHeaders(host),
-                            host: host,
-                            timeout: _this._timeout,
-                            uri: url.format({
-                                protocol: parse.protocol,
-                                hostname: ipArr[0],
-                                port: parse.port || 80,
-                                pathname: parse.path
-                            })
-                        };
-                        apiResolveCache[host] = apiParams;
-                        promise.fulfill(apiParams);
-                    }
-                }));
+                return Vow.fulfill(apiResolveCache[host]);
             }
-            return promise;
+
+            return this._dnsResolve(host).then(function (ip) {
+                var apiParams = {
+                    headers: _this._getRequestHeaders(host),
+                    ip: ip,
+                    protocol: parse.protocol,
+                    port: parse.port || 80
+                };
+                apiResolveCache[host] = apiParams;
+                return apiParams;
+            });
         },
 
         /**
@@ -118,9 +129,18 @@
             }
         },
 
-        _getUri: function (uri, query) {
-            var stringQuery = query && querystring.stringify(query);
-            return uri + (stringQuery ? ((uri.indexOf('?') !== -1 ? '&' : '?') + stringQuery) : '');
+        _getUri: function (resource, query, apiParams) {
+            var stringQuery = query && querystring.stringify(query),
+                path = apiParams ?
+                url.format({
+                    protocol: apiParams.protocol,
+                    hostname: apiParams.ip,
+                    port: apiParams.port,
+                    pathname: resource.replace(/https?\:\/\/[^\/]+/, '')
+                }) :
+                resource;
+
+            return path + (stringQuery ? ((path.indexOf('?') !== -1 ? '&' : '?') + stringQuery) : '');
         },
 
         /**
@@ -130,19 +150,20 @@
             var promise = Vow.promise(),
                 _this = this,
                 query = data && data.params,
-                requestUri = this._getUri(resource, query),
+                requestUri = this._getUri(resource, query, apiParams),
                 requestOptions = {
                     uri: requestUri,
                     method: method,
                     encoding: null,
                     forever: true,
                     headers: apiParams.headers,
-                    timeout: apiParams.timeout
+                    timeout: this.TIMEOUT
                 };
 
             if (data && data.body) {
                 requestOptions.body = this._normalizeBody(data.body);
             }
+
             request(requestOptions, function (err, res, encodedBody) {
                 if (err) {
                     if (err.code === 'ETIMEDOUT') {
