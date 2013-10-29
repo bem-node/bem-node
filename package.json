@@ -15,7 +15,7 @@
     },
     "scripts": {
         "postinstall": "./bin/install.sh",
-        "test": "node test.js && enb make && find pages -name '*tests.js' | xargs mocha"
+        "test": "node test.js && YENV=production enb make && find pages -name '*tests.js' | xargs mocha && cp pages/bem-node/_bem-node.js bem-node.min.js"
     },
     "dependencies": {
         "bh": "0.1.19",

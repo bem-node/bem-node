@@ -71,35 +71,75 @@ function enbMake(config) {
             .useSourceFilename('templates', '?.bemhtml.js')
             .createTech();
     }
+    config.mode('development', function () {
+        config.nodes(pages, function (nodeConfig) {
+            nodeConfig.addTechs([
+                [ require('enb/techs/levels'), { levels: getLevels(config) } ],
+                [ require('enb/techs/file-provider'), { target: '?.bemdecl.js' } ],
+                require('enb/techs/deps-old'),
+                require('enb/techs/files'),
+                require('enb/techs/css-includes'),
+                server,
+                priv,
+                js,
+                tests
+            ]);
 
-    config.nodes(pages, function (nodeConfig) {
-        nodeConfig.addTechs([
-            [ require('enb/techs/levels'), { levels: getLevels(config) } ],
-            [ require('enb/techs/file-provider'), { target: '?.bemdecl.js' } ],
-            require('enb/techs/deps-old'),
-            require('enb/techs/files'),
-            require('enb/techs/css-includes'),
-            server,
-            priv,
-            js,
-            tests
-        ]);
 
+            nodeConfig.addTargets([
+                '?.server.js',
+                '?.priv.js',
+                '?.js',
+                '?.css',
+                '?.tests.js'
+            ]);
 
-        nodeConfig.addTargets([
-            '?.server.js',
-            '?.priv.js',
-            '?.js',
-            '?.css',
-            '?.tests.js'
-        ]);
+            if (bemhtml) {
+                nodeConfig.addTechs([require('enb-bemhtml/techs/bemhtml')]);
+                nodeConfig.addTarget('?.bemhtml.js');
+            }
 
-        if (bemhtml) {
-            nodeConfig.addTechs([require('enb-bemhtml/techs/bemhtml')]);
-            nodeConfig.addTarget('?.bemhtml.js');
-        }
-
+        });
     });
+
+    config.mode('production', function () {
+        js = js
+            .buildFlow()
+            .justJoinFilesWithComments()
+            .createTech();
+
+        config.nodes(pages, function (nodeConfig) {
+            nodeConfig.addTechs([
+                [ require('enb/techs/levels'), { levels: getLevels(config) } ],
+                [ require('enb/techs/file-provider'), { target: '?.bemdecl.js' } ],
+                [ require('enb/techs/borschik'), { sourceTarget: '?.js', destTarget: '_?.js', minify: true } ],
+                [ require('enb/techs/borschik'), { sourceTarget: '?.css', destTarget: '_?.css', minify: true } ],
+                require('enb/techs/deps-old'),
+                require('enb/techs/files'),
+                require('enb/techs/css-includes'),
+                server,
+                priv,
+                js,
+                tests
+            ]);
+
+
+            nodeConfig.addTargets([
+                '?.server.js',
+                '?.priv.js',
+                '_?.js',
+                '_?.css',
+                '?.tests.js'
+            ]);
+
+            if (bemhtml) {
+                nodeConfig.addTechs([require('enb-bemhtml/techs/bemhtml')]);
+                nodeConfig.addTarget('?.bemhtml.js');
+            }
+
+        });
+    });
+
 }
 
 /**

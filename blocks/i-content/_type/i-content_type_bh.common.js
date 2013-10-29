@@ -4,8 +4,6 @@
  */
 BEM.decl('i-content', null, {
 
-
-
     _htmlAsync: function (json) {
         var __base = this.__base.bind(this);
         return BEM.blocks['i-bh'].bh().processBemJsonAsync(json).then(function () {
