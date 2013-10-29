@@ -140,6 +140,14 @@
          */
         getHost: function () {
             return this.get('req').headers.host;
+        },
+
+        /**
+         * Get current uri
+         * @returns {String}
+         */
+        getUri: function () {
+            return this.get('uri');
         }
 
     });

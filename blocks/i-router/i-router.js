@@ -32,6 +32,9 @@
                         if (_this.setPath(this.pathname + this.search)) {
                             e.preventDefault();
                         }
+                        if (this.hash) {
+                            location.href = this.hash;
+                        }
                     }
                 });
 
@@ -210,11 +213,12 @@
         },
 
         /**
-         * Get current host name.
+         *
+         * Get current uri
          * @returns {String}
          */
-        getHost: function () {
-            return location.host;
+        getUri: function () {
+            return location.href;
         }
         
 
