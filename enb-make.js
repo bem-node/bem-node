@@ -72,7 +72,7 @@ function enbMake(config) {
             .createTech();
     }
 
-    config.nodes('pages/*', function(nodeConfig) {
+    config.nodes(pages, function (nodeConfig) {
         nodeConfig.addTechs([
             [ require('enb/techs/levels'), { levels: getLevels(config) } ],
             [ require('enb/techs/file-provider'), { target: '?.bemdecl.js' } ],
@@ -100,7 +100,7 @@ function enbMake(config) {
         }
 
     });
-};
+}
 
 /**
  * Setting project levels
@@ -118,7 +118,7 @@ enbMake.levels = function (levels, noConcat) {
     }
     projectLevels = levels;
     return this;
-}
+};
 
 /**
  * Setting project pages
@@ -132,7 +132,7 @@ enbMake.levels = function (levels, noConcat) {
 enbMake.pages = function (inPages) {
     pages = inPages;
     return this;
-}
+};
 
 
 /**

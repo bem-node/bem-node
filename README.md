@@ -1,152 +1,626 @@
-Tiny framefork for single-page applications with NodeJS and BEM
+## bem-node
 
-[API](https://github.com/wtfil/bem-node/wiki/API)
+Single-page web application with [node.js](http://nodejs.org/api/), [BEM](http://bem.info/)
 
-Getting Started
----------------
+### Install
 
-You should have NodeJS >= 0.8, Node Package Manager (npm) and bem tools installed
-
-To install enb tools run following
-
-    sudo npm install -g enb
-
-Creation new project
----------------
-
-next steps will be replaced with one command soon (something like ```bem-node create <app_name>```)
-
-checkout test project
-
-    git clone https://github.com/wtfil/bem-node-test.git app_name
-
-this is test project and you should remove all other blocks
-
-    cd app_name
-    rm -rf blocks/*
-    
-finaly you should install bem-node (bem-node already in dependencies)
-
-    npm install
+Use bem-node with our [project-stub](https://github.com/delfrrr/bem-node-hello-world/)
 
 
-Creating new page
----------------
+### How it works
 
-create new block in the root of project
+The main principle of bem-node is presenting page layout as bemjson ([russian ref](https://github.com/bem/bemhtml/blob/master/common.docs/reference/reference.ru.md#%D0%A1%D0%B8%D0%BD%D1%82%D0%B0%D0%BA%D1%81%D0%B8%D1%81-bemjson)) object. Block templates apply on bemjson tree to produce complete layout with data. Then bemjson is serialising to html.
 
-    bem create block -l blocks -t common.js -t deps.js i-page-test
+![](http://farm6.staticflickr.com/5537/10481480915_dd2ca51aaa.jpg)
 
-note: ```i-page-test``` is page name
+### Demo
 
-    open blocks/i-page-test/i-page-test.common.js
+https://github.com/delfrrr/bem-node-hello-world/commits/demo
 
-add following lines
+
+### File extensions
+
+####js
+
+Browser code
+
+####common.js
+
+Common (client/server) code
+
+####priv.js
+
+Private (server) code
+
+####server.js
+
+Builded node.js application (server)
+
+
+####bemdecl.js
+
+Application declaration
+
+```js
+// application declaration example
+exports.blocks = [
+
+    // bem-node part
+    {block: 'i-console'}, //colorful console log
+    {block: 'i-ycssjs'}, //output static files
+    {block: 'i-bem-node'}, //bem-node api
+
+    // pages
+    {block: 'hello-world'}
+];
 ```
-/**
- * Define /\d+ url for matching
- */
-BEM.blocks['i-router'].define(/^\/(\d+)?\/?$/, 'i-page-test');
 
-BEM.decl({block: 'i-page-test', baseBlock: 'i-page'}, null, {
+####deps.js
 
-    init: function (matchers) {
-        return this.out(/* your bemjson or string here */);
-    }
+Block dependencies
 
-});
-```
-```BEM.blocks['i-router'].define``` function  allows to subscribe url changing
-
-the ```.out```  argument is what you will see as the result.
-
-It can be bemjson or string
-
-```
-init: function (matchers) {
-    return this.out({
-        block: 'b-test-block',
-        someParam: matches[1]
-    });
-}
-```
-note: in this case dont forget add ```b-test-block``` to dependencies
-
-
-every page is module with thee mandatory methods
-
-```init``` will calls after url matches first time
-
-```update``` will be called if same url is matching with new matchers (on client-side)
-
-```destruct``` will be called for previous page before update of new page is called.
-
-```update``` and ```destruct``` methods should be defined in ```js``` (not ```common.js```) file
-
-all this methods are return promises and implemented in base block
-
-note: every page is inherit base page. The name is ```i-page```. Dont forget to add it to dependencies
-
-    open blocks/i-page-test/i-page-test.deps.js
-
-and add dependencies
-```
+```js
+//block dependencies example
 ({
-    mustDeps: [
-        {block: 'i-page'}
+    shouldDeps: [
+        {block: 'depended-block'}
+    ],
+    mustdDeps: [
+        {block: 'must-dependeded-block'} //should be included before target block
     ]
 })
 ```
 
-add this page to bemdecl
+### BN
 
-    open pages/index/index.bemdecl.js
+Block constructor. It creates i-bem ([russian guide](http://ru.bem.info/libs/bem-core/i-bem-js/), [english guide](http://bem.info/articles/bem-js-main-terms/)) blocks with static and dom declarations, and bh [(russian ref)](https://github.com/enb-make/bh) templates.
 
-You can see few rows in ```bem-node``` part. Dont remove its:) ``user part``` is your own. Crean it and add
+#### BN(blockName)
+ * blockName {String}
+ * return {Object} bem block
+
+Returns link on BEM block static methods and properties.
+
+#### BN.addDecl(blockName , [type], [options])
+ * blockName {String}
+ * return {BN.Generator} bem block generator
+
+Creates block generator.
+
+#### BN.Generator.baseBlock(blockName)
+ * returns {BN.Generator}
+
+Inherits block declaration from base block.
+
+#### BN.Generator.staticProp(decl)
+ * decl {Object} static methods and properties
+ * return {BN.Generator}
+
+Adds static methods and properties ([i-bem](http://ru.bem.info/libs/bem-core/i-bem-js/)).
+
+```js
+BN.addDecl('example').staticProp({
+    someProp: 'a',
+    someMethod: function(){
+        return this.someProp + 'b';
+    }
+}).done();
+
+BN('example').someMethod(); //returns 'ab'
+
+BN.addDecl('example').staticProp({
+    someMethod: function(){
+        return this.__base() + 'c';
+    }
+}).done();
+
+BN('example').someMethod(); //returns 'abc'
+
 ```
-{block: 'i-page-test'}
+
+`this` – inherits [i-bem](http://ru.bem.info/libs/bem-core/i-bem-js/)
+
+`this.__instances` – array of block dom instances (only for client side code)
+
+`this.__lastInstance` – last created block instances (only for client side code)
+
+#### BN.Generator.instanceProp(decl)
+ * decl {Object} dom instances methods and properties
+ * return {BN.Generator}
+
+Adds methods and properties for block dom instance ([i-bem.dom](http://ru.bem.info/libs/bem-core/i-bem-js/))
+
+#### BN.Generator.onSetMod(decl)
+ * decl {Object} define block dom instances behaviour on modification change (see [i-bem.dom]())
+ * return {BN.Generator}
+
+Adds methods and properties for block dom instance ([i-bem.dom](http://bem.info/articles/bem-js-main-terms/))
+
+#### BN.Generator.blockTemplate(decl)
+ * decl {Object|Function} define block bh template
+ * return {BN.Generator}
+
+#### BN.Generator.elemTemplate(decl)
+ * decl {Object} define block element bh template
+ * return {BN.Generator}
+
+Creates bh templates (see [bh](https://github.com/enb-make/bh)) for block, elements and it's modifications.
+
+```js
+/**
+ * Example of block with element
+ */
+BN.addDecl('example').blockTemplate(function (ctx) {
+    //block template
+    ctx.content([
+        {elem: 'item', url: 'item-1', text: 'item 1'},
+        {elem: 'item', url: 'item-1', text: 'item 2'}
+    ]);
+}).elemTemplate({
+    'item': function (ctx) {
+        //element template
+        var json = ctx.json();
+        ctx.content({
+            block: 'b-link',
+            url: json.url,
+            content: json.text
+        });
+    }
+});
 ```
 
-API
----------------
-subscribe ```i-page-name``` to handle /qwe url
+`ctx` is instances of [bh.Ctx]()
 
-url can be regular expression
+#### BN.Generator.elemTemplate(decl)
+ * decl {Function} define block data template
+ * return {BN.Generator}
+
+`decl` can return promise (see [Vow.promise]()). If promise is fulfilled, other block templates will be applied. If promise is rejected, block will be removed.
+
+```js
+BN.addDecl('example').dataTemplate(function(ctx){
+    return BN('some-ajax-block').get().then(function(data){
+        ctx.param('data', data) //set data to block property
+        return Vow.fulfill();
+    }).blockTemplate(function(ctx){
+        ctx.content(ctx.json().data.text); //ouput data
+    });
+})
 ```
-BEM.blocks['i-router'].define('GET|POST', '/qwe', 'i-page-name')
-``` 
+`ctx` is instance of [bh.Ctx](https://github.com/enb-make/bh#%D0%9A%D0%BB%D0%B0%D1%81%D1%81-ctx)
 
-set path to '/foo' (redirect on server)
+#### BN.Generator.done()
+
+Creates i-bem block from generator and adds bh matchers. All blocks will be created automatically on next event loop. Use this methods only to force block creation.
+
+
+### Page blocks
+
+Page block are controllers for pages.
+
+```js
+/**
+ * Hello world page
+ */
+BN.addDecl('hello-world', 'page', {
+    route: /^\/$/
+}).staticProp({
+    init: function () {
+        return this.out('hello world');
+    }
+});
 ```
-BEM.blocks['i-router'].setPath('/foo')
-``` 
 
-geting resource from api (retuns promise)
-``` 
-BEM.blocks['i-api-request'].get('http://nodejs.org/api/index.json')
-BEM.blocks['i-api-request'].get('index.json') // if .apiHost sets to "http://nodejs.org/api" on your level
+All pages are extended from `i-page` block.
+
+```js
+BN.addDecl('usual-page', 'page', {
+    route: /^\/$/ //page route
+}).staticProp({
+    init: function (matchers) {
+        //...
+        return this.out(/*bemjson*/);
+    },
+    update: function(matchers) {
+       //...
+       return Vow.fulfill();
+    },
+    destruct: function() {
+       //...
+       return Vow.fulfill();
+    }
+});
+```
+`route` is {RegExp} or {String} which can be matched to request url.
+
+`init` is called when page route match to request url. Init should return fulfilled promise. Otherwise page returns error.
+
+`update` is called when page should be updated on client (new url matched with the same route). By default `update` calls `init`
+
+`destruct` is called on client side before current page is going to be replaced with other page.
+
+Page blocks are extended from [i-page](#bni-page) block.
+
+### Ajax blocks
+
+Ajax blocks are kind of models (or data blocks). They can provide data to view blocks with common interface between client and server.
+
+On server: get → _request (server implementation) → REST API
+
+On client: get → _request (client implementation) → ajax request → _request (server implementation) → REST API
+
+```js
+// example-ajax-block.common.js
+BN.addDecl('example-ajax-block', 'ajax', {
+    apiHost: 'http://api.example.com/v1/' //json api provider
+});
 ```
 
-Building
----------------
-You should run this command in the root of project
+```js
+//get data from http://api.example.com/v1/some/resource?count=10
+BN('example-ajax-block').get('some/resource', {
+    params: {
+        count: 10
+    }
+}).then(function(result){
+    console.log(result);
+});
+```
+Ajax blocks are inheriting from ['i-api-request'](#bni-api-request) block. You can extend block methods to provide additional input params and output data processing:
 
-after creating / removing of new blocks / files / dependencies
+```js
+/**
+ * Fetching data from node.js doc api
+ */
+BN.addDecl('node-doc-api', 'ajax', {
+    apiHost: 'http://nodejs.org/api/'
+}).staticProp({
+    /**
+     * Add .json to resources
+     * @overide
+     */
+    get: function (resource) {
+        resource = resource + '.json';
+        return this.__base(resource);
+    }
+});
+```
 
-    enb make
+By default ajax blocks have only `GET` method. To provide `POST `PUT` and `DELETE` you should declare them:
 
-Run
----------------
+```js
+// ajax block supporting post
+BN.addDecl('example-ajax-block', 'page', {
+    apiHost: 'http://api.example.com/v1/' //json api provider
+}).staticProp({
+    post: function (resource, options) {
+        return this._request('post', resource, options)
+    }
+});
+```
 
-after buiding run
+You are able to extend ajax block to fetch data from any source (like database).
 
-    node pages/index/index.server.js --socket 3000
+### Existing blocks
 
-open http://127.0.0.1:3000
+Bem-node includes some visual blocks from [bem-bl library](http://bem.github.io/bem-bl/index.en.html)
 
-Example
----------------
-Checkout this test project https://github.com/wtfil/bem-node-test
+### Overriding existing blocks
+
+Power of BEM is ability to override almost any method, template or style of block:
+
+```js
+//change content of b-page by adding block b-head
+BN.addDecl('b-page').blockTemplate(function (ctx) {
+    ctx.content([
+        {block: 'b-head'},
+        ctx.content()
+    ], true);
+});
+```
+
+### BN('i-page')
+
+This is a base block for page blocks. But some of the static methods can be called from other blocks ([issue](https://github.com/wtfil/bem-node/issues/70)).
+
+#### BN('i-page').setTitle(title)
+ * title {String}
+ * return {Object} this
+
+Setting page `<title/>` on client and on server
+
+#### BN('i-page').setDescription(text)
+ * text {String}
+ * return {Object} this
+
+Setting page description meta tag on client and on server
+
+#### BN('i-page').setMeta(name, content)
+ * name {String} name attribute of `<meta/>`
+ * content {String} content attribute of `<meta/>`
+ * return {Object} this
+
+Setting page `<meta/>` tags
+
+#### BN('i-page').addToHead(bemjson)
+ * bemjson {Object|String}
+ * return {Object} this
+
+Adds to page `<head/>` any content
+
+#### .init(matchers)
+ * matchers {Array} result of appling route regexp on url
+ * return {Vow.promise}
+
+This method is called when page route match to url. Redefine this method to output your page layout. See example in [page blocks](#page-blocks) and [i-page.out method](#bni-pageoutbemjson). By default page outputs empty string.
+
+#### .update(matchers)
+ * matchers {Array} result of appling route regexp on url
+ * return {Vow.promise}
+
+This method is called when page should be updated on client (new url matched with the same route). By default it calls `this.init(). You can setup selective block updates by redefining this method.
+
+```js
+/**
+ * Node docs page
+ */
+BN.addDecl('node-doc', 'page', {
+    route: /^\/node-doc\/?(.+)?$/
+}).staticProp({
+    //calls on page render
+    init: function (matches) {
+        var section = this._getSectionName(matches);
+        this.setTitle(section + ' – node.js api'); //set page title
+        //output page layout
+        return this.out({
+            block: 'node-doc',
+            content: [
+                {elem: 'toc', content: {block: 'node-doc-toc'}},
+                {elem: 'section', content: {block: 'node-doc-section', section: section}}
+            ]
+        });
+    },
+
+    _getSectionName: function (matches) {
+        return matches[1] || 'documentation'; //set section from url
+    },
+
+    //update page on client
+    update: function (matches) {
+        var section = this._getSectionName(matches);
+        return BN('node-doc-section').updateSection(section);
+    }
+});
+```
+
+#### .destruct()
+ * return {Vow.promise}
+
+Is called when user leaves page on client and page should be destructed. Extend this method for custom calls on destruct.
+
+
+#### .out(bemjson)
+ * bemjson {Object|String} page content
+ * return {Vow.promise}
+
+On server:
+
+* wrap bemjson with static layout (header, footer, etc); you can override static layout by redefining `getPageJson()`; page content should be placed in `i-content` block;
+* process bemjson
+* serialise bemjson to html
+* send http response `200 OK` with resulting html
+
+On client:
+
+* process bemjson
+* serialise bemjson to html
+* update `i-content` block content with resulting html
+* init blocks inside `i-content`
+
+Use it to output page layout from [page blocks](#page-blocks). Do not call `BN('i-page').out(bemjson)`, use only `this.out(bemjson)`
+
+
+```js
+/**
+ * Node docs page
+ */
+BN.addDecl('node-doc', 'page', {
+    route: /^\/node-doc\/?(.+)?$/
+}).staticProp({
+    init: function () {
+        return this.out({ //this works on client and server
+            block: 'node-doc',
+            content: [
+                {elem: 'toc', content: {block: 'node-doc-toc'}},
+                {elem: 'section', content: {block: 'node-doc-section'}}
+            ]
+        });
+    }
+});
+```
+
+### BN('i-content')
+
+This block is a container for pages content. Content inside `i-content` can be automatically updated on client.
+
+Block has api to manipulate content inside pages.
+
+
+#### BN('i-content').html(bemjson, [isSync=false])
+ * bemjson {Object|String}
+ * isSync {Boolean}
+ * return {Vow.promise|String} rendered html
+
+Applies all supported templates (bh, bem.json, bemhtml) to bemjson tree and then serialises it to html.
+
+By setting `isSync = true` you will get error when rendering blocks with defined `dataTemplate`.
+
+#### BN('i-content').update | replace | append | before(container, bemjson)
+ * container {Object} jQuery object
+ * bemjson {Object}
+ * return {Vow.promise}
+
+Update dom with new content.
+
+```js
+BN.addDecl('example').blockTemplate(function(ctx){
+    //.. adding some content
+}).dataTemplate(function(ctx){
+    /.. adding some data to params
+}).staticProp({
+    updateBlock: function(param) {
+        return BN('i-content').update(this.__lastInstance.domElem.parent(), {
+            block: this._name,
+            param: param
+        });
+    }
+});
+
+```
+
+### BN('i-response')
+
+Manages error pages (404, 50x), http redirect and responses.
+
+#### BN('i-response').send(status, body, contentType)
+ * status {Number} http status
+ * body {String}
+ * [contentType='text/plain'] {String}
+
+Sends http response.
+
+#### BN('i-response').json(json)
+
+Responses with json.
+
+#### BN('i-response').redirect(path)
+
+Redirects to path with 302 status.
+
+#### BN('i-response').missing()
+
+Responses with 404 status.
+
+#### BN('i-response').error(err)
+* err {Error|HttpError} http status
+
+Responses with error (503 or status, defined in HttpError) and log error.
+
+```js
+//block sends error when data fetching fails
+BN.addDecl('example').dataTemplate(function(ctx){
+    var resource = ctx.json().resourceParam; //geting block param
+    return BN('ajax-block').get(resource).then(function(dataJson){ //get data from ajax block
+        ctx.param('data', dataJson); //setup data in block param
+        Vow.fulfill(); //continue render
+    }).fail(function(err){ // if data fails
+        BN('i-response').error(err); //send error to user
+        return Vow.reject(err); // stop render
+    });
+})
+```
+
+### BN('i-router')
+
+Manages page blocks and transitions between urls.
+
+#### BN('i-router').setPath | replacePath(path, [allowFallback=false])
+ * path {String}
+ * allowFallback {Boolean} if history.pushState is not supported, reload page to render on server
+
+Changes url path.
+
+On server: redirects with 302.
+
+On client: destructs current page and inits new page. `setPath` uses `history.pushState`; `replacePath` uses `history.replaceState`.
+
+
+#### BN('i-router').setParams | replaceParams(params, [allowFallback=false], [extend=false])
+ * params {Object} key-value map of url params
+ * allowFallback {Boolean} if history.pushState is not supported, reload page to render on server
+ * extend {Boolean} extend current url params with new one
+
+Changes url params.
+
+On server: redirects with 302.
+
+On client: `setParams` uses `history.pushState`; `replaceParams` uses `history.replaceState`.
+
+#### BN('i-router').getHost()
+
+Returns url host.
+
+#### BN('i-router').escapeHTML | unescapeHTML (html)
+
+Escapes user content to prevent XSS.
+
+#### BN('i-router').get('params')
+
+GET or POST params.
+
+#### BN('i-router').get('req')
+
+Node [http.IncomingMessage](http://nodejs.org/api/http.html#http_http_incomingmessage)
+
+#### BN('i-router').get('res')
+
+Node [http.ServerResponse](http://nodejs.org/api/http.html#http_class_http_serverresponse)
+
+#### BN('i-router').get('cookies')
+
+Request cookies. See [node-cookie api](https://github.com/defunctzombie/node-cookie);
+
+#### Event 'update'
+
+Use it to update static page content on client:
+
+```js
+//example of static header that updates when page changing
+BN.addDecl('app-header').blockTemplate(function(ctx){
+    ctx.js(true); //enable creation of block instance in client
+    //..
+}).onSetMod({
+    'js': function () { //fires when block inits on client
+        BN('i-router').on('update', this._onPageUpdate); //listen to page updates
+    }
+}).instanceProp({
+    _onPageUpdate: function () {
+        this.elem('search-input').val( //change value of search input element
+            BN.escapeHTML( //escape to prevent XSS
+                BN('i-router').get('params').q //get param from url
+            )
+        );
+    }
+});
+```
+
+### BN('i-api-request')
+
+Base block for ajax blocks.
+
+#### .get(resource, [options])
+
+Calls `this._request('get', resource, options)`;
+
+#### ._request(method, resource, [options])
+ * method {string} http method
+ * resource {string} REST api resource
+ * options {Object}
+ * options.params {Object} REST api request params
+ * options.body {Object} REST api request body
+
+On server: makes request to rest api host, defined by `this._apiHost`.
+
+On client: makes remote call (through xhr) of server implementation.
+
+#### Event 'beforerequest' 'afterrequest'
+
+Triggered on client before and after xhr request.
+
+#### Event 'error'
+
+Triggered on client on xhr error.
+
 
 
 

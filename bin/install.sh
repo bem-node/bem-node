@@ -26,3 +26,5 @@ mkdir -p blocks/i-bem/__html
 ln -sf ../../../node_modules/bem-json/i-bem/__html/i-bem__html.js blocks/i-bem/__html/i-bem__html.priv.js
 
 ln -sf ../../node_modules/vow/lib/vow.js blocks/i-promise/i-promise.js
+
+ln -sf ../../node_modules/bh/lib/bh.js blocks/i-bh/i-bh.js
