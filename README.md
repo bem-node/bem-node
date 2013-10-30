@@ -534,6 +534,13 @@ On server: redirects with 302.
 
 On client: destructs current page and inits new page. `setPath` uses `history.pushState`; `replacePath` uses `history.replaceState`.
 
+#### BN('i-router').getPath()
+
+Returns url path
+
+#### BN('i-router').getUri()
+
+Returns  full uri (i.e. protocol, domain, path, query)
 
 #### BN('i-router').setParams | replaceParams(params, [allowFallback=false], [extend=false])
  * params {Object} key-value map of url params
