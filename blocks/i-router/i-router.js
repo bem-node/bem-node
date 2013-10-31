@@ -219,8 +219,15 @@
          */
         getUri: function () {
             return location.href;
+        },
+
+        /**
+         * Get path, that is pathname & query
+         * @returns {String}
+         */
+        getPath: function () {
+            return location.pathname + location.search;
         }
-        
 
     });
 

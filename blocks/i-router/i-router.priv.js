@@ -148,6 +148,14 @@
          */
         getUri: function () {
             return this.get('uri');
+        },
+
+        /**
+         * Get path, that is pathname & query
+         * @returns {String}
+         */
+        getPath: function () {
+            return this.get('req.url');
         }
 
     });
