@@ -23,7 +23,7 @@ BEM.decl('i-api-request', null, {
      * Trim slashes from resource
      */
     _normalizeResource: function (resource) {
-        return String(resource).replace(/^\/|\/$/, '');
+        return String(resource).replace(/^\/|\/$/g, '');
     },
 
     /**
