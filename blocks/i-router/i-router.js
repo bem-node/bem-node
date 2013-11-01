@@ -7,11 +7,7 @@
     /**
      * Some browsers pops state on load, we'll process popState only if location or state were changed before
      */
-    var initialUrl = location.href,
-        wasChanged = false;
-
     BEM.decl('i-router', null, {
-
         /**
          * check if history state is supported
          */
@@ -25,39 +21,40 @@
         init: function () {
             var _this = this;
 
-            this._lastHandler = this._prepearRoute();
+            this._lastPath = this.getPath();
+            this._lastHandler = this._prepearRoute(this._lastPath);
             if (this._historyStateSupported()) {
                 jQuery(document).delegate('a', 'click', function (e) {
                     if (!e.metaKey && !e.ctrlKey && this.protocol === location.protocol && this.host === location.host) {
-                        if (_this.setPath(this.pathname + this.search)) {
+                        if (_this.setPath(this.pathname + this.search + this.hash)) {
                             e.preventDefault();
-                        }
-                        if (this.hash) {
-                            location.href = this.hash;
                         }
                     }
                 });
 
                 jQuery(window).bind('popstate', function () {
-                    if (wasChanged || location.href !== initialUrl) {
-                        _this._onPathChange();
-                    }
-                    wasChanged = true;
+                    _this._onPathChange();
                 });
             }
         },
         /**
          * Set path to url with history.pushState
+         *
          * @param {String} path
          * @param {Boolean} [allowFallback = false] change path with page reload
+         *
+         * @returns {Boolean} False if history API not supported
          */
         setPath: function (path, allowFallback) {
             return this._changePath.call(this, 'push', path, allowFallback);
         },
         /**
          * Replace current path with history.replaceState
+         *
          * @param {String} path
          * @param {Boolean}  [allowFallback = false] change path with page reload
+         *
+         * @returns {Boolean} False if history API not supported
          */
         replacePath: function (path, allowFallback) {
             return this._changePath.call(this, 'replace', path, allowFallback);
@@ -78,40 +75,22 @@
         },
 
         /**
-         * Calls when error while routing was occur
-         * May be useful for better describing errors
-         *
-         * @param {Error} ex
-         */
-        _onError: function (ex) {
-            console.log(ex.message);
-            console.log(ex.stack);
-        },
-
-        /**
          * Changing windlow.location
          * @override
+         * @private
+         *
          * @param {String} path
          * @param {Boolean} [allowFallback = false] change path with page reload
-         * @private
+         *
+         * @returns {Boolean} False if history API not supported
          */
         _changePath: function (method, path, allowFallback) {
-            if (this.get('path') === path) {
-                return true;
-            }
-
             if (!this._historyStateSupported()) {
                 return this._fallback(allowFallback, path);
             }
 
-            try {
-                this._onPathChange(path);
-            } catch (ex) {
-                this._onError(ex);
-                return this._fallback(allowFallback, path);
-            }
             history[method + 'State'](undefined, undefined, path);
-            wasChanged = true;
+            this._onPathChange();
             return true;
         },
 
@@ -134,19 +113,22 @@
         /**
          * Handle popstate event from window
          * Process handler for given path
-         *
-         * @param {String} path new path to route
          */
-        _onPathChange: function (path) {
-            var handler = this._prepearRoute(path);
+        _onPathChange: function () {
+            var currentPath = this.getPath(), handler;
 
-            BEM.channel('i-router').trigger('update', {path: path});
-            if (handler) {
-                this._execHandler(handler)
-                    .fail(this.reload)
-                    .done();
-            } else {
-                this.missing();
+            if (this._lastPath !== currentPath) {
+                this._lastPath = currentPath;
+                handler = this._prepearRoute();
+                BEM.channel('i-router').trigger('update', {path: currentPath});
+
+                if (handler) {
+                    this._execHandler(handler)
+                        .fail(this.reload)
+                        .done();
+                } else {
+                    this.missing();
+                }
             }
         },
 
@@ -154,7 +136,8 @@
          * Set path and matchers
          * Return handler by new path
          *
-         * @param {String} [path] new path to route. if not given, will be taken from location
+         * @param {String} [path] If ommited, then use path from location
+         *
          * @return {Object} handler
          */
         _prepearRoute: function (path) {
