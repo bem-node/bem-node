@@ -38,18 +38,6 @@ BEM.decl('i-api-request', null, {
     },
 
     /**
-     * Pass parsed json to promise resolve
-     */
-    _parse: function (promise, result) {
-        try {
-            promise.fulfill(JSON.parse(result));
-        } catch (err) {
-            promise.reject(err);
-        }
-
-    },
-
-    /**
      * Check if error is Http error
      *
      * @param {Error} error

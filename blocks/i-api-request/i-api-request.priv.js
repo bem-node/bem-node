@@ -157,6 +157,15 @@
         },
 
         /**
+         * Preprocess response from backend
+         * This function is for future overriding
+         * @param {Object} response
+         */
+        _preprocessResponse: function (response) {
+            return response;
+        },
+
+        /**
          * Request rest api with predefined api params
          * @param {String} method HTTP protocol method.
          * @param {Object} parsedUrl Standart nodejs's object that represents url.
@@ -194,9 +203,11 @@
                                     [method, originalUrl].join(' ')
                                 ));
                             } else if (data && data.requestSource === 'ajax') {
-                                promise.fulfill(body);
+                                promise.fulfill(_this._preprocessResponse(body));
                             } else {
-                                _this._parse(promise, body);
+                                promise.sync(Vow.invoke(function (body) {
+                                    return _this._preprocessResponse(JSON.parse(body));
+                                }, body));
                             }
                         }
                     });
