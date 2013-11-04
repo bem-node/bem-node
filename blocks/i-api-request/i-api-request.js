@@ -184,7 +184,9 @@ BEM.decl('i-api-request', null, {
                 data: data,
                 complete: function (xhr) {
                     if (xhr.status === 200) {
-                        _this._parse(promise, xhr.responseText);
+                        promise.sync(Vow.invoke(function () {
+                            return JSON.parse(xhr.responseText);
+                        }));
                     } else {
                         _this._shouldRetry(xhr, method, resource, data)
                             .then(function () {
