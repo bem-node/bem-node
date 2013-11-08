@@ -24,16 +24,22 @@
             this._lastPath = this.getPath();
             this._lastHandler = this._prepearRoute(this._lastPath);
             if (this._historyStateSupported()) {
-                jQuery(document).delegate('a', 'click', function (e) {
-                    if (!e.metaKey && !e.ctrlKey && this.protocol === location.protocol && this.host === location.host) {
-                        if (_this.setPath(this.pathname + this.search + this.hash)) {
-                            e.preventDefault();
-                        }
-                    }
-                });
+                // Subscribe to popstate after 'load' event
+                // to tackle bug in Chrome with 'popstate' on load
+                jQuery(window).one('load', function () {
+                    setTimeout(function () {
+                        jQuery(document).delegate('a', 'click', function (e) {
+                            if (!e.metaKey && !e.ctrlKey && this.protocol === location.protocol && this.host === location.host) {
+                                if (_this.setPath(this.pathname + this.search + this.hash)) {
+                                    e.preventDefault();
+                                }
+                            }
+                        });
 
-                jQuery(window).bind('popstate', function () {
-                    _this._onPathChange();
+                        jQuery(window).bind('popstate', function () {
+                            _this._onPathChange();
+                        });
+                    });
                 });
             }
         },
