@@ -152,9 +152,9 @@
                 pathName = pathAndSearch[0],
                 routeInfo = this._getRoute(pathName);
 
-            this.set('matchers', (routeInfo) ? routeInfo.matchers : [])
-                .set('path', routePath)
-                ._readParams(pathAndSearch[1] || '');
+            this._state.set('matchers', (routeInfo) ? routeInfo.matchers : []);
+            this._state.set('path', routePath);
+            this._readParams(pathAndSearch[1] || '');
 
             return routeInfo && routeInfo.handler;
         },
@@ -171,10 +171,10 @@
 
             return {
                 enter: function () {
-                    return BEM.blocks[blockName].init(_this.get('matchers'));
+                    return BEM.blocks[blockName].init(_this._state.get('matchers'));
                 },
                 update: function () {
-                    return BEM.blocks[blockName].update(_this.get('matchers'));
+                    return BEM.blocks[blockName].update(_this._state.get('matchers'));
                 },
                 leave: function () {
                     return BEM.blocks[blockName].destruct();
@@ -211,20 +211,77 @@
         },
 
         /**
+         * Get current url params hash
          *
-         * Get current uri
-         * @returns {String}
+         * @return {Object}
          */
-        getUri: function () {
-            return location.href;
+        _readParams: function (search) {
+            this._state.set(
+                'params',
+                String(arguments.length === 1 ? search : location.search)
+                    .replace(/^\?/, '')
+                    .split('&')
+                    .reduce(function (urlParamsObj, keyValue) {
+                        var keyValueAr = keyValue.split('=');
+                        if (keyValueAr.length === 2) {
+                            urlParamsObj[keyValueAr[0]] = decodeURIComponent(
+                                keyValueAr[1].replace(/\+/g, ' ')
+                            );
+                        }
+                        return urlParamsObj;
+                    }, {})
+            );
         },
 
         /**
-         * Get path, that is pathname & query
-         * @returns {String}
+         * Sets params to url with history.pushState
+         * @param {Object} params
+         * @param {Boolean} [allowFallback=false]
+         * @param {Boolean} [extend=false] will extend current params
          */
-        getPath: function () {
-            return location.pathname + location.search;
+        setParams: function (params, allowFallback, extend) {
+            return this._changeParams.call(this, 'set', params, allowFallback, extend);
+        },
+
+        /**
+         * Replace current params with history.replaceState
+         * @param {Object} params
+         * @param {Boolean} [allowFallback=false]
+         * @param {Boolean} [extend=false] will extend current params
+         */
+        replaceParams: function (params, allowFallback, extend) {
+            return this._changeParams.call(this, 'replace', params, allowFallback, extend);
+        },
+
+        /**
+         * Change params
+         * @param {Object} params
+         * @param {Boolean} [allowFallback=false]
+         * @param {Boolean} [extend=false] will extend current params
+         * @private
+         * @returns {*}
+         */
+        _changeParams: function (method, params, allowFallback, extend) {
+            var search = '',
+                newParams = params;
+
+            if (extend) {
+                newParams = jQuery.extend({}, this.getParams(), params);
+            }
+            search += jQuery.param(newParams);
+            if (location.search === ('?' + search)) {
+                return;
+            }
+            this._state.set('params', params);
+            return this[method + 'Path'](location.pathname + (search ? '?' + search : ''), allowFallback);
+        },
+
+        /**
+         * Return current i-router params as query string
+         * @returns {String} something like "?bla=1&name=blabla"
+         */
+        encodedParams: function () {
+            return location.search;
         }
 
     });

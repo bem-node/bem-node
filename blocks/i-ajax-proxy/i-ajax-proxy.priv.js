@@ -92,7 +92,7 @@ BEM.decl('i-ajax-proxy', {}, {
     init: function (matchers) {
         var blockName = matchers[1],
             methodName = matchers[2],
-            data = BEM.blocks['i-router'].get('params');
+            data = BEM.blocks['i-router'].getParams();
 
         if (this._checkMethod(blockName, methodName, data)) {
             return this._runMethod(blockName, methodName, data)

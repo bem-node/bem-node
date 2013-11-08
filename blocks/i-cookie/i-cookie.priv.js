@@ -4,7 +4,7 @@ BEM.decl('i-cookie', null, {
      * @param {String} name
      */
     get: function (name) {
-        return BEM.blocks['i-router'].get('cookies').get(name);
+        return BEM.blocks['i-router'].getCookies().get(name);
     },
 
     /**
@@ -14,6 +14,6 @@ BEM.decl('i-cookie', null, {
      * @param {Object} [params]
      */
     set: function (name, val, params) {
-        return BEM.blocks['i-router'].get('cookies').set(name, val, params);
+        return BEM.blocks['i-router'].getCookies().set(name, val, params);
     }
 });

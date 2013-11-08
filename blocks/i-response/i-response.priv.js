@@ -99,7 +99,7 @@ BEM.decl('i-response', null, {
      * @return {http.ServerResponse}
      */
     _getResponse: function () {
-        return BEM.blocks['i-router'].get('res');
+        return BEM.blocks['i-router'].getRes();
     }
 
 });
