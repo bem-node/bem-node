@@ -42,14 +42,31 @@
          * @return {Vow.promise}
          */
         _dnsResolve: function (host) {
-            var promise = Vow.promise();
-            dns.lookup(host, null, function (err, address) {
-                if (err) {
-                    return promise.reject(err);
-                }
-                promise.fulfill(address);
+            var promises = ['resolve6', 'resolve4'].map(function (method) {
+                var promise = Vow.promise();
+                dns[method](host, BEM.blocks['i-state'].bind(function (err, ips) {
+                    if (err) {
+                        return promise.reject(err);
+                    }
+
+                    var ip = ips[0],
+                        testUrl = url.format({
+                            protocol: 'http:',
+                            hostname: ip
+                        });
+
+                    request(testUrl, function (err) {
+                        if (err) {
+                            return promise.reject(err);
+                        }
+                        promise.fulfill(ip);
+                    });
+
+                }));
+                return promise;
             });
-            return promise;
+
+            return Vow.any(promises);
         },
 
         /**
