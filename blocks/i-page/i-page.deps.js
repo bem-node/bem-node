@@ -1,6 +1,7 @@
 ({
     mustDeps: [
-        {block: 'i-state'}
+        {block: 'i-state'},
+        {block: 'i-bem', elem: 'dom'}
     ],
     shouldDeps: [
         {block: 'i-content'},
