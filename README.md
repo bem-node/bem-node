@@ -588,7 +588,7 @@ BN.addDecl('app-header').blockTemplate(function(ctx){
     //..
 }).onSetMod({
     'js': function () { //fires when block inits on client
-        BN('i-router').on('update', this._onPageUpdate); //listen to page updates
+        BEM.channel('i-router').on('update', this._onPageUpdate); //listen to page updates
     }
 }).instanceProp({
     _onPageUpdate: function () {
