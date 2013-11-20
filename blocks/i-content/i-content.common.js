@@ -3,7 +3,7 @@
  *
  */
 (function () {
-    var error = new Error('You should add {block: \'i-content\', mods: {type: 'bemhtml'}} into .bemdecl.js file to use bemhtml templates or some other type you want');
+    var error = new Error('You should add {block: \'i-content\', mods: {type: \'bemhtml\'}} into .bemdecl.js file to use bemhtml templates or some other type you want');
 
     BEM.decl('i-content', null, {
 
