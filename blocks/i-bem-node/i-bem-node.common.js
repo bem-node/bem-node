@@ -305,6 +305,8 @@
                     __instances: [],
                     __lastInstance: null
                 });
+                //prevent second declaration with base block
+                delete declName.baseBlock;
             }
             bem.decl(declName, instanceDecl, staticDecl);
             addBHMatchers(this._name);
