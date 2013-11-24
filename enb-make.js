@@ -8,6 +8,7 @@ var build = require('enb/lib/build-flow'),
         'node_modules/bem-node/blocks'
     ],
     bemhtml = true,
+    freeze = false,
     pages = 'pages/*',
     js, priv, server, tests;
 
@@ -112,8 +113,8 @@ function enbMake(config) {
             nodeConfig.addTechs([
                 [ require('enb/techs/levels'), { levels: getLevels(config) } ],
                 [ require('enb/techs/file-provider'), { target: '?.bemdecl.js' } ],
-                [ require('enb/techs/borschik'), { sourceTarget: '?.js', destTarget: '_?.js', minify: true } ],
-                [ require('enb/techs/borschik'), { sourceTarget: '?.css', destTarget: '_?.css', minify: true } ],
+                [ require('enb/techs/borschik'), { sourceTarget: '?.js', destTarget: '_?.js', minify: true, freeze: freeze } ],
+                [ require('enb/techs/borschik'), { sourceTarget: '?.css', destTarget: '_?.css', minify: true, freeze: freeze } ],
                 require('enb/techs/deps-old'),
                 require('enb/techs/files'),
                 require('enb/techs/css-includes'),
@@ -184,6 +185,18 @@ enbMake.pages = function (inPages) {
  */
 enbMake.noBEMHTML = function () {
     bemhtml = false;
+    return this;
+}
+
+/**
+ * Use freeze in production mode
+ *
+ * @ex
+ *   module.exports('bem-node/enb-make')
+ *      .freeze()
+ */
+enbMake.freeze = function () {
+    freeze = true;
     return this;
 }
 
