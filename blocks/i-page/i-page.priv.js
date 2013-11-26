@@ -1,5 +1,26 @@
-BEM.decl('i-page', null, BEM.blocks['i-state'].initNs('i-page'));
 BEM.decl('i-page', null, {
+
+    _state: BEM.blocks['i-state'].initNs('i-page'),
+
+    /**
+     * Setting in state
+     *
+     * @deprecated since 0.7.0
+     */
+    set : function (key, val) {
+        console.error('method "set" of i-page is deprecated');
+        this._state.set(key, val);
+    },
+
+    /**
+     * Getting from state
+     *
+     * @deprecated since 0.7.0
+     */
+    get: function (key) {
+        console.error('method "get" of i-page is deprecated');
+        this._state.get(key);
+    },
 
     /**
      * Process bemjson and bemhtml then output generated html
@@ -7,41 +28,21 @@ BEM.decl('i-page', null, {
      * @param {Mixed} json
      */
     out: function (json) {
-        var _this = this;
-        return _this._runDeferred().then(function () {
-            var bemJson = _this.getPageJson(json);
+        var _this = this,
+            bemJson = _this.getPageJson(json);
 
-            return Vow.fulfill(_this.extendPageJson(bemJson)).then(function (bemJson) {
-                return _this.html(bemJson).then(function (html) {
-                    BEM.blocks['i-response'].send(200, html, 'text/html');
-                });
+        return Vow.fulfill(_this.extendPageJson(bemJson)).then(function (bemJson) {
+            return _this.html(bemJson).then(function (html) {
+                BEM.blocks['i-response'].send(200, html, 'text/html');
             });
         });
     },
 
-    _deferred: [],
-
     /**
-     * Run defered functions before page rendering
+     * @deprecated since 0.7.0. not forking now
      */
-    _runDeferred: function () {
-        return Vow.all(this._deferred.map(function (fun) {
-            return fun();
-        }));
-    },
-
-    /**
-     * Set function that will be callen before render ony page
-     *
-     * @param {Function} fun
-     * @return {i-page}
-     */
-    beforeOut: function (fun) {
-        if (this._name !== 'i-page') {
-            throw new Error("BEM.blocks['" + this._name + "'].beforeOut is not allowed; Use BEM.blocks['i-page'].beforeOut instead");
-        }
-        this._deferred.push(fun);
-        return this;
+    beforeOut: function () {
+        console.error('"beforeOut" is deprecated; Redefine i-page on yours level');
     },
 
     /**
@@ -111,7 +112,7 @@ BEM.decl('i-page', null, {
             meta;
 
         head.some(function (item) {
-            if (item.elem === 'meta' && item.attrs.name === name) {
+            if (item && item.elem === 'meta' && item.attrs.name === name) {
                 meta = item;
                 return true;
             }
@@ -140,26 +141,26 @@ BEM.decl('i-page', null, {
      * @return {i-page}
      */
     addToHead: function (elem) {
-        var head = this._getPageParams().head || [];
         head.push(elem);
         this._setPageParams('head', head);
         return this;
     },
 
     _getPageParams: function () {
-        var params = this.get('b-page');
+        var params = this._state.get('b-page');
         if (!params) {
             params = {};
-            this.set('b-page', params);
+            this._state.set('b-page', params);
         }
         return params;
     },
 
     _setPageParams: function (name, value) {
+
         if (value === undefined) {
-            this.set('b-page', name);
+            this._state.set('b-page', name);
         } else {
-            this.set('b-page.' + name, value);
+            this._state.set('b-page.' + name, value);
         }
     }
 
