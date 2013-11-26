@@ -1,7 +1,7 @@
 0.7.0
 ---------------
 
-method ```beforeOut``` now deprecated. I you need make something before rendering you shold make it in ```init``` method.
+method ```beforeOut``` now deprecated. If you need make something before rendering you shold make it in ```init``` method.
 
 instad of:
 ```js
@@ -17,7 +17,6 @@ BN.addDecl('hello-world', 'page', {
     }
 });
 ```
-
 you should write:
 ```js
 BN.addDecl('hello-world', 'page', {
