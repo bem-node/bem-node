@@ -103,7 +103,10 @@
         /**
          * Reloading page
          */
-        reload: function () {
+        reload: function (e) {
+            if (e) {
+                console.error(e);
+            }
             setTimeout(function () {
                 location.reload();
             });
