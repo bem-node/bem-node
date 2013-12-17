@@ -21,6 +21,7 @@
         init: function () {
             var _this = this;
 
+            this._state.set('path', decodeURIComponent(location.pathname + location.search));
             this._lastPath = this.getPath();
             this._lastHandler = this._prepearRoute(this._lastPath);
             if (this._historyStateSupported()) {
@@ -43,6 +44,7 @@
                 });
             }
         },
+
         /**
          * Set path to url with history.pushState
          *
@@ -91,6 +93,7 @@
          * @returns {Boolean} False if history API not supported
          */
         _changePath: function (method, path, allowFallback) {
+            this._state.set('path', path);
             if (!this._historyStateSupported()) {
                 return this._fallback(allowFallback, path);
             }
