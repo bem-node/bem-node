@@ -4,6 +4,10 @@
  */
 (function () {
 
+    function getPathFromLocation() {
+        return decodeURIComponent(location.pathname + location.search);
+    }
+
     /**
      * Some browsers pops state on load, we'll process popState only if location or state were changed before
      */
@@ -21,7 +25,7 @@
         init: function () {
             var _this = this;
 
-            this._state.set('path', decodeURIComponent(location.pathname + location.search));
+            this._state.set('path', getPathFromLocation());
             this._lastPath = this.getPath();
             this._lastHandler = this._prepearRoute(this._lastPath);
             if (this._historyStateSupported()) {
@@ -38,6 +42,7 @@
                         });
 
                         jQuery(window).bind('popstate', function () {
+                            _this._state.set('path', getPathFromLocation());
                             _this._onPathChange();
                         });
                     });
