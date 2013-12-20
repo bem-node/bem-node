@@ -28,14 +28,15 @@ BEM.decl('i-response', null, {
      * @param {String} [contentType=text/plain]
      */
     send: function (status, body, contentType) {
-        var res = this._getResponse();
+        var res = this._getResponse(),
+            savedStatusCode = BEM.blocks['i-state'].get('i-response.statusCode');
 
         if (res.finished) {
             console.log('Cannot finish response. It is already finished.');
         } else {
             contentType = contentType || 'text/plain';
             try {
-                res.writeHead(status, this._getResponseHeaders.apply(this, arguments));
+                res.writeHead(savedStatusCode || status, this._getResponseHeaders.apply(this, arguments));
                 res.end(body);
             } catch (err) {
                 console.error(err);
@@ -94,12 +95,20 @@ BEM.decl('i-response', null, {
     },
 
     /**
+     * Change statusCode of current response
+     * @param {Number} statusCode
+     */
+    setStatus: function (statusCode) {
+        BEM.blocks['i-state'].set('i-response.statusCode', statusCode);
+    },
+
+    /**
      * Shorthand mathod for accessing http.response
      *
      * @return {http.ServerResponse}
      */
     _getResponse: function () {
-        return BEM.blocks['i-router'].get('res');
+        return BEM.blocks['i-router'].getRes();
     }
 
 });

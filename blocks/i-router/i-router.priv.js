@@ -6,7 +6,9 @@
 (function () {
 
     var url = require('url'),
-        domain = require('domain');
+        domain = require('domain'),
+        qs = require('querystring'),
+        Cookies = require('cookies');
 
     BEM.decl('i-router', null, {
 
@@ -63,9 +65,10 @@
                 _this = this;
 
             reqDomain.run(function () {
-                _this.set('matchers', (routeInfo) ? routeInfo.matchers : [])
-                    .set('req', req)
-                    .set('res', res);
+                _this._state.set('matchers', (routeInfo) ? routeInfo.matchers : []);
+                _this._state.set('req', req);
+                _this._state.set('res', res);
+                _this._state.set('path', req.url);
 
                 reqDomain.on('error', function (err) {
                     _this._error(err);
@@ -112,7 +115,7 @@
             var _this = this;
 
             return function () {
-                var state = _this.get();
+                var state = _this._state.get();
                 BEM.blocks[blockName].init(state.matchers, state.req, state.res)
                     .fail(function (err) {
                         if (typeof err !== 'undefined') {
@@ -123,15 +126,70 @@
             };
         },
 
+        MAX_POST_BODY_SIZE: 1024 * 1024,
+
         /**
          * Execute route handler
          *
          * @param {Function} reqHandler route handler
          */
-        _execHandler: function (reqHandler) {
-            reqHandler();
+        _execHandler: function (handler) {
+            var _this = this;
+
+            this._readCookies();
+            this._readRequestParams(function (params) {
+                _this._state.set('params', params);
+                handler();
+            });
         },
-        
+
+        /**
+         * Retrieve cookies and write them to local state
+         */
+        _readCookies: function () {
+            var state = this._state.get();
+
+            this._state.set('cookies', new Cookies(state.req, state.res));
+        },
+
+        /**
+         * Retrieve GET|POST params from request
+         *
+         * @param {Function} callback
+         */
+        _readRequestParams: function (callback) {
+            var req = this.getReq(),
+                _this = this,
+                body = '';
+
+            this._state.set('params', {});
+
+            if (req.method === 'GET') {
+                callback(url.parse(req.url, true).query);
+            } else if (req.method === 'POST') {
+                req.on('data', BEM.blocks['i-state'].bind(function (chunk) {
+                    body += chunk.toString();
+                    if (body.length > _this.MAX_POST_BODY_SIZE) {
+                        body = '';
+                        _this._error(new Error('Request body too large'));
+                        req.connection.destroy();
+                        process.domain.dispose();
+                    }
+                }));
+                req.on('end', BEM.blocks['i-state'].bind(function () {
+                    callback(qs.parse(body));
+                }));
+            }
+        },
+        /**
+         * Return current i-router params as query string
+         * @returns {String} something like "?bla=1&name=blabla"
+         */
+        encodedParams: function () {
+            return '?' + qs.stringify(this.getParams());
+        },
+
+
         /**
          * Get host name for current request.
          * Hostname is taken from HOST header
@@ -139,24 +197,9 @@
          * if HOST header is missing
          */
         getHost: function () {
-            return this.get('req').headers.host;
-        },
-
-        /**
-         * Get current uri
-         * @returns {String}
-         */
-        getUri: function () {
-            return this.get('uri');
-        },
-
-        /**
-         * Get path, that is pathname & query
-         * @returns {String}
-         */
-        getPath: function () {
-            return this.get('req.url');
+            return this._state.get('req').headers.host;
         }
+
 
     });
 

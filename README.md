@@ -561,19 +561,19 @@ Returns url host.
 
 Escapes user content to prevent XSS.
 
-#### BN('i-router').get('params')
+#### BN('i-router').getParams()
 
 GET or POST params.
 
-#### BN('i-router').get('req')
+#### BN('i-router').getReq()
 
 Node [http.IncomingMessage](http://nodejs.org/api/http.html#http_http_incomingmessage)
 
-#### BN('i-router').get('res')
+#### BN('i-router').getRes()
 
 Node [http.ServerResponse](http://nodejs.org/api/http.html#http_class_http_serverresponse)
 
-#### BN('i-router').get('cookies')
+#### BN('i-router').getCookies()
 
 Request cookies. See [node-cookie api](https://github.com/defunctzombie/node-cookie);
 
@@ -588,7 +588,7 @@ BN.addDecl('app-header').blockTemplate(function(ctx){
     //..
 }).onSetMod({
     'js': function () { //fires when block inits on client
-        BN('i-router').on('update', this._onPageUpdate); //listen to page updates
+        BEM.channel('i-router').on('update', this._onPageUpdate); //listen to page updates
     }
 }).instanceProp({
     _onPageUpdate: function () {

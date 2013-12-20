@@ -1,6 +1,6 @@
 {
     "name": "bem-node",
-    "version": "0.6.2",
+    "version": "0.7.5",
     "description": "",
     "keywords": [
         "bem",
@@ -15,8 +15,11 @@
     },
     "scripts": {
         "postinstall": "./bin/install.sh",
-        "test": "node test.js && enb make && find pages -name '*tests.js' | xargs mocha"
+        "test": "node test.js && YENV=production enb make && find pages -name '*tests.js' | xargs mocha && cp pages/bem-node/_bem-node.js bem-node.min.js"
     },
+    "bundledDependencies": [
+        "bh", "bem-json", "vow", "cookies", "request", "inherit", "borschik", "bem-bl"
+    ],
     "dependencies": {
         "bh": "0.1.19",
         "bem-json": "0.1.6",

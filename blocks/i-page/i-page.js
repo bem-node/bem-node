@@ -3,7 +3,7 @@
  *
  * @abstract
  */
-BEM.decl('i-page', null, {
+BEM.DOM.decl('i-page', null, {
 
     /**
      * Called when page params changed
@@ -11,7 +11,7 @@ BEM.decl('i-page', null, {
      * @param {Array} matchers matched params from path
      * @return {Vow.promise}
      */
-    update: function (matchers) {
+    update: function (/*matchers*/) {
         return this.init.apply(this, arguments);
     },
 

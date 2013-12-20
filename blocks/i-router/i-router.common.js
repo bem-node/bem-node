@@ -3,8 +3,77 @@
  *  associates request path with i-block's method
  *
  */
-BEM.decl('i-router', null, BEM.blocks['i-state'].initNs('i-router'));
 BEM.decl('i-router', null, {
+
+    _state: BEM.blocks['i-state'].initNs('i-router'),
+
+    /**
+     * @deprecated
+     */
+    set: function (key, value) {
+        console.error(new Error('i-router.set is deprecated'));
+        this.set = this._state.set.bind(this._state);
+        this.set(key, value);
+        return this;
+    },
+
+    /**
+     * @deprecated
+     */
+    get: function (key) {
+        console.error(new Error('i-router.get is deprecated'));
+        this.get  = this._state.get.bind(this._state);
+        return this.get(key);
+    },
+
+
+    /**
+     * Returns request uri
+     * @returns {String}
+     */
+    getUri: function () {
+        return 'http://' + this.getHost() + this.getPath();
+    },
+
+    /**
+     * Returns server request object
+     * @see http://nodejs.org/api/http.html#http_http_incomingmessage
+     */
+    getParams: function () {
+        return this._state.get('params');
+    },
+
+    /**
+     * Returns server request object
+     * @see http://nodejs.org/api/http.html#http_http_incomingmessage
+     */
+    getReq: function () {
+        return this._state.get('req');
+    },
+
+    /**
+     * Returns server response object
+     * @see http://nodejs.org/api/http.html#http_class_http_serverresponse
+     */
+    getRes: function () {
+        return this._state.get('res');
+    },
+
+    /**
+     * Returns cookies obj
+     * @see https://github.com/defunctzombie/node-cookie
+     */
+    getCookies: function () {
+        return this._state.get('cookies');
+    },
+
+    /**
+     * Get path, that is pathname & query
+     * @returns {String}
+     */
+    getPath: function () {
+        return this._state.get('path');
+    },
 
     /**
      * List of allowed http methods
@@ -133,6 +202,25 @@ BEM.decl('i-router', null, {
      * @abstract
      * @param {Mixed} reqHandler request handler created by i-router._createHandler
      */
-    _execHandler: function () {}
+    _execHandler: function () {},
+
+    /**
+    * @deprecated
+    */
+    escapeHTML: function (html) {
+        console.error(new Error('i-router.escapeHTML deprecated use BN(\'i-content\').escapeHTML()'));
+        this.escapeHTML = BEM.blocks['i-content'].escapeHTML;
+        return this.escapeHTML(html);
+    },
+
+    /**
+    * @deprecated
+    */
+    unescapeHTML: function (text) {
+        console.error(new Error('i-router.unescapeHTML deprecated use BN(\'i-content\').unescapeHTML()'));
+        this.unescapeHTML = BEM.blocks['i-content'].unescapeHTML;
+        return this.unescapeHTML(text);
+    }
+
 
 });

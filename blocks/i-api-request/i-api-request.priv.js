@@ -41,30 +41,49 @@
          * @param {String} host
          * @return {Vow.promise}
          */
-        _dnsResolve: function (host) {
-            var promise = Vow.promise();
-            dns.lookup(host, null, function (err, address) {
-                if (err) {
-                    return promise.reject(err);
-                }
-                promise.fulfill(address);
+        _dnsResolve: function (parsedUrl) {
+            var promises = ['resolve6', 'resolve4'].map(function (method) {
+                var promise = Vow.promise();
+                dns[method](parsedUrl.hostname, BEM.blocks['i-state'].bind(function (err, ips) {
+                    if (err) {
+                        return promise.reject(err);
+                    }
+
+                    var ip = ips[0],
+                        testUrl = url.format({
+                            protocol: parsedUrl.protocol,
+                            hostname: ip,
+                            port: parsedUrl.port
+                        });
+
+                    request(testUrl, function (err) {
+                        if (err) {
+                            return promise.reject(err);
+                        }
+                        promise.fulfill(ip);
+                    });
+
+                }));
+                return promise;
             });
-            return promise;
+
+            return Vow.any(promises);
         },
 
         /**
          * Cachable resolve hostname in DNS.
          * Use cached ip if possible.
          * Maintain cache.
-         * @param {String} host
+         * @param {Object} parsedUrl
          * @returns {Vow}
          */
-        _resolveHostname: function (host) {
+        _resolveHostname: function (parsedUrl) {
+            var host = parsedUrl.hostname;
             if (apiResolveCache[host]) {
                 return Vow.fulfill(apiResolveCache[host]);
             }
 
-            return this._dnsResolve(host).then(function (ip) {
+            return this._dnsResolve(parsedUrl).then(function (ip) {
                 apiResolveCache[host] = ip;
                 return apiResolveCache[host];
             });
@@ -96,7 +115,7 @@
             }
             parsedUrl = url.parse(requestUrl);
 
-            return this._resolveHostname(parsedUrl.hostname).then(function (hostIp) {
+            return this._resolveHostname(parsedUrl).then(function (hostIp) {
                 return this._requestApi(method, parsedUrl, hostIp, data);
             }.bind(this));
         },
