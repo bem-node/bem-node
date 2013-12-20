@@ -34,7 +34,8 @@
                 jQuery(window).one('load', function () {
                     setTimeout(function () {
                         jQuery(document).delegate('a', 'click', function (e) {
-                            if (!e.metaKey && !e.ctrlKey && this.protocol === location.protocol && this.host === location.host) {
+                            if (!e.metaKey && !e.ctrlKey && this.protocol === location.protocol && 
+                                this.host === location.host && !this.attributes.target) {
                                 if (_this.setPath(this.pathname + this.search + this.hash)) {
                                     e.preventDefault();
                                 }
