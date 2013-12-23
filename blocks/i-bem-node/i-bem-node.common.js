@@ -61,7 +61,7 @@
         bemDomInit = BEM.DOM.init.bind(BEM.DOM);
         BEM.DOM.init = function () {
             BN.init();
-            return bemDomInit();
+            return bemDomInit.apply(BEM.DOM, arguments);
         };
         autoinit = true;
     }
@@ -314,3 +314,4 @@
     };
 
 }());
+
