@@ -1,7 +1,9 @@
 0.7.0
 ---------------
+* ```BEM.blocks['i-router'].excapeHTML()``` now is depreaceted. Use ```BEM.blocks['i-content'].excapeHTML()```
+* ```BEM.blocks['i-router'].get()``` now is deprecated. Use ```BEM.blocks['i-router'].getPath() | getUri() | getRes() | getReq() | getParams()``` instead
 
-method ```beforeOut``` now deprecated. If you need make something before rendering you shold make it in ```init``` method.
+* method ```beforeOut``` now deprecated. If you need make something before rendering you shold make it in ```init``` method.
 
 instad of:
 ```js
