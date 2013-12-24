@@ -234,10 +234,10 @@
                     .replace(/^\?/, '')
                     .split('&')
                     .reduce(function (urlParamsObj, keyValue) {
-                        var keyValueAr = keyValue.split('=');
-                        if (keyValueAr.length === 2) {
-                            urlParamsObj[keyValueAr[0]] = decodeURIComponent(
-                                keyValueAr[1].replace(/\+/g, ' ')
+                        var keyValueAr = keyValue.match(/([^=]+)=(.+)/);
+                        if (keyValueAr) {
+                            urlParamsObj[keyValueAr[1]] = decodeURIComponent(
+                                keyValueAr[2].replace(/\+/g, ' ')
                             );
                         }
                         return urlParamsObj;
