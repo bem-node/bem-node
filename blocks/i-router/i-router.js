@@ -29,24 +29,18 @@
             this._lastPath = this.getPath();
             this._lastHandler = this._prepearRoute(this._lastPath);
             if (this._historyStateSupported()) {
-                // Subscribe to popstate after 'load' event
-                // to tackle bug in Chrome with 'popstate' on load
-                jQuery(window).one('load', function () {
-                    setTimeout(function () {
-                        jQuery(document).delegate('a', 'click', function (e) {
-                            if (!e.metaKey && !e.ctrlKey && this.protocol === location.protocol &&
-                                this.host === location.host && !this.attributes.target) {
-                                if (_this.setPath(this.pathname + this.search + this.hash)) {
-                                    e.preventDefault();
-                                }
-                            }
-                        });
+                jQuery(document).delegate('a', 'click', function (e) {
+                    if (!e.metaKey && !e.ctrlKey && this.protocol === location.protocol
+                        && this.host === location.host && !this.attributes.target) {
+                        if (_this.setPath(this.pathname + this.search + this.hash)) {
+                            e.preventDefault();
+                        }
+                    }
+                });
 
-                        jQuery(window).bind('popstate', function () {
-                            _this._state.set('path', getPathFromLocation());
-                            _this._onPathChange();
-                        });
-                    });
+                jQuery(window).bind('popstate', function () {
+                    _this._state.set('path', getPathFromLocation());
+                    _this._onChange();
                 });
             }
         },
@@ -105,7 +99,7 @@
             }
 
             history[method + 'State'](undefined, undefined, path);
-            this._onPathChange();
+            this._onChange();
             return true;
         },
 
@@ -132,7 +126,7 @@
          * Handle popstate event from window
          * Process handler for given path
          */
-        _onPathChange: function () {
+        _onChange: function () {
             var currentPath = this.getPath(), handler;
 
             if (this._lastPath !== currentPath) {
