@@ -34,7 +34,7 @@
                 jQuery(window).one('load', function () {
                     setTimeout(function () {
                         jQuery(document).delegate('a', 'click', function (e) {
-                            if (!e.metaKey && !e.ctrlKey && this.protocol === location.protocol && 
+                            if (!e.metaKey && !e.ctrlKey && this.protocol === location.protocol &&
                                 this.host === location.host && !this.attributes.target) {
                                 if (_this.setPath(this.pathname + this.search + this.hash)) {
                                     e.preventDefault();
@@ -234,7 +234,7 @@
                     .replace(/^\?/, '')
                     .split('&')
                     .reduce(function (urlParamsObj, keyValue) {
-                        var keyValueAr = keyValue.match(/([^=]+)=(.+)/);
+                        var keyValueAr = keyValue.match(/([^=]+)=(.*)/);
                         if (keyValueAr) {
                             urlParamsObj[keyValueAr[1]] = decodeURIComponent(
                                 keyValueAr[2].replace(/\+/g, ' ')
