@@ -1,3 +1,7 @@
+0.7.10
+---------------
+* pass lastPath to page update handler
+
 0.7.0
 ---------------
 * ```BEM.blocks['i-router'].excapeHTML()``` now is depreaceted. Use ```BEM.blocks['i-content'].excapeHTML()```

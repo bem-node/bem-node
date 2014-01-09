@@ -130,10 +130,8 @@
             var currentPath = this.getPath(), handler;
 
             if (this._lastPath !== currentPath) {
-                this._lastPath = currentPath;
                 handler = this._prepearRoute();
                 BEM.channel('i-router').trigger('update', {path: currentPath});
-
                 if (handler) {
                     this._execHandler(handler)
                         .fail(this.reload)
@@ -141,6 +139,8 @@
                 } else {
                     this.missing();
                 }
+                this._lastPath = currentPath;
+
             }
         },
 
@@ -180,7 +180,7 @@
                     return BEM.blocks[blockName].init(_this._state.get('matchers'));
                 },
                 update: function () {
-                    return BEM.blocks[blockName].update(_this._state.get('matchers'));
+                    return BEM.blocks[blockName].update(_this._state.get('matchers'), _this._lastPath, _this.getPath());
                 },
                 leave: function () {
                     return BEM.blocks[blockName].destruct();
