@@ -221,7 +221,7 @@ BN.addDecl('usual-page', 'page', {
         //...
         return this.out(/*bemjson*/);
     },
-    update: function(matchers) {
+    update: function(matchers, prevPath, newPath) {
        //...
        return Vow.fulfill();
     },
@@ -354,8 +354,10 @@ Adds to page `<head/>` any content
 
 This method is called when page route match to url. Redefine this method to output your page layout. See example in [page blocks](#page-blocks) and [i-page.out method](#bni-pageoutbemjson). By default page outputs empty string.
 
-#### .update(matchers)
+#### .update(matchers, prevPath, newPath)
  * matchers {Array} result of appling route regexp on url
+ * prevPath {String} url path before update
+ * newPath {String} new url path
  * return {Vow.promise}
 
 This method is called when page should be updated on client (new url matched with the same route). By default it calls `this.init(). You can setup selective block updates by redefining this method.
