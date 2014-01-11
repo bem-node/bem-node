@@ -152,6 +152,7 @@
          * Adds bh matchers for tree like declaration
          */
         _addMatchersByMode: function (prefix, decl) {
+            var _this = this;
             switch (typeof decl) {
             case 'function':
                 this._matchers[prefix] = decl;
@@ -159,7 +160,7 @@
             case 'object':
                 Object.keys(decl).forEach(function (mod) {
                     if (typeof decl[mod] === 'function') {
-                        this._matchers[prefix + '_' + mod] = decl[mod];
+                        _this._matchers[prefix + '_' + mod] = decl[mod];
                     } else {
                         throw new Error('Expected ' + prefix + '_' + mod + ' to be a function');
                     }

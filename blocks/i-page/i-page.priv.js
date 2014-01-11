@@ -141,6 +141,7 @@ BEM.decl('i-page', null, {
      * @return {i-page}
      */
     addToHead: function (elem) {
+        var head = this._getPageParams().head || [];
         head.push(elem);
         this._setPageParams('head', head);
         return this;
