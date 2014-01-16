@@ -108,7 +108,7 @@
          */
         reload: function (e) {
             if (e) {
-                console.error(e);
+                console.error(e instanceof Error ? e.stack : e);
             }
             setTimeout(function () {
                 location.reload();
