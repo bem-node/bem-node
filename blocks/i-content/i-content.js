@@ -16,5 +16,16 @@ BEM.decl('i-content', null,
                 });
         };
         return stat;
-    }, {})
+    }, {
+
+        /**
+         * Deletes a block
+         * @param {Boolean} [keepDOM]
+         * @param {jQuery} ctx
+         * @param {Boolean} [exludeSelf]
+         */
+        destruct: function () {
+            BEM.DOM.destruct.apply(BEM.DOM, arguments);
+        }
+    })
 );
