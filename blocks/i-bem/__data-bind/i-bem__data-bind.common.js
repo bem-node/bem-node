@@ -226,9 +226,8 @@
          * @param {Object} block Bem block
          */
         createDataBindings: function (block) {
-            if (block._getDataBindings) {
+            if (block._getDataBindings && !block.hasOwnProperty(storageKey)) {
                 block.bindToData(block._getDataBindings());
-                delete block._getDataBindings;
             }
         },
 
@@ -295,9 +294,8 @@
                         BD.getBinding(name + '.' + key).val(value[key] === undefined ? null : value[key]);
                     });
                 } else {
-                    stringValue = JSON.stringify(value);
-                    if (this.value !== stringValue) {
-                        this.value = stringValue;
+                    if (!$.equals(JSON.parse(this.value), value)) {
+                        this.value = JSON.stringify(value);
                         this.trigger();
                         while ((idx = name.lastIndexOf('.')) > 0) {
                             name = name.slice(0, idx);
@@ -336,7 +334,7 @@
          */
         trigger: function () {
             var value = this.val();
-            channel.trigger(this.name, {originValue: this.val(), stringValue: (this.ns) ? JSON.stringify(value) : this.value});
+            channel.trigger(this.name, {originValue: value, stringValue: (this.ns) ? JSON.stringify(value) : this.value});
         }
 
     };
@@ -369,9 +367,8 @@
             }
 
             value = this.get(undefined, this.nameSufix, this.name);
-            stringValue = JSON.stringify(value);
-            if (this.value !== stringValue) {
-                this.value = stringValue;
+            if (!$.equals(JSON.parse(this.value), value)) {
+                this.value = JSON.stringify(value);
                 BEM.dataBindVal(this.name, value);
             }
         },
@@ -406,7 +403,8 @@
          * @param {String|Function} opts.accessor Method, method or property name in context for getting and setting value from/to context
          * @param {String|Function} opts.get Method, method or property name in context getting for value from context. Requires 'opts.event'
          * @param {String|Function} opts.set Method, method or property name in context setting for value to context
-         * @param {String|Function} opts.initAccessor Method, method or property name in context for processing initial data binding value
+         * @param {String|Function|Boolean} opts.initAccessor Method, method or property name in context for processing initial data binding value.
+         *  if true then value from data binding will be set to binder
          * @param {Object} [scope=this] Context for data binder
          * @returns {Object} self
          */
@@ -429,8 +427,8 @@
                         //  if it returns some value, then this value will be newValue value for binding
                         //  if it doesn't return value, then binding will keep current value
                         newValue = fn(value, binder.nameSufix, name);
-                    // if 'initAccessor' is a path to property
-                    } else {
+                    // if 'initAccessor' is a string value - it is a path to property
+                    } else if (typeof accessor === 'string') {
                         newValue = accessor.split('.').reduce(function (obj, part, idx, all) {
                             if (idx === all.length - 1) {
                                 // if property is undefined ..
