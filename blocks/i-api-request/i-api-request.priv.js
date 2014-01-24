@@ -90,6 +90,16 @@
         },
 
         /**
+         * Security check for resource
+         *
+         * @param {String} resource
+         * @return {Boolean}
+         */
+        _checkResource: function (resource) {
+            return resource.indexOf('?') === -1;
+        },
+
+        /**
          *  Http request rest api
          *
          *  @param {String} method Http method
@@ -106,11 +116,17 @@
                 parsedUrl;
 
             if (resource.indexOf('http') !== 0) {
+                if (!this._checkResource(resource)) {
+                    return Vow.reject(new this._HttpError(400));
+                }
                 if (!this._apiHost) {
                     return Vow.reject(new Error('_apiHost is not specified; Define ._apiHost on your level first'));
                 }
                 requestUrl = this._apiHost.replace(/\/+$/, '') + '/' + resource;
             } else {
+                if (!this._checkResource(resource.replace(/https?\/\//, ''))) {
+                    return Vow.reject(new this._HttpError(400));
+                }
                 requestUrl = resource;
             }
             parsedUrl = url.parse(requestUrl);
