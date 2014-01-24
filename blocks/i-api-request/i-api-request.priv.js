@@ -225,8 +225,7 @@
                             if (res.statusCode !== 200) {
                                 console.error([res.statusCode, method, originalUrl].join(' '));
                                 promise.reject(new _this._HttpError(
-                                    res.statusCode,
-                                    [method, originalUrl].join(' ')
+                                    res.statusCode
                                 ));
                             } else if (data && data.requestSource === 'ajax') {
                                 promise.fulfill(body);
