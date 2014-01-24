@@ -1,8 +1,8 @@
 ({
     mustDeps: [
+        {block: 'i-bem', elems: ['dom']},
         {block: 'i-router', mods: {init: 'auto'}},
         {block: 'i-content', mods: {type: 'bh'}},
-        {block: 'i-bem', elems: ['dom']},
         {block: 'i-bh'}
     ],
     shouldDeps: [
