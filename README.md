@@ -594,13 +594,13 @@ BN.addDecl('app-header').blockTemplate(function(ctx){
     //..
 }).onSetMod({
     'js': function () { //fires when block inits on client
-        BEM.channel('i-router').on('update', this._onPageUpdate); //listen to page updates
+        BN('i-router').on('update', this._onPageUpdate); //listen to page updates
     }
 }).instanceProp({
     _onPageUpdate: function () {
         this.elem('search-input').val( //change value of search input element
             BN.escapeHTML( //escape to prevent XSS
-                BN('i-router').get('params').q //get param from url
+                BN('i-router').getParams().q //get param from url
             )
         );
     }
@@ -629,6 +629,16 @@ On client: makes remote call (through xhr) of server implementation.
 #### Event 'beforerequest' 'afterrequest'
 
 Triggered on client before and after xhr request.
+
+```js
+BN('i-api-request').on('beforerequest', function () {
+    //show ajax loader
+});
+BN('i-api-request').on('afterrequest', function () {
+    //hide ajax loader
+});
+
+```
 
 #### Event 'error'
 
