@@ -83,6 +83,10 @@ Returns link on BEM block static methods and properties.
 
 #### BN.addDecl(blockName , [type], [options])
  * blockName {String}
+ * [type] {String} - must be "page" or "ajax", if defined
+ * [options] {Object}
+ * [options.route] {String|RegExp} route for blocks with type="page"
+ * [options.apiHost] {String} api host for blocks with type="ajax"
  * return {BN.Generator} bem block generator
 
 Creates block generator.
@@ -171,7 +175,7 @@ BN.addDecl('example').blockTemplate(function (ctx) {
 
 `ctx` is instances of [bh.Ctx]()
 
-#### BN.Generator.elemTemplate(decl)
+#### BN.Generator.dataTemplate(decl)
  * decl {Function} define block data template
  * return {BN.Generator}
 
@@ -290,7 +294,7 @@ By default ajax blocks have only `GET` method. To provide `POST `PUT` and `DELET
 
 ```js
 // ajax block supporting post
-BN.addDecl('example-ajax-block', 'page', {
+BN.addDecl('example-ajax-block', 'ajax', {
     apiHost: 'http://api.example.com/v1/' //json api provider
 }).staticProp({
     post: function (resource, options) {
@@ -450,7 +454,7 @@ Block has api to manipulate content inside pages.
 
 #### BN('i-content').html(bemjson, [isSync=false])
  * bemjson {Object|String}
- * isSync {Boolean}
+ * [isSync=false] {Boolean}
  * return {Vow.promise|String} rendered html
 
 Applies all supported templates (bh, bem.json, bemhtml) to bemjson tree and then serialises it to html.
@@ -484,7 +488,7 @@ BN.addDecl('example').blockTemplate(function(ctx){
 
 Manages error pages (404, 50x), http redirect and responses.
 
-#### BN('i-response').send(status, body, contentType)
+#### BN('i-response').send(status, body, [contentType='text/plain'])
  * status {Number} http status
  * body {String}
  * [contentType='text/plain'] {String}
@@ -528,7 +532,7 @@ Manages page blocks and transitions between urls.
 
 #### BN('i-router').setPath | replacePath(path, [allowFallback=false])
  * path {String}
- * allowFallback {Boolean} if history.pushState is not supported, reload page to render on server
+ * [allowFallback=false] {Boolean} if history.pushState is not supported, reload page to render on server
 
 Changes url path.
 
@@ -546,8 +550,8 @@ Returns  full uri (i.e. protocol, domain, path, query)
 
 #### BN('i-router').setParams | replaceParams(params, [allowFallback=false], [extend=false])
  * params {Object} key-value map of url params
- * allowFallback {Boolean} if history.pushState is not supported, reload page to render on server
- * extend {Boolean} extend current url params with new one
+ * [allowFallback = false] {Boolean} if history.pushState is not supported, reload page to render on server
+ * [extend = false] {Boolean} extend current url params with new one
 
 Changes url params.
 
@@ -614,9 +618,9 @@ Calls `this._request('get', resource, options)`;
 #### ._request(method, resource, [options])
  * method {string} http method
  * resource {string} REST api resource
- * options {Object}
- * options.params {Object} REST api request params
- * options.body {Object} REST api request body
+ * [options] {Object}
+ * [options.params] {Object} REST api request params
+ * [options.body] {Object} REST api request body
 
 On server: makes request to rest api host, defined by `this._apiHost`.
 
