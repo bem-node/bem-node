@@ -367,7 +367,7 @@
             }
 
             value = this.get(undefined, this.nameSufix, this.name);
-            if (!$.equals(JSON.parse(this.value), value)) {
+            if (!$.equals(this.value ? JSON.parse(this.value) : undefined, value)) {
                 this.value = JSON.stringify(value);
                 BEM.dataBindVal(this.name, value);
             }
