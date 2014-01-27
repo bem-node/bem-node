@@ -3,7 +3,7 @@
  *
  * @abstract
  */
-BEM.decl({block: 'i-page'}, null, {
+(BEM.DOM || BEM).decl({block: 'i-page'}, null, {
 
     /**
      * Called when route on page was changed
