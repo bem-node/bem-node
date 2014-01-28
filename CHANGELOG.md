@@ -1,3 +1,6 @@
+0.7.19
+---------------
+* added ```BEM.blocks['i-router'].getMatchers()```
 0.7.10
 ---------------
 * pass lastPath to page update handler

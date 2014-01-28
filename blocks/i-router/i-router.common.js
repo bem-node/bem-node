@@ -76,6 +76,14 @@ BEM.decl('i-router', null, {
     },
 
     /**
+     * Getting regexp matchers from current router
+     * @return {Array}
+     */
+    getMatchers: function () {
+        return this._state.get('matchers');
+    },
+
+    /**
      * List of allowed http methods
      *
      * @const

@@ -565,6 +565,8 @@ Returns url host.
 
 #### BN('i-router').escapeHTML | unescapeHTML (html)
 
+ DEPRECATED — use BN('i-content').escapeHTML | unescapeHTML instead
+
 Escapes user content to prevent XSS.
 
 #### BN('i-router').getParams()
@@ -582,6 +584,10 @@ Node [http.ServerResponse](http://nodejs.org/api/http.html#http_class_http_serve
 #### BN('i-router').getCookies()
 
 Request cookies. See [node-cookie api](https://github.com/defunctzombie/node-cookie);
+
+#### BN('i-router').getMatchers()
+
+Getting regexp matchers from current router
 
 #### Event 'update'
 
