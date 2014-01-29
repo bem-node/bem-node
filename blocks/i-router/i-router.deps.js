@@ -4,6 +4,7 @@
     ],
     shouldDeps: [
         {block: 'i-www-server'},
-        {block: 'i-response'}
+        {block: 'i-response'},
+        {block: 'tests'}
     ]
 })

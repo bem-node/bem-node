@@ -6,7 +6,6 @@ Single-page web application with [node.js](http://nodejs.org/api/), [BEM](http:/
 
 Use bem-node with our [project-stub](https://github.com/delfrrr/bem-node-hello-world/)
 
-
 ### How it works
 
 The main principle of bem-node is presenting page layout as bemjson ([russian ref](https://github.com/bem/bemhtml/blob/master/common.docs/reference/reference.ru.md#%D0%A1%D0%B8%D0%BD%D1%82%D0%B0%D0%BA%D1%81%D0%B8%D1%81-bemjson)) object. Block templates apply on bemjson tree to produce complete layout with data. Then bemjson is serialising to html.
@@ -650,6 +649,43 @@ BN('i-api-request').on('afterrequest', function () {
 
 Triggered on client on xhr error.
 
+### Tests
 
+####run tests
 
+    git clone git@github.com:bem-node/bem-node.git
+    cd bem-node
+    npm test
 
+####quick tests
+
+    ./tests.sh -c #client tests only
+    ./tests.sh -s #server tests only
+    ./tests.sh -b #rebuild tests
+    ./tests.sh -b -s -c #rebuild, server, client
+
+####create tests
+You should use ```.common.test.js``` for tests common for client and server, ```.priv.tests.js``` for server tests only, and ```.tests.js``` for client tests only.
+
+Typical test looks like this
+```js
+describe('whatever', function () {
+    it ('testing someting', function (done) {
+        return expect(env('/some-url?param-name=param-value', function () {
+            return <promise or not>
+        })).eventually.equal(<some value>)
+    });
+});
+```
+
+```js
+describe('i-api-request', function () {
+    it('get with full path', function () {
+        return expect(env(function () {
+            return BEM.blocks['i-api-request'].get('http://nodejs.org/api/index.json')
+        })).eventually.have.property('source')
+    });
+});
+```
+
+You should use global ```env``` function to create page context 

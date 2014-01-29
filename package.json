@@ -15,11 +15,20 @@
     },
     "scripts": {
         "postinstall": "./bin/install.sh",
-        "test": "node test.js && YENV=production enb make && find pages -name '*tests.js' | xargs mocha && cp pages/bem-node/_bem-node.js bem-node.min.js"
+        "test": "npm install --save-dev && ./tests.sh"
     },
     "bundledDependencies": [
         "bh", "bem-json", "vow", "cookies", "request", "inherit", "borschik", "bem-bl"
     ],
+    "devDependencies": {
+        "mocha": "~1.18",
+        "chai": "~1.9",
+        "chai-as-promised": "~4.1",
+        "mocha-phantomjs": "*",
+        "enb": "0.8.48",
+        "enb-bemhtml": "0.2.2",
+        "phantomjs": "1.9.7-1"
+    },
     "dependencies": {
         "bh": "0.1.19",
         "bem-json": "0.1.6",
