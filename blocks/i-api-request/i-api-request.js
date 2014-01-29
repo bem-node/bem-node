@@ -86,7 +86,7 @@ BEM.decl('i-api-request', null, {
             this._abortOneRequest(requests);
         }
     },
-    
+
     /**
      * Modifying request params before maing ajax request
      *
@@ -106,7 +106,7 @@ BEM.decl('i-api-request', null, {
         }
         return data;
     },
-    
+
     /**
      * Creating pathname for ajax query
      *
@@ -116,7 +116,7 @@ BEM.decl('i-api-request', null, {
     _createAjaxUrl: function (method) {
         return '/ajax/' + this._name + '/' + method;
     },
-    
+
     /**
      * Checking if cache should be droped before request
      *
@@ -128,7 +128,7 @@ BEM.decl('i-api-request', null, {
     _checkDropCache: function (method) {
         return method !== 'get';
     },
-    
+
     /**
      * Calls when http status is not equal to 200
      *
@@ -162,7 +162,7 @@ BEM.decl('i-api-request', null, {
         this._activeXhrs = this._activeXhrs || [];
         return this._makeAjax(method, resource, data);
     },
-    
+
     /**
      * Making ajax qeury with jQuery
      *
@@ -176,6 +176,7 @@ BEM.decl('i-api-request', null, {
             _this = this;
 
         BEM.channel('i-api-request').trigger('beforerequest');
+        BEM.blocks['i-api-request'].trigger('beforerequest');
         this._activeXhrs.push({
             promise: promise,
             xhr: jQuery.ajax({
@@ -203,6 +204,7 @@ BEM.decl('i-api-request', null, {
                                     xhr.responseTex
                                 );
                                 BEM.channel('i-api-request').trigger('error', error);
+                                BEM.blocks['i-api-request'].trigger('error', error);
                                 promise.reject(error);
                             })
                             .done();
@@ -211,6 +213,7 @@ BEM.decl('i-api-request', null, {
                         return xhr !== xhrItem.xhr;
                     });
                     BEM.channel('i-api-request').trigger('afterrequest');
+                    BEM.blocks['i-api-request'].trigger('afterrequest');
                 }
             })
         });

@@ -131,7 +131,8 @@
 
             if (this._lastPath !== currentPath) {
                 handler = this._prepearRoute();
-                BEM.channel('i-router').trigger('update', {path: currentPath});
+                BEM.channel('i-router').trigger('update', {path: currentPath}); //deprecated
+                this.trigger('update', {path: currentPath});
                 if (handler) {
                     this._execHandler(handler)
                         .fail(this.reload)
