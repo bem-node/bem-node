@@ -222,7 +222,7 @@
                         if (err) {
                             promise.reject(err);
                         } else {
-                            if (res.statusCode !== 200) {
+                            if (res.statusCode >= 300) {
                                 console.error([res.statusCode, method, originalUrl].join(' '));
                                 promise.reject(new _this._HttpError(
                                     res.statusCode
