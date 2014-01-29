@@ -100,7 +100,7 @@ Inherits block declaration from base block.
  * decl {Object} static methods and properties
  * return {BN.Generator}
 
-Adds static methods and properties ([i-bem](http://ru.bem.info/libs/bem-core/i-bem-js/)).
+Adds static methods and properties ([i-bem](https://github.com/bem-node/i-bem-doc#bem-i-bem-api-reference)).
 
 ```js
 BN.addDecl('example').staticProp({
@@ -122,7 +122,7 @@ BN('example').someMethod(); //returns 'abc'
 
 ```
 
-`this` – inherits [i-bem](http://ru.bem.info/libs/bem-core/i-bem-js/)
+`this` – inherits [i-bem](https://github.com/bem-node/i-bem-doc#bem-i-bem-api-reference)
 
 `this.__instances` – array of block dom instances (only for client side code)
 
@@ -132,13 +132,13 @@ BN('example').someMethod(); //returns 'abc'
  * decl {Object} dom instances methods and properties
  * return {BN.Generator}
 
-Adds methods and properties for block dom instance ([i-bem.dom](http://ru.bem.info/libs/bem-core/i-bem-js/))
+Adds methods and properties for block dom instance ([i-bem.dom](https://github.com/bem-node/i-bem-doc#bemdom-i-bem__dom-api-reference))
 
 #### BN.Generator.onSetMod(decl)
- * decl {Object} define block dom instances behaviour on modification change (see [i-bem.dom]())
+ * decl {Object} define block dom instances behaviour on modification change (see [i-bem.dom](https://github.com/bem-node/i-bem-doc#bemdom-i-bem__dom-api-reference))
  * return {BN.Generator}
 
-Adds methods and properties for block dom instance ([i-bem.dom](http://bem.info/articles/bem-js-main-terms/))
+Adds methods and properties for block dom instance ([i-bem.dom](https://github.com/bem-node/i-bem-doc#bemdom-i-bem__dom-api-reference))
 
 #### BN.Generator.blockTemplate(decl)
  * decl {Object|Function} define block bh template
