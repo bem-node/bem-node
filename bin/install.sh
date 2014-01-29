@@ -28,3 +28,10 @@ ln -sf ../../../node_modules/bem-json/i-bem/__html/i-bem__html.js blocks/i-bem/_
 ln -sf ../../node_modules/vow/lib/vow.js blocks/i-promise/i-promise.js
 
 ln -sf ../../node_modules/bh/lib/bh.js blocks/i-bh/i-bh.js
+
+mkdir -p tests.blocks/mocha
+ln -sf ../../node_modules/mocha/mocha.js tests.blocks/mocha/mocha.js
+ln -sf ../../node_modules/mocha/mocha.css tests.blocks/mocha/mocha.css
+
+ln -sf ../../node_modules/chai/chai.js tests.blocks/chai/chai.js
+ln -sf ../../../node_modules/chai-as-promised/lib/chai-as-promised.js tests.blocks/chai/__as-promised/chai__as-promised.js

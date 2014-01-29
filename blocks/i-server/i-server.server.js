@@ -10,12 +10,7 @@ BEM.decl('i-server', null, {
         var cluster = require('cluster'),
             workers = Number(BEM.blocks['i-command'].get('workers'));
 
-        if (!workers) {
-            console.log('Workers number not specified; 1 worker by default');
-            workers = 1;
-        }
-
-        if (cluster.isMaster) {
+        if (workers && cluster.isMaster) {
             while (workers--) {
                 cluster.fork();
             }

@@ -10,7 +10,14 @@ blocks/i-jquery/__is-empty-object/*server.js
 blocks/i-jquery/__observable/*server.js
 blocks/i-jquery/_dummy/
 blocks/i-promise/i-promise.js
+blocks/i-bh/i-bh.js
+tests.blocks/mocha/mocha.js
+tests.blocks/chai/chai.js
+tests.blocks/chai/__as-promised/chai__as-promised.js
 
 .bem/tmp
-pages/*
+tests/*/*
+!tests/*/*.bemdecl.js
 !pages/.gitignore
+
+npm-debug.log

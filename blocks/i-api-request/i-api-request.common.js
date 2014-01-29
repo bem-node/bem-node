@@ -10,14 +10,23 @@ BEM.decl('i-api-request', null, {
      * @param {String} message
      * @param {String} responseBody
      */
-    _HttpError: function (status, message, responseBody) {
-        this.name = 'E_HTTP_ERROR';
-        this.status = status;
-        this.message = message;
-        if (responseBody) {
-            this.message += ' ' + String(responseBody).replace(/\n/g, '\\n');
-        }
-    },
+    _HttpError: (function () {
+        var HttpError = function(status, message, responseBody) {
+            this.status = status;
+            this.message = message;
+            if (responseBody) {
+                this.message += ' ' + String(responseBody).replace(/\n/g, '\\n');
+            }
+            if (Error.captureStackTrace) {
+                Error.captureStackTrace(this, HttpError);
+            }
+        };
+        HttpError.prototype = Object.create(Error.prototype);
+        HttpError.prototype.message = 'Http Error';
+        HttpError.prototype.name = 'E_HTTP_ERROR';
+
+        return HttpError;
+    }()),
 
     /**
      * Trim slashes from resource

@@ -5,13 +5,11 @@ BEM.decl({name: 'i-www-server', baseBlock: 'i-server'}, null, {
      */
     init: function () {
         var cluster = require('cluster'),
-            socket = BEM.blocks['i-command'].get('socket'),
+            socket = BEM.blocks['i-command'].get('socket') || 3000,
+            workers = Number(BEM.blocks['i-command'].get('workers')),
+            priv,
             number;
 
-        if (!socket) {
-            console.error('Socket not specified');
-            return 1;
-        }
         number = Number(socket);
         socket = !isNaN(number) ? number : socket;
 
@@ -19,9 +17,19 @@ BEM.decl({name: 'i-www-server', baseBlock: 'i-server'}, null, {
 
         if (cluster.isMaster) {
             this.prepairSocket(socket);
-        } else {
+        }
+        if (!workers || !cluster.isMaster) {
             this._startHTTP(socket);
-            require(process.argv[1].replace('server.js', 'priv.js'));
+            // 2 — default start
+            // 3 — tests
+            if (process.argv.length === 2) {
+                priv = process.argv[1].replace('server.js', 'priv.js')
+            } else if (process.argv.length === 3) {
+                priv = process.cwd() + '/' +
+                    process.argv[2].replace('server.tests.js', 'priv.js');
+            }
+
+            require(priv);
         }
     },
 
