@@ -225,7 +225,9 @@
                             if (res.statusCode >= 300) {
                                 console.error([res.statusCode, method, originalUrl].join(' '));
                                 promise.reject(new _this._HttpError(
-                                    res.statusCode
+                                    res.statusCode,
+                                    '',
+                                    body
                                 ));
                             } else if (data && data.requestSource === 'ajax') {
                                 promise.fulfill(body);
