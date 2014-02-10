@@ -138,6 +138,8 @@
 
         /**
          * Decode gziped body
+         * @param {Object} res Response
+         * @param {String|Buffer} body
          * @returns {Vow.promise}
          */
         _decodeBody: function (res, body) {

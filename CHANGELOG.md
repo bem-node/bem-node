@@ -1,3 +1,19 @@
+0.8.0
+---------------
+new interface for ```_decodeBody``` method in ```i-api-request```
+was
+```
+     @param {Object} res Response
+     @param {String|Buffer} body
+     @param {Function} callback
+```
+
+now
+```
+     @param {Object} res Response
+     @param {String|Buffer} body
+     @returns {Vow.promise}
+```
 0.7.19
 ---------------
 * added ```BEM.blocks['i-router'].getMatchers()```
