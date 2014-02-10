@@ -138,21 +138,25 @@
 
         /**
          * Decode gziped body
+         * @returns {Vow.promise}
          */
-        _decodeBody: function (res, body, callback) {
+        _decodeBody: function (res, body) {
+            var promise = Vow.promise();
+
             if (body && res.headers['content-encoding'] === 'gzip') {
                 zlib.gunzip(body, function (err, decodedBody) {
                     if (err) {
-                        callback(err);
+                        promise.reject(err);
                     } else {
-                        callback(null, decodedBody.toString());
+                        promise.fulfill(decodedBody.toString());
                     }
                 });
             } else if (body) {
-                callback(null, body.toString());
+                promise.fulfill(body.toString());
             } else {
-                callback(null, '');
+                promise.fulfill('');
             }
+            return promise;
         },
 
         /**
@@ -192,6 +196,19 @@
         },
 
         /**
+         * Makes request
+         * @param requestOptions
+         * @returns {Vow.promise}
+         */
+        _makeRequest: function (requestOptions) {
+            var promise = Vow.promise();
+            request(requestOptions, function (err, res, encodedBody) {
+                promise.fulfill({err: err, res: res, encodedBody: encodedBody});
+            });
+            return promise;
+        },
+
+        /**
          * Request rest api with predefined api params
          * @param {String} method HTTP protocol method.
          * @param {Object} parsedUrl Standart nodejs's object that represents url.
@@ -200,8 +217,7 @@
          * @returns {Vow}
          */
         _requestApi: function (method, parsedUrl, hostIp, data) {
-            var promise = Vow.promise(),
-                _this = this,
+            var _this = this,
                 requestOptions = this._buildRequestOptions(method, parsedUrl, hostIp, data),
                 originalUrl = this._getUri(parsedUrl, data && data.params);
 
@@ -209,33 +225,63 @@
                 requestOptions.body = this._normalizeBody(data.body);
             }
 
-            request(requestOptions, function (err, res, encodedBody) {
-                if (err) {
-                    if (err.code === 'ETIMEDOUT') {
-                        console.error(['ETIMEDOUT', method, originalUrl].join(' '));
-                        promise.reject(new _this._HttpError(500, ['ETIMEDOUT', method, originalUrl].join(' ')));
-                    } else {
-                        promise.reject(err);
-                    }
-                } else {
-                    _this._decodeBody(res, encodedBody, function (err, body) {
-                        if (err) {
-                            promise.reject(err);
-                        } else {
-                            if (res.statusCode >= 300) {
-                                console.error([res.statusCode, method, originalUrl].join(' '));
-                                promise.reject(new _this._HttpError(
-                                    res.statusCode
-                                ));
-                            } else if (data && data.requestSource === 'ajax') {
-                                promise.fulfill(body);
-                            } else {
-                                _this._parse(promise, body);
-                            }
-                        }
+            return this._makeRequest(requestOptions).then(function (info) {
+                return _this._checkResponse(info.err, info.res, {
+                    method: method,
+                    originalUrl: originalUrl
+                })
+                    .then(function () {
+                        return _this._decodeBody(info.res, info.encodedBody);
                     });
+            })
+                .then(function (body) {
+                    return _this._handleSuccessResponse(body, data && data.requestSource === 'ajax' ? true : false);
+                })
+                .fail(function (err) {
+                    if (err instanceof _this._HttpError) {
+                        console.error(originalUrl, err.status, err.message);
+                    }
+                    return Vow.reject(err);
+                });
+        },
+
+        /**
+         *
+         * @param err
+         * @param res
+         * @param options
+         * @returns {Vow.promise}
+         * @private
+         */
+        _checkResponse: function (err, res, options) {
+            if (err) {
+                if (err.code === 'ETIMEDOUT') {
+                    return Vow.reject(new this._HttpError(500, ['ETIMEDOUT', options.method, options.originalUrl].join(' ')));
                 }
-            });
+                return Vow.reject(err);
+            }
+            if (res.statusCode >= 300) {
+                return Vow.reject(new this._HttpError(
+                    res.statusCode
+                ));
+            }
+            return Vow.fulfill();
+        },
+
+        /**
+         * Handles success response
+         * @param body of response
+         * @param isAjax
+         * @returns {Vow.promise}
+         */
+        _handleSuccessResponse: function (body, isAjax) {
+            var promise = Vow.promise();
+
+            if (isAjax) {
+                promise.fulfill(body);
+            } else {
+                this._parse(promise, body);
+            }
 
             return promise;
         }
