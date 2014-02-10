@@ -1,6 +1,7 @@
 0.8.0
 ---------------
 new interface for ```_decodeBody``` method in ```i-api-request```
+
 was
 ```
      @param {Object} res Response
