@@ -184,7 +184,7 @@ BEM.decl('i-api-request', null, {
                 url: this._createAjaxUrl(method),
                 data: data,
                 complete: function (xhr) {
-                    if (xhr.status === 200) {
+                    if (xhr.status >= 200 && xhr.status < 300) {
                         _this._parse(promise, xhr.responseText);
                     } else {
                         _this._shouldRetry(xhr, method, resource, data)
