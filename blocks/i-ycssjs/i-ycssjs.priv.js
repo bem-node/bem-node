@@ -3,7 +3,8 @@
  */
 (function () {
     var fs = require('fs'),
-        normalize = require('path').normalize,
+        dirname = require('path').dirname,
+        resolve = require('path').resolve,
         borschik = require('borschik').api,
         CONTENT_TYPES = {
             'css': 'text/css;charset=utf-8',
@@ -25,7 +26,7 @@
 
     BEM.blocks['i-router'].define('GET', route, 'i-ycssjs');
     BEM.decl({block: 'i-ycssjs'}, null, {
-        
+
         init: function (matches, req, res) {
             var path = '.' + matches[0],
                 suffix = matches[1],
@@ -60,7 +61,7 @@
                     }).done();
 
                 } else {
-                    
+
                     fs.readFile(path, function (err, source) {
                         var result = source;
 
@@ -68,22 +69,9 @@
                             res.writeHead(404);
                             return res.end();
                         }
-                        
+
                         if (suffix === 'js') {
-                            result = result.toString().replace(/include\(['"](.+)['"]\);?/g, function (p, p1) {
-                                var path = p1[0] === '/' ? p1 : (fileDir + p1);
-                                path = normalize(path);
-                                try {
-                                    return [
-                                        '/* start: ' + path + '*/\n',
-                                        fs.readFileSync(path, 'utf8'),
-                                        '/* end: ' + path + '*/\n\n'
-                                    ].join('');
-                                } catch (e) {
-                                    console.log(e.message);
-                                    return e.stack;
-                                }
-                            });
+                            result = expandContent(source, path);
                         }
 
                         res.end(result);
@@ -96,4 +84,21 @@
         }
 
     });
+
+    function expandContent(content, rootPath) {
+        return content.toString().replace(/include\(['"](.+)['"]\);?/g, function (p, p1) {
+            var path = resolve(dirname(rootPath), p1);
+
+            try {
+                return [
+                    '/* start: ' + path + '*/\n',
+                    expandContent(fs.readFileSync(path, 'utf8'), path),
+                    '/* end: ' + path + '*/\n\n'
+                ].join('');
+            } catch (e) {
+                console.log(e.message);
+                return e.stack;
+            }
+        })
+    }
 }());
