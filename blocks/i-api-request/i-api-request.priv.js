@@ -230,6 +230,7 @@
             return this._makeRequest(requestOptions).then(function (info) {
                 return _this._checkResponse(info.err, info.res, {
                     method: method,
+                    encodedBody: info.encodedBody,
                     originalUrl: originalUrl
                 })
                     .then(function () {
