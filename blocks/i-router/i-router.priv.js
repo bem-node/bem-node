@@ -159,14 +159,15 @@
          */
         _readRequestParams: function (callback) {
             var req = this.getReq(),
+                method = req.method,
                 _this = this,
                 body = '';
 
             this._state.set('params', {});
 
-            if (req.method === 'GET') {
+            if (method === 'GET' || method === 'DELETE') {
                 callback(url.parse(req.url, true).query);
-            } else if (req.method === 'POST') {
+            } else if (method === 'POST' || method === 'PUT') {
                 req.on('data', BEM.blocks['i-state'].bind(function (chunk) {
                     body += chunk.toString();
                     if (body.length > _this.MAX_POST_BODY_SIZE) {
