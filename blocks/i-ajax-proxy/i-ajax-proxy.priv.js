@@ -2,7 +2,7 @@
  * Proxy ajax calls on i-blocks
  */
 
-BEM.blocks['i-router'].define('GET,POST', /^\/ajax\/([\w\-]+)\/([^_][\w]+)/, 'i-ajax-proxy');
+BEM.blocks['i-router'].define('GET,POST,PUT,DELETE', /^\/ajax\/([\w\-]+)\/([^_][\w]+)/, 'i-ajax-proxy');
 
 BEM.decl('i-ajax-proxy', {}, {
 
