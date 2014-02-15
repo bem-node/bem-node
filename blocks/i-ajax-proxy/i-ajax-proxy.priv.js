@@ -6,15 +6,22 @@ BEM.blocks['i-router'].define('GET,POST', /^\/ajax\/([\w\-]+)\/([^_][\w]+)/, 'i-
 
 BEM.decl('i-ajax-proxy', {}, {
 
-    _blockList: [],
+    WILDCARD: '*',
+
+    _allowedRequests: {},
 
     /**
      * Allow to proxy blocks
      *
      * @param {String} blockName
+     * @param [String = *] methodName
+     * @param [Array<String, RegExp> = *] resources
      */
-    allowBlock: function (blockName) {
-        this._blockList.push(blockName);
+    allowBlock: function (blockName, methodName, resources) {
+        var policy = {};
+        policy[blockName] = {};
+        policy[blockName][methodName || this.WILDCARD] = resources || [this.WILDCARD];
+        jQuery.extend(true, this._allowedRequests, policy);
     },
 
     _parseJSONParam: function (str) {
@@ -61,11 +68,41 @@ BEM.decl('i-ajax-proxy', {}, {
         return Vow.fulfill('');
     },
 
-    _checkMethod: function (blockName, methodName) {
+    _accessPolicies: [
+        //allowed block
+        function (blockName) {
+            return this._allowedRequests[blockName];
+        },
+        // allowed method
+        function (blockName, methodName) {
+            var blockData = this._allowedRequests[blockName];
+            return blockData[methodName] || blockData[this.WILDCARD];
+        },
+        // method is a function
+        function (blockName, methodName) {
+            return typeof BEM.blocks[blockName][methodName] === 'function';
+        },
+        // allowed resources
+        function (blockName, methodName, data) {
+            var blockData = this._allowedRequests[blockName];
 
-        return this._blockList.indexOf(blockName) !== -1 &&
-            BEM.blocks[blockName] &&
-            typeof BEM.blocks[blockName][methodName] === 'function';
+            return [blockData[methodName], blockData[this.WILDCARD]].some(function (methodData) {
+                return methodData && methodData.some(function (needle) {
+                    if (needle === this.WILDCARD) {
+                        return true;
+                    } else if (needle instanceof String) {
+                        return data.resource === needle;
+                    } else if (needle instanceof RegExp) {
+                        return data.resource.match(needle);
+                    }
+                }, this);
+            }, this);
+        }
+    ],
+    _checkMethod: function (blockName, methodName, data) {
+        return this._accessPolicies.every(function (policy) {
+            return policy.call(this, blockName, methodName, data);
+        }, this);
     },
 
     _runMethod: function (blockName, methodName, data) {
