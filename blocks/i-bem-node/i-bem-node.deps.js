@@ -7,6 +7,7 @@
     ],
     shouldDeps: [
         {block: 'i-page'},
+        {block: 'i-ajax'},
         {block: 'i-api-request'},
         {block: 'i-ajax-proxy'}
     ]
