@@ -24,8 +24,18 @@
         },
 
         /**
+         * Showing error page if it defined overwise shoing blank page with 500 status code
+         *
+         * @param {Error} err
+         */
+        error: function (err) {
+            return this._error(err);
+        },
+
+        /**
          * Handles 50x page
          *
+         * @deprecated
          * @note will be called from domain
          * @param {Error} err
          */
