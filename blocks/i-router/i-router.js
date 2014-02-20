@@ -279,7 +279,7 @@
             if (location.search === ('?' + search)) {
                 return;
             }
-            this._state.set('params', params);
+            this._state.set('params', newParams);
             return this[method + 'Path'](location.pathname + (search ? '?' + search : ''), allowFallback);
         },
 
