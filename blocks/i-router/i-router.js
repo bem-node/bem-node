@@ -289,6 +289,20 @@
          */
         encodedParams: function () {
             return location.search;
+        },
+ 
+        /**
+         * Showing error page if it defined overwise shoing blank page with 500 status code
+         *
+         * @param {Error} err
+         */
+        error: function (err) {
+            var routeInfo = this._getRoute('500');
+            if (routeInfo) {
+                this._execHandler(routeInfo.handler);
+            } else {
+                this.reload(err);
+            }
         }
 
     });

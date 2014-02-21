@@ -589,6 +589,14 @@ Request cookies. See [node-cookie api](https://github.com/defunctzombie/node-coo
 
 Getting regexp matchers from current router
 
+#### BN('i-router').missing()
+
+Showing 404 page
+
+#### BN('i-router').error(err)
+
+Showing 5xx page
+
 #### Event 'update'
 
 Use it to update static page content on client:

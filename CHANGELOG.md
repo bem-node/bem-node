@@ -1,3 +1,7 @@
+0.8.4
+---------------
+added ```error``` method to ```i-router``` to showing 5xx pages
+
 0.8.0
 ---------------
 new interface for ```_decodeBody``` method in ```i-api-request```
