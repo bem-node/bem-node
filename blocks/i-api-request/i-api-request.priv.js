@@ -241,7 +241,7 @@
                     return _this._handleSuccessResponse(body, data && data.requestSource === 'ajax' ? true : false);
                 })
                 .fail(function (err) {
-                    if (err instanceof _this._HttpError) {
+                    if (_this.isHttpError(err)) {
                         console.error(originalUrl, err.status, err.message);
                     }
                     return Vow.reject(err);
@@ -252,7 +252,10 @@
          *
          * @param err
          * @param res
-         * @param options
+         * @param {Object} options
+         * @param {String} options.method
+         * @param {String} options.encodedBody
+         * @param {String} options.originalUrl
          * @returns {Vow.promise}
          * @private
          */
@@ -265,7 +268,9 @@
             }
             if (res.statusCode >= 300) {
                 return Vow.reject(new this._HttpError(
-                    res.statusCode
+                    res.statusCode,
+                    '',
+                    options.encodedBody
                 ));
             }
             return Vow.fulfill();

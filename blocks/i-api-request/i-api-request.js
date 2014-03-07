@@ -201,7 +201,7 @@ BEM.decl('i-api-request', null, {
                                 var error = e || new _this._HttpError(
                                     xhr.status,
                                     xhr.statusText,
-                                    xhr.responseTex
+                                    xhr.responseText
                                 );
                                 BEM.channel('i-api-request').trigger('error', error);
                                 BEM.blocks['i-api-request'].trigger('error', error);
