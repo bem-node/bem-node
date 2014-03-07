@@ -7,9 +7,10 @@
         dns = require('dns'),
         apiResolveCache = {},
         querystring = require('querystring'),
-        zlib = require('zlib');
+        zlib = require('zlib'),
+        http = require('http');
 
-    require('http').globalAgent.maxSockets = 20;
+    http.globalAgent.maxSockets = 20;
 
     BEM.decl('i-api-request', null, {
 
@@ -115,18 +116,15 @@
             var requestUrl,
                 parsedUrl;
 
+            if (!this._checkResource(resource)) {
+                return Vow.reject(new this._HttpError(400, 'Resource must not contain "?" symbol'));
+            }
             if (resource.indexOf('http') !== 0) {
-                if (!this._checkResource(resource)) {
-                    return Vow.reject(new this._HttpError(400));
-                }
                 if (!this._apiHost) {
                     return Vow.reject(new Error('_apiHost is not specified; Define ._apiHost on your level first'));
                 }
                 requestUrl = this._apiHost.replace(/\/+$/, '') + '/' + resource;
             } else {
-                if (!this._checkResource(resource.replace(/https?\/\//, ''))) {
-                    return Vow.reject(new this._HttpError(400));
-                }
                 requestUrl = resource;
             }
             parsedUrl = url.parse(requestUrl);
@@ -241,7 +239,7 @@
                     return _this._handleSuccessResponse(body, data && data.requestSource === 'ajax' ? true : false);
                 })
                 .fail(function (err) {
-                    if (err instanceof _this._HttpError) {
+                    if (_this.isHttpError(err)) {
                         console.error(originalUrl, err.status, err.message);
                     }
                     return Vow.reject(err);
@@ -252,20 +250,25 @@
          *
          * @param err
          * @param res
-         * @param options
+         * @param {Object} options
+         * @param {String} options.method
+         * @param {String} options.encodedBody
+         * @param {String} options.originalUrl
          * @returns {Vow.promise}
          * @private
          */
         _checkResponse: function (err, res, options) {
             if (err) {
                 if (err.code === 'ETIMEDOUT') {
-                    return Vow.reject(new this._HttpError(500, ['ETIMEDOUT', options.method, options.originalUrl].join(' ')));
+                    return Vow.reject(new this._HttpError(500, 'ETIMEDOUT', ['ETIMEDOUT', options.method, options.originalUrl].join(' ')));
                 }
                 return Vow.reject(err);
             }
             if (res.statusCode >= 300) {
                 return Vow.reject(new this._HttpError(
-                    res.statusCode
+                    res.statusCode,
+                    http.STATUS_CODES[res.statusCode],
+                    options.encodedBody
                 ));
             }
             return Vow.fulfill();

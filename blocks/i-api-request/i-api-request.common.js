@@ -4,19 +4,16 @@
 BEM.decl('i-api-request', null, {
 
     /**
-     * Http error constructor
-     *
+     * @class HttpError
      * @param {Number} status
-     * @param {String} message
-     * @param {String} responseBody
+     * @param {String} [message]
+     * @param {String} [responseBody]
      */
     _HttpError: function (status, message, responseBody) {
         this.name = 'E_HTTP_ERROR';
         this.status = status;
         this.message = message;
-        if (responseBody) {
-            this.message += ' ' + String(responseBody).replace(/\n/g, '\\n');
-        }
+        this.responseBody = responseBody;
     },
 
     /**
