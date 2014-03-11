@@ -5,7 +5,7 @@
 (function () {
 
     function getPathFromLocation() {
-        return decodeURIComponent(location.pathname + location.search);
+        return decodeURIComponent((location.pathname + location.search).replace(/\+/g, ' '));
     }
 
     /**
@@ -154,7 +154,7 @@
          * @return {Object} handler
          */
         _prepearRoute: function (path) {
-            var routePath = path || (location.pathname + location.search),
+            var routePath = path || getPathFromLocation(),
                 pathAndSearch = routePath.split('?'),
                 pathName = pathAndSearch[0],
                 routeInfo = this._getRoute(pathName);
@@ -231,9 +231,7 @@
                     .reduce(function (urlParamsObj, keyValue) {
                         var keyValueAr = keyValue.match(/([^=]+)=(.*)/);
                         if (keyValueAr) {
-                            urlParamsObj[keyValueAr[1]] = decodeURIComponent(
-                                keyValueAr[2].replace(/\+/g, ' ')
-                            );
+                            urlParamsObj[keyValueAr[1]] = keyValueAr[2];
                         }
                         return urlParamsObj;
                     }, {})
