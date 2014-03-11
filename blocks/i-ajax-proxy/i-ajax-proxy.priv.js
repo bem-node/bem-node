@@ -20,7 +20,7 @@ BEM.decl('i-ajax-proxy', {}, {
     _parseJSONParam: function (str) {
         try {
             if (str) {
-                return JSON.parse(decodeURIComponent(BEM.blocks['i-content'].unescapeHTML(str)));
+                return JSON.parse(BEM.blocks['i-content'].unescapeHTML(str));
             } else {
                 return {};
             }
