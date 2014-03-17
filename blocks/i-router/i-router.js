@@ -5,7 +5,7 @@
 (function () {
 
     function getPathFromLocation() {
-        return decodeURIComponent((location.pathname + location.search).replace(/\+/g, ' '));
+        return location.pathname + location.search;
     }
 
     /**
@@ -231,7 +231,9 @@
                     .reduce(function (urlParamsObj, keyValue) {
                         var keyValueAr = keyValue.match(/([^=]+)=(.*)/);
                         if (keyValueAr) {
-                            urlParamsObj[keyValueAr[1]] = keyValueAr[2];
+                            urlParamsObj[keyValueAr[1]] = decodeURIComponent(
+                                keyValueAr[2].replace(/\+/g, ' ')
+                            );
                         }
                         return urlParamsObj;
                     }, {})
