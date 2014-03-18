@@ -16,3 +16,4 @@ BEM.decl('i-router', null, {
         return this.__base(req, res);
     }
 });
+BEM.blocks['i-router'].init();
