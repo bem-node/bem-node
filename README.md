@@ -1,3 +1,6 @@
+bem-node [![Build Status](https://travis-ci.org/bem-node/bem-node.png?branch=master)](https://travis-ci.org/bem-node/bem-node)
+===
+
 ## bem-node
 
 Single-page web application with [node.js](http://nodejs.org/api/), [BEM](http://bem.info/)
