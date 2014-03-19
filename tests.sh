@@ -16,7 +16,7 @@ function server {
     for D in `find tests/*/*server.tests.js -type f`; do
         echo "  Testing $D"
         killall node
-        $MOCHA $D
+        $MOCHA -R spec $D
     done
 }
 if [ $1 ]; then
