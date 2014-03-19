@@ -12,13 +12,37 @@
  * @return {Vow.promise}
  */
 env = function (url, fn) {
+    var result, last;
+
     if (!fn) {
         fn = url;
         url = null;
     }
     if (url) {
-        history.pushState(null, null, url);
-        BEM.blocks['i-router']._prepearRoute();
+        var lastUrl = window.location.href;
+
+        try {
+            history.pushState(null, null, url);
+            BEM.blocks['i-router']._prepearRoute();
+        } catch (e) {
+            result = Vow.reject(e);
+        }
     }
-    return Vow.promise(fn()); 
+
+    if (!result) {
+        try {
+            result = fn();
+            result = Vow.promise(result);
+        } catch (e) {
+            result = Vow.reject(e);
+        }
+    }
+
+    return result.always(function (p) {
+        if (lastUrl) {
+            history.pushState(null, null, lastUrl);
+        }
+        return p;
+    });
+
 };

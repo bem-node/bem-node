@@ -10,18 +10,30 @@ describe('i-router.common', function () {
             }
         });
 
-        it ('params', function (done) {
-            env('/foo?qwe=123', function (meta) {
-                expect(router.getParams().qwe).equal('123');
-                done();
-            }).done();
+        it ('params', function () {
+            return expect(env('/foo?qwe=123', function (meta) {
+                return router.getParams().qwe;
+            })).eventually.equal('123');
         });
-        it ('params', function (done) {
-            env('/foo?p1=123?4&p2=%20567', function (meta) {
-                expect(router.getParams().p1).equal('123?4');
-                expect(router.getParams().p2).equal(' 567');
-                done();
-            }).done();
+
+        it ('? in params', function () {
+            return expect(env('/foo?bar=123?4&p2=3333', function (meta) {
+                return router.getParams().bar;
+            })).eventually.equal('123?4');
         });
+
+        it ('= in params', function () {
+            return expect(env('/foo?bar=2=3&p2=3333', function (meta) {
+                return router.getParams().bar;
+            })).eventually.equal('2=3');
+        });
+
+        it ('% in params', function () {
+            return expect(env('/foo?bar=%', function () {
+                return router.getParams().bar;
+            })).eventually.equal('%');
+        });
+
+
     }); 
 });

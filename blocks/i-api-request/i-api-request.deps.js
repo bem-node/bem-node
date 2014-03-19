@@ -3,9 +3,10 @@
         {block: 'i-ajax-proxy'},
         {block: 'i-promise'},
         {block: 'i-state'},
+    ],
+    shouldDeps: [
         // tests
-        {block: 'mocha'},
-        {block: 'chai'},
-        {block: 'env'}
+        {block: 'tests'},
+        {block: 'i-test-api'}
     ]
 })
