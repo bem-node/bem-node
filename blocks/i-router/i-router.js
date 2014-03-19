@@ -236,7 +236,6 @@
          */
         _readParams: function (search) {
 
-            console.log(search, location.search);
             this._state.set(
                 'params',
                 String(arguments.length === 1 ? search : location.search)
