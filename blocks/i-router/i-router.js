@@ -155,13 +155,23 @@
          */
         _prepearRoute: function (path) {
             var routePath = path || (location.pathname + location.search),
-                pathAndSearch = routePath.split('?'),
-                pathName = pathAndSearch[0],
-                routeInfo = this._getRoute(pathName);
+                idx = routePath.indexOf('?'),
+                pathName, search, routeInfo;
+
+
+            if (idx > -1) {
+                pathName = routePath.substr(0, idx);
+                search = routePath.substr(idx + 1);
+            } else {
+                pathName = routePath;
+                search = '';
+            }
+
+            routeInfo = this._getRoute(pathName);
 
             this._state.set('matchers', (routeInfo) ? routeInfo.matchers : []);
             this._state.set('path', routePath);
-            this._readParams(pathAndSearch[1] || '');
+            this._readParams(search || '');
 
             return routeInfo && routeInfo.handler;
         },
@@ -220,22 +230,39 @@
         /**
          * Get current url params hash
          *
+         * @copyright https://github.com/joyent/node/blob/master/lib/querystring.js#L152-L206
+         *
          * @return {Object}
          */
         _readParams: function (search) {
+
+            console.log(search, location.search);
             this._state.set(
                 'params',
                 String(arguments.length === 1 ? search : location.search)
-                    .replace(/^\?/, '')
                     .split('&')
-                    .reduce(function (urlParamsObj, keyValue) {
-                        var keyValueAr = keyValue.match(/([^=]+)=(.*)/);
-                        if (keyValueAr) {
-                            urlParamsObj[keyValueAr[1]] = decodeURIComponent(
-                                keyValueAr[2].replace(/\+/g, ' ')
-                            );
+                    .map(function (x) {
+                        var x = x.replace(/\+/g, '%20'),
+                            idx = x.indexOf('='),
+                            key, val;
+
+                        if (idx > -1) {
+                            key = x.substr(0, idx);
+                            val = x.substr(idx + 1);
+                        } else {
+                            key = x;
+                            val = '';
                         }
-                        return urlParamsObj;
+
+                        try {
+                            key = decodeURIComponent(key),
+                            val = decodeURIComponent(val);
+                        } catch (e) {};
+                        return [key, val];
+                    })
+                    .reduce(function (p, sp) {
+                        p[sp[0]] = sp[1];
+                        return p
                     }, {})
             );
         },

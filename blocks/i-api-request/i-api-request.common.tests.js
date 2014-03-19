@@ -1,16 +1,17 @@
 describe('i-api-request', function () {
-    try {
-        BEM.blocks['i-ajax-proxy'].allowBlock('i-test-api');
-    } catch(e) {};
-    BEM.decl({block: 'i-test-api', baseBlock: 'i-api-request'}, null, {
-        _apiHost: 'http://nodejs.org/api/'
-    });
 
     var api = BEM.blocks['i-test-api'];
 
-    it('get with full path', function () {
+    it('resourse only', function () {
         return expect(env(function () {
-            return api.get('index.json')
-        })).eventually.have.property('source')
+            return api.get('index.json');
+        })).eventually.have.property('source');
     });
+
+    it('params', function () {
+        return expect(env(function () {
+            return api.get('index.json', {params: {foo: '%bar'}});
+        })).eventually.have.property('source');
+    });
+
 });
