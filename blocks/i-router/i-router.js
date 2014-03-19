@@ -5,7 +5,7 @@
 (function () {
 
     function getPathFromLocation() {
-        return decodeURIComponent(location.pathname + location.search);
+        return location.pathname + location.search;
     }
 
     /**
@@ -154,7 +154,7 @@
          * @return {Object} handler
          */
         _prepearRoute: function (path) {
-            var routePath = path || (location.pathname + location.search),
+            var routePath = path || getPathFromLocation(),
                 pathAndSearch = routePath.split('?'),
                 pathName = pathAndSearch[0],
                 routeInfo = this._getRoute(pathName);
