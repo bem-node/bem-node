@@ -29,8 +29,7 @@
 
         init: function (matches, req, res) {
             var path = '.' + matches[0],
-                suffix = matches[1],
-                fileDir = path.replace(/[^\/]+$/, '');
+                suffix = matches[1];
 
             if (suffix === 'css' || suffix === 'js') {
                 path = path.replace(/_([\w\.]+$)/, '$1');
@@ -99,6 +98,6 @@
                 console.log(e.message);
                 return e.stack;
             }
-        })
+        });
     }
 }());

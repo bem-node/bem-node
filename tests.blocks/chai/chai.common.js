@@ -1,7 +1,8 @@
 (function () {
+    var chai;
     if (!this.chai) {
         try {
-            var chai = require('chai');
+            chai = require('chai');
         } catch (e) {
             return;
         }

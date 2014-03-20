@@ -1,3 +1,4 @@
+/*global env:true*/
 /**
  * Creating page context
  *
@@ -12,14 +13,14 @@
  * @return {Vow.promise}
  */
 env = function (url, fn) {
-    var result, last;
+    var result, lastUrl;
 
     if (!fn) {
         fn = url;
         url = null;
     }
     if (url) {
-        var lastUrl = window.location.href;
+        lastUrl = window.location.href;
 
         try {
             history.pushState(null, null, url);
