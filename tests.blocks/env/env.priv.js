@@ -57,6 +57,7 @@ global.env = env = function (path, fn) {
                 process.domain.state = env.states[meta.stateKey];
                 delete meta.stateKey;
             }
+
             var result = fn(meta);
             if (Vow.isPromise(result)) {
                 result.then(

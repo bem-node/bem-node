@@ -115,9 +115,13 @@
             var requestUrl,
                 parsedUrl;
 
+            if (this._checkDropCache(method, resource, data)) {
+                this.dropCache();
+            }
+
             if (resource.indexOf('http') !== 0) {
                 if (!this._checkResource(resource)) {
-                    return Vow.reject(new this._HttpError(400));
+                    return Vow.reject(new this._HttpError(400, 'resource "' + resource + '" denier'));
                 }
                 if (!this._apiHost) {
                     return Vow.reject(new Error('_apiHost is not specified; Define ._apiHost on your level first'));
