@@ -1,3 +1,4 @@
+/*global env:true*/
 /**
  * Creating page context
  *
@@ -17,7 +18,7 @@
 var domain = require('domain'),
     http = require('http');
 
-global.env = function (path, fn) {
+global.env = env = function (path, fn) {
     var pathPromise = Vow.promise();
 
     if (arguments.length === 1) {
@@ -34,7 +35,7 @@ global.env = function (path, fn) {
                 res.on('data', function (data) {
                     chunks.push(data);
                 });
-                res.on('end', function (e) {
+                res.on('end', function () {
                     pathPromise.fulfill({
                         stateKey: key,
                         statusCode: res.statusCode,
@@ -70,5 +71,5 @@ global.env = function (path, fn) {
         return promise;
     });
 
-}
+};
 global.env.states = {};

@@ -273,7 +273,7 @@
          */
         val: function (value) {
             var name = this.name,
-                stringValue, idx;
+                idx;
 
             // read value
             if (value === undefined) {
@@ -360,7 +360,7 @@
          * Sets new value from context to data binding if binder not suspended
          */
         eventListener: function () {
-            var value, stringValue;
+            var value;
 
             if (this.suspended === true) {
                 return;

@@ -58,6 +58,16 @@
         };
 
         BH.prototype.processBemJsonAsync = function (bemJson, blockName, ignoreContent) {
+            /**
+             * Враппер для json-узла.
+             * @constructor
+             */
+            function Ctx() {
+                this.ctx = null;
+                this.newCtx = null;
+            }
+            Ctx.prototype = this.utils;
+
             if (!this._inited) {
                 this._init();
             }
@@ -71,15 +81,6 @@
                 var processContent = !ignoreContent;
                 var infiniteLoopDetection = this._infiniteLoopDetection;
 
-                /**
-                 * Враппер для json-узла.
-                 * @constructor
-                 */
-                function Ctx() {
-                    this.ctx = null;
-                    this.newCtx = null;
-                }
-                Ctx.prototype = this.utils;
                 var ctx = new Ctx();
                 while (node = nodes.shift()) {
                     json = node.json;

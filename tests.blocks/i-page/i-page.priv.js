@@ -1,7 +1,8 @@
+/*global mocha, expect:true, chai:true, mochaPhantomJS*/
 function script(url, content) {
     var tag = {
         tag: 'script',
-    }
+    };
     if (url) {
         tag.attrs = {src: url};
     } else if (content) {
@@ -10,7 +11,7 @@ function script(url, content) {
     return tag;
 }
 
-function getTestName () {
+function getTestName() {
     return process.argv[1].match(/\/(\w+)[^\/]+$/)[1];
 }
 
@@ -60,7 +61,7 @@ BEM.decl('i-page', null, {
                     ]
                 }
             ]
-        }
+        };
     }
 });
 

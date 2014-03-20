@@ -27,7 +27,8 @@
         "mocha-phantomjs": "*",
         "enb": "0.8.48",
         "enb-bemhtml": "0.2.2",
-        "phantomjs": "1.9.7-1"
+        "phantomjs": "1.9.7-1",
+        "jshint": "*"
     },
     "dependencies": {
         "bh": "0.1.19",

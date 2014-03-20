@@ -2,6 +2,7 @@
 MOCHA=./node_modules/.bin/mocha
 PHANTOM=./node_modules/.bin/mocha-phantomjs
 ENB=./node_modules/.bin/enb
+JSHINT=./node_modules/.bin/jshint
 
 function client {
     echo Client tests
@@ -19,9 +20,17 @@ function server {
         $MOCHA -R spec $D
     done
 }
+
+function lint {
+    find blocks tests.blocks -type f | grep -vEe 'deps.js' | xargs $JSHINT
+}
+
 if [ $1 ]; then
     while test $# -gt 0; do
         case "$1" in
+            -l|--lint|--jslint)
+                lint;
+                ;;
             -c|--client)
                 client
                 ;;
@@ -39,6 +48,7 @@ if [ $1 ]; then
         shift;
     done;
 else
+    lint
     enb make
     server
     client

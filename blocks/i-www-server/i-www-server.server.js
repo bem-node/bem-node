@@ -24,7 +24,7 @@ BEM.decl({name: 'i-www-server', baseBlock: 'i-server'}, null, {
 
 
             if (!isTest) {
-                priv = process.argv[1].replace('server.js', 'priv.js')
+                priv = process.argv[1].replace('server.js', 'priv.js');
             } else {
 
                 priv = process.argv.filter(function (path) {

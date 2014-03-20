@@ -1,3 +1,4 @@
+/*global env*/
 var http = require('http'),
     end = http.ServerResponse.prototype.end;
 
@@ -12,7 +13,7 @@ BEM.decl('i-router', null, {
             } catch (e) {}
 
             return end.apply(res, arguments);
-        }
+        };
         return this.__base(req, res);
     }
 });

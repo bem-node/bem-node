@@ -11,7 +11,7 @@ BEM.decl('i-api-request', null, {
      * @param {String} responseBody
      */
     _HttpError: (function () {
-        var HttpError = function(status, message, responseBody) {
+        var HttpError = function (status, message, responseBody) {
             this.status = status;
             this.message = message;
             if (responseBody) {

@@ -240,8 +240,8 @@
                 'params',
                 String(arguments.length === 1 ? search : location.search)
                     .split('&')
-                    .map(function (x) {
-                        var x = x.replace(/\+/g, '%20'),
+                    .map(function (part) {
+                        var x = part.replace(/\+/g, '%20'),
                             idx = x.indexOf('='),
                             key, val;
 
@@ -254,16 +254,17 @@
                         }
 
                         try {
-                            key = decodeURIComponent(key),
+                            key = decodeURIComponent(key);
                             val = decodeURIComponent(val);
-                        } catch (e) {};
+                        } catch (e) {}
                         return [key, val];
                     })
                     .reduce(function (p, sp) {
                         p[sp[0]] = sp[1];
-                        return p
+                        return p;
                     }, {})
             );
+
         },
 
         /**

@@ -1,3 +1,4 @@
+/*global BEMHTML:true*/
 var script = process.argv[1],
     base = script.replace('server.js', '');
 

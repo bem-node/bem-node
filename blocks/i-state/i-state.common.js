@@ -64,6 +64,7 @@ BEM.decl('i-state', null, {
      */
     _getParam: function (path, state) {
         try {
+            /*jshint unused:false*/
             return eval('state["' + path.split('.').join('"]["') + '"]');
         } catch (err) {
             return null;

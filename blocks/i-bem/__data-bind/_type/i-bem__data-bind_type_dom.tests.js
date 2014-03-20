@@ -1,4 +1,4 @@
-describe('BEM data bindings', function () {
+describe('BEM data bindings for BEM.DOM', function () {
 
     var text = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum'.split(/,\s|\.\s|\s/),
         txtLen = text.length,
@@ -13,11 +13,11 @@ describe('BEM data bindings', function () {
     }
 
     function staticBlock(props) {
-        return BEM.decl('i-test-' + blockIdx++, null, props);
+        return BEM.decl('b-test-' + blockIdx++, null, props);
     }
 
     function dynamicBlock(props) {
-        return BEM.decl('i-test-' + blockIdx++, props);
+        return BEM.decl('b-test-' + blockIdx++, props);
     }
 
 
@@ -25,9 +25,9 @@ describe('BEM data bindings', function () {
         var block1, block2;
 
         describe('should be defined', function () {
-            BEM.decl('i-test', {foo: 'bar'}, {baz: 'foo'});
+            BEM.decl('b-test', {foo: 'bar'}, {baz: 'foo'});
 
-            ['BEM', 'BEM.blocks[\'i-test\']', 'BEM.create(\'i-test\')'].forEach(function (context) {
+            ['BEM.DOM', 'BEM.blocks[\'b-test\']', 'jQuery(\'<span></span>\').bem(\'b-test\')'].forEach(function (context) {
                 var scope = eval(context);
                 it('method "bindToData" works in "' + context + '"', function () {
                     expect(typeof scope.bindToData === 'function').toBeTruthy();
@@ -123,8 +123,7 @@ describe('BEM data bindings', function () {
             param_1_1_value_3 = randomValue(),
             param_1_1_name, param_1_1_in,
             param_1_1_name_2, param_1_1_in_2,
-            param_1dot1_path, param_1dot1_name,
-            block1, block2, block3, block4, block5;
+            block1, block2, block3, block4;
 
         describe('setup new value', function () {
             it('from context property', function () {
@@ -167,37 +166,9 @@ describe('BEM data bindings', function () {
                 expect(block4.initValue).toBe(param_1_1_value_3);
                 expect(block4.initValue).toBe(BEM.dataBindVal('param-1-1'));
             });
-
-            it('from context property by path', function () {
-                var value = randomValue(),
-                    block1 = staticBlock({
-                        dataBindings: {'binding-param': { initAccessor: 'path.to.param' }},
-                        path: {to: {param: value}}
-                    });
-                expect(block1.path.to.param).toBe(value);
-                expect(BEM.dataBindVal('binding-param')).toBe(value);
-                block1.unbindFromData();
-            });
-
-            it('to context property by path', function () {
-                var value = randomValue(),
-                    block2 = staticBlock({
-                        dataBindings: {'param-1-1': { initAccessor: 'path.to.param' }}
-                    });
-                expect(block2.path.to.param).toBe(BEM.dataBindVal('param-1-1'));
-            });
         });
 
         it('functions reseive correct params', function () {
-            var block5 = staticBlock({
-                dataBindings: {'param-1.1': { initAccessor: 'initValue' }},
-                initValue: function (value, name, path) {
-                    param_1dot1_path = path;
-                    param_1dot1_name = name;
-                }
-            });
-            expect(param_1dot1_path).toBe('param-1.1');
-            expect(param_1dot1_name).toBe('1');
             expect(param_1_1_name).toBe('param-1-1');
             expect(param_1_1_name_2).toBe('param-1-1');
             expect(param_1_1_in).toBe(param_1_1_value);
@@ -207,12 +178,12 @@ describe('BEM data bindings', function () {
             block2.unbindFromData();
             block3.unbindFromData();
             block4.unbindFromData();
-            block5.unbindFromData();
         });
     });
 
     describe('synchronize primitive values', function () {
-        var decl1, decl2, Decl3, block1, block2;
+        var decl1 = staticBlock(getProps()),
+            decl2, decl3, block1, block2;
 
         function getProps() {
             return {
@@ -252,7 +223,6 @@ describe('BEM data bindings', function () {
             }};
             return props;
         }
-        decl1 = staticBlock(getProps());
 
         it('between new block and dataBindVal', function () {
             expect(decl1.dataBindVal('param-2-1')).toEqual(decl1.val(undefined, 'param-2-1'));
@@ -279,8 +249,8 @@ describe('BEM data bindings', function () {
         });
 
         it('between params of static and dynamic blocks', function () {
-            Decl3 = dynamicBlock(getDynamicProps());
-            block1 = new Decl3();
+            decl3 = dynamicBlock(getDynamicProps());
+            block1 = jQuery('<b/>').bem(decl3.getName());
 
             expect(block1.val(undefined, 'param-2-1')).toEqual(decl1.val(undefined, 'param-2-1'));
             expect(block1.val(undefined, 'param-2-2')).toEqual(decl1.val(undefined, 'param-2-2'));
@@ -296,7 +266,7 @@ describe('BEM data bindings', function () {
         });
 
         it('between params of dynamic blocks', function () {
-            block2 = new Decl3();
+            block2 = jQuery('<b/>').bem(decl3.getName());
             expect(block2.val(undefined, 'param-2-1')).toEqual(block1.val(undefined, 'param-2-1'));
             expect(block2.val(undefined, 'param-2-2')).toEqual(block1.val(undefined, 'param-2-2'));
 
@@ -317,7 +287,8 @@ describe('BEM data bindings', function () {
     });
 
     describe('synchronize object values', function () {
-        var decl1, decl2, Decl3, block1, block2;
+        var decl1 = staticBlock(getProps()),
+            decl2, decl3, block1, block2;
 
         function getProps() {
             return {
@@ -357,7 +328,6 @@ describe('BEM data bindings', function () {
             }};
             return props;
         }
-        decl1 = staticBlock(getProps()),
 
         it('between new block and dataBindVal', function () {
             expect(decl1.dataBindVal('param-3-1')).toEqual(decl1.val(undefined, 'param-3-1'));
@@ -384,8 +354,8 @@ describe('BEM data bindings', function () {
         });
 
         it('between params of static and dynamic blocks', function () {
-            Decl3 = dynamicBlock(getDynamicProps());
-            block1 = new Decl3();
+            decl3 = dynamicBlock(getDynamicProps());
+            block1 = jQuery('<b/>').bem(decl3.getName());
 
             expect(block1.val(undefined, 'param-3-1')).toEqual(decl1.val(undefined, 'param-3-1'));
             expect(block1.val(undefined, 'param-3-2')).toEqual(decl1.val(undefined, 'param-3-2'));
@@ -401,7 +371,7 @@ describe('BEM data bindings', function () {
         });
 
         it('between params of dynamic blocks', function () {
-            block2 = new Decl3();
+            block2 = jQuery('<b/>').bem(decl3.getName());
             expect(block2.val(undefined, 'param-3-1')).toEqual(block1.val(undefined, 'param-3-1'));
             expect(block2.val(undefined, 'param-3-2')).toEqual(block1.val(undefined, 'param-3-2'));
 
@@ -418,139 +388,6 @@ describe('BEM data bindings', function () {
             decl2.unbindFromData();
             block1.unbindFromData();
             block2.unbindFromData();
-        });
-    });
-
-    describe('name-spaces', function () {
-        var block1 = staticBlock({
-                dataBindings: {
-                    'ns.subNs.property1': {
-                        accessor: 'val1',
-                        initAccessor: 'val1',
-                        event: 'change'
-                    },
-                    'ns.subNs.property2': {
-                        accessor: 'val2',
-                        initAccessor: 'val2',
-                        event: 'change'
-                    }
-                },
-                val1: randomValue(),
-                val2: randomValue(),
-                update: function (values) {
-                    this.val1 = values.val1;
-                    this.val2 = values.val2;
-                    this.trigger('change');
-                }
-            });
-
-        it('return correct value from dataBindVal', function () {
-            var values = BEM.dataBindVal('ns');
-            expect(block1.val1).toBe(values.subNs.property1);
-            expect(block1.val2).toBe(values.subNs.property2);
-            values = BEM.dataBindVal('ns.subNs');
-            expect(block1.val1).toBe(values.property1);
-            expect(block1.val2).toBe(values.property2);
-        });
-
-        it('change value through dataBindVal', function () {
-            var newValue1 = randomValue(),
-                newValue2 = randomValue(),
-                values;
-
-            BEM.dataBindVal('ns', {
-                subNs: {
-                    property1: newValue1,
-                    property2: newValue2
-                }
-            });
-
-            values = BEM.dataBindVal('ns');
-            expect(newValue1).toBe(values.subNs.property1);
-            expect(newValue2).toBe(values.subNs.property2);
-            values = BEM.dataBindVal('ns.subNs');
-            expect(newValue1).toBe(values.property1);
-            expect(newValue2).toBe(values.property2);
-            expect(BEM.dataBindVal('ns.subNs.property1')).toBe(newValue1);
-            expect(BEM.dataBindVal('ns.subNs.property2')).toBe(newValue2);
-            expect(newValue1).toBe(block1.val1);
-            expect(newValue2).toBe(block1.val2);
-        });
-
-        it('call accessors with correct params', function () {
-            var block2 = staticBlock({
-                    dataBindings: {'ns.subNs.testProp': 'val'},
-                    val: function (value, prop, path) {
-                        called = true;
-                        argValue = value;
-                        argProp = prop;
-                        argPath = path;
-                    }
-                }),
-                value = randomValue(),
-                argValue, argProp, argPath, called;
-
-            BEM.dataBindVal('ns.subNs.testProp', value);
-            expect(argValue).toBe(value);
-            expect(argProp).toBe('testProp');
-            expect(argPath).toBe('ns.subNs.testProp');
-
-            block2.unbindFromData();
-        });
-
-        it('trigger data change events', function () {
-            var block2, block3, values, ready;
-
-            runs(function () {
-                block2 = staticBlock({
-                    dataBindings: {ns: 'nsValue'}
-                });
-                block3 = staticBlock({
-                    dataBindings: {'ns.subNs': 'nsValue'}
-                });
-                values = {
-                    val1: randomValue(),
-                    val2: randomValue()
-                };
-
-                block1.update(values);
-                setTimeout(function () {
-                    ready = 1;
-                }, 200);
-            });
-
-            waitsFor(function () {
-                return ready;
-            }, 'properties should be changed', 400);
-
-            runs(function () {
-                expect(BEM.dataBindVal('ns.subNs.property1')).toBe(values.val1);
-                expect(BEM.dataBindVal('ns.subNs.property2')).toBe(values.val2);
-                expect(block2.nsValue).toBeDefined();
-                expect(block2.nsValue).toEqual(BEM.dataBindVal('ns'));
-                expect(block3.nsValue).toBeDefined();
-                expect(block3.nsValue).toEqual(BEM.dataBindVal('ns.subNs'));
-
-                block2.unbindFromData();
-                block3.unbindFromData();
-            });
-        });
-
-        it('destruct successfully', function () {
-            var block2 = staticBlock({
-                    dataBindings: {ns: 'nsValue'}
-                }),
-                block3 = staticBlock({
-                    dataBindings: {'ns.subNs': 'nsValue'}
-                });
-
-            block2.unbindFromData('ns');
-            block3.unbindFromData('ns.subNs');
-            block1.unbindFromData();
-            expect(BEM.dataBindVal('ns.subNs.property1')).toBeUndefined();
-            expect(BEM.dataBindVal('ns.subNs.property2')).toBeUndefined();
-            expect(BEM.dataBindVal('ns.subNs')).toBeUndefined();
-            expect(BEM.dataBindVal('ns')).toBeUndefined();
         });
     });
 
