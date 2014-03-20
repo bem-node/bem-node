@@ -4,20 +4,25 @@ PHANTOM=./node_modules/.bin/mocha-phantomjs
 ENB=./node_modules/.bin/enb
 JSHINT=./node_modules/.bin/jshint
 
+function kn {
+    killall node 2>/dev/null
+}
 function client {
     echo Client tests
     for D in `find tests/*/*server.js -type f`; do
         echo "  Testing $D"
-        killall node
+        kn
         node $D & $PHANTOM http://127.0.0.1:3000/
+        kn
     done
 }
 function server {
     echo Server tests
     for D in `find tests/*/*server.tests.js -type f`; do
         echo "  Testing $D"
-        killall node
+        kn
         $MOCHA -R spec $D
+        kn
     done
 }
 
@@ -30,7 +35,7 @@ function coverage {
 }
 
 function lint {
-    find blocks tests.blocks -type f | grep -vEe 'deps.js' | xargs $JSHINT
+    find blocks tests.blocks -type f | grep -vEe 'deps.js' | xargs $JSHINT 1>&2
 }
 
 if [ $1 ]; then

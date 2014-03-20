@@ -36,6 +36,18 @@ BEM.decl('i-api-request', null, {
     },
 
     /**
+     * Checking if cache should be droped before request
+     *
+     * @param {String} method
+     * @param {String} [resource]
+     * @param {Object} [data]
+     * @return {Boolean}
+     */
+    _checkDropCache: function (method) {
+        return method !== 'get';
+    },
+
+    /**
      * Get json string of body
      */
     _normalizeBody: function (body) {
