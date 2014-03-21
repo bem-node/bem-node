@@ -7,6 +7,7 @@ var build = require('enb/lib/build-flow'),
         'node_modules/bem-node/node_modules/bem-json',
         'node_modules/bem-node/blocks'
     ],
+    makeTests = false,
     bemhtml = true,
     freeze = false,
     pages = 'pages/*',
@@ -91,20 +92,26 @@ function enbMake(config) {
                 require('enb/techs/css-includes'),
                 server,
                 priv,
-                js,
-                serverTests,
-                clientTests
+                js
             ]);
-
 
             nodeConfig.addTargets([
                 '?.server.js',
                 '?.priv.js',
                 '?.js',
-                '?.css',
-                '?.server.tests.js',
-                '?.client.tests.js'
+                '?.css'
             ]);
+
+            if (makeTests) {
+                nodeConfig.addTechs([
+                    serverTests,
+                    clientTests
+                ]);
+                nodeConfig.addTargets([
+                    '?.server.tests.js',
+                    '?.client.tests.js'
+                ]);
+            }
 
             if (bemhtml) {
                 nodeConfig.addTechs([require('enb-bemhtml/techs/bemhtml')]);
@@ -208,6 +215,18 @@ enbMake.noBEMHTML = function () {
  */
 enbMake.freeze = function () {
     freeze = true;
+    return this;
+}
+
+/**
+ * Create .server.tests.js and .tests.js
+ *
+ * @ex
+ *   module.exports('bem-node/enb-make')
+ *      .makeTests()
+ */
+enbMake.makeTests = function () {
+    makeTests = true;
     return this;
 }
 
