@@ -28,7 +28,8 @@
         "enb": "0.8.48",
         "enb-bemhtml": "0.2.2",
         "phantomjs": "1.9.7-1",
-        "jshint": "*"
+        "jshint": "*",
+        "blanket": "*"
     },
     "dependencies": {
         "bh": "0.1.19",
@@ -43,5 +44,10 @@
     "main": "index",
     "engines": {
         "node": ">= 0.8.0"
+    },
+    "config": {
+        "blanket": {
+            "pattern": ["common.js", "priv.js"]
+        }
     }
 }
