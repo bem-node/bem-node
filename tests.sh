@@ -21,6 +21,14 @@ function server {
     done
 }
 
+function coverage {
+    for D in `find tests/*/*server.tests.js -type f`; do
+        killall node 2>/dev/null
+        $MOCHA -R html-cov --require blanket $D > coverage.html
+        echo $ open coverage.html
+    done
+}
+
 function lint {
     find blocks tests.blocks -type f | grep -vEe 'deps.js' | xargs $JSHINT
 }
@@ -28,6 +36,9 @@ function lint {
 if [ $1 ]; then
     while test $# -gt 0; do
         case "$1" in
+            --coverage)
+                coverage
+                ;;
             -l|--lint|--jslint)
                 lint;
                 ;;
