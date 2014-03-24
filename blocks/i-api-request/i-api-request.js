@@ -118,18 +118,6 @@ BEM.decl('i-api-request', null, {
     },
 
     /**
-     * Checking if cache should be droped before request
-     *
-     * @param {String} method
-     * @param {String} [resource]
-     * @param {Object} [data]
-     * @return {Boolean}
-     */
-    _checkDropCache: function (method) {
-        return method !== 'get';
-    },
-
-    /**
      * Calls when http status is not equal to 200
      *
      * @param {XMLHttpRequest} xhr of request

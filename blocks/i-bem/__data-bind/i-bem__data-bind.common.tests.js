@@ -180,8 +180,7 @@ describe('BEM data bindings', function () {
             });
 
             it('to context property by path', function () {
-                var value = randomValue(),
-                    block2 = staticBlock({
+                var block2 = staticBlock({
                         dataBindings: {'param-1-1': { initAccessor: 'path.to.param' }}
                     });
                 expect(block2.path.to.param).toBe(BEM.dataBindVal('param-1-1'));

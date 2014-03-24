@@ -50,7 +50,7 @@ BEM.decl({name: 'i-www-server', baseBlock: 'i-server'}, null, {
 
         //handling uncaught exception
         process.on('uncaughtException', function (err) {
-            console.error('UNCAUGHT EXCEPTION:', err);
+            console.error('UNCAUGHT EXCEPTION:', err.stack);
             //gracefull exit
             httpServer.close(function () {
                 process.exit(1);
