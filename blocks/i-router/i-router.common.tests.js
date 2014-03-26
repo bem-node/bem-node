@@ -1,16 +1,20 @@
 describe('i-router.common', function () {
     var router = BEM.blocks['i-router'];
 
-    describe('define', function () {
+    describe('params', function () {
         router.define('GET', /\/(foo)/, 'i-router-page-1');
+
         BEM.decl('i-router-page-1', null, {
             init: function () {
                 router.getRes().end();
                 return Vow.fulfill();
+            },
+            destruct: function () {
+                return Vow.fulfill();
             }
         });
 
-        it('params', function () {
+        it('simple', function () {
             return expect(env('/foo?qwe=123', function () {
                 return router.getParams().qwe;
             })).eventually.equal('123');
@@ -33,6 +37,7 @@ describe('i-router.common', function () {
                 return router.getParams().bar;
             })).eventually.equal('%');
         });
+
 
 
     });
