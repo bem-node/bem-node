@@ -15,7 +15,8 @@
     },
     "scripts": {
         "postinstall": "./bin/install.sh",
-        "test": "npm install --save-dev && ./tests.sh"
+        "test": "npm install --save-dev && ./tests.sh",
+        "cov": "./bin/coverage.js"
     },
     "bundledDependencies": [
         "bh", "bem-json", "vow", "cookies", "request", "inherit", "borschik", "bem-bl"

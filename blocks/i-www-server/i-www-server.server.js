@@ -23,17 +23,10 @@ BEM.decl({name: 'i-www-server', baseBlock: 'i-server'}, null, {
             this._startHTTP(socket);
 
 
-            if (!isTest) {
-                priv = process.argv[1].replace('server.js', 'priv.js');
-            } else {
-
-                priv = process.argv.filter(function (path) {
-                    return path.indexOf('server.tests.js') !== -1;
-                })[0];
-
-                priv = process.cwd() + '/' +
-                    priv.replace('server.tests.js', 'priv.js');
-            }
+            priv = Object.keys(require.cache).filter(function (path) {
+                return path.indexOf('server.js') !== -1;
+            })[0];
+            priv = priv.replace('server.js', 'priv.js');
 
             require(priv);
         }
