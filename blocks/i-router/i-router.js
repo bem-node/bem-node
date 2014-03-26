@@ -46,6 +46,20 @@
         },
 
         /**
+         * Define handler or list of handlers
+         *
+         * @param [{String|Array} reqMethod request method: 'get', 'post', 'get,post', 'delete' etc. or list of arguments
+         *  To assign more than one method list with comma]
+         * @param {String|RegExp} reqPath request path matcher
+         * @param {String} blockName block name
+         */
+        define: function () {
+            this.__base.apply(this, arguments);
+            this._lastPath = this.getPath();
+            this._lastHandler = this._prepearRoute(this._lastPath);
+        },
+
+        /**
          * Set path to url with history.pushState
          *
          * @param {String} path

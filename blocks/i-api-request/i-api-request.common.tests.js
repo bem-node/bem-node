@@ -50,7 +50,7 @@ describe('i-api-request.common.js', function () {
                 })
                 .then(function (response) {
                     return expect(responseId).not.equal(response.responseId);
-                })
+                });
         });
     });
 
@@ -65,7 +65,7 @@ describe('i-api-request.common.js', function () {
                 })
                 .then(function (response) {
                     return expect(responseId).not.equal(response.responseId);
-                })
+                });
         });
     });
 
@@ -79,13 +79,13 @@ describe('i-api-request.common.js', function () {
 
         it('bad resourse', function () {
             return expect(env(function () {
-                return api.get('secret?uid=123')
+                return api.get('secret?uid=123');
             })).to.be.rejectedWith(api._HttpError);
         });
 
         it('bad status', function () {
             return expect(env(function () {
-                return api.get('error')
+                return api.get('error');
             })).to.be.rejectedWith(api._HttpError);
         });
 
