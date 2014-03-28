@@ -85,6 +85,10 @@ BEM.decl('i-ajax', {}, {
         };
     },
 
+    responseData: function (data) {
+        BEM.blocks['i-response'].json({data: data});
+    },
+
     /**
      * Handler for each request for /api/:block/:method
      * @param {Array} matchers
@@ -97,14 +101,10 @@ BEM.decl('i-ajax', {}, {
             block = BEM.blocks[blockName];
 
         if (!blockName) {
-            return this._combine(args).then(function (data) {
-                BEM.blocks['i-response'].json(data);
-            });
+            return this._combine(args).then(this.responseData);
         }
-        if (block && ~block._allowAjax.indexOf(methodName)) {
-            return block[methodName].apply(block, args || []).then(function (data) {
-                BEM.blocks['i-response'].json(data);
-            });
+        if (block && block[methodName] && ~block._allowAjax.indexOf(methodName)) {
+            return block[methodName].apply(block, args || []).then(this.responseData);
         } else {
             return this._missingResponse();
         }

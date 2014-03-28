@@ -60,6 +60,12 @@ describe('i-router.common', function () {
             })).eventually.equal('%');
         });
 
+        it('complex', function () {
+            return expect(env('/foo?filter=timezone%3D%3DGMT%2B05%3A45', function () {
+                return router.getParams().filter;
+            })).eventually.equal('timezone==GMT+05:45');
+        });
+
 
     });
 });

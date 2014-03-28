@@ -65,7 +65,7 @@
                         try {
                             data = JSON.parse(xhr.responseText);
                         } catch (e) {
-                            _this._rejectPromises(promises, 'Combined request failed')
+                            _this._rejectPromises(promises, 'Combined request failed');
                         }
                         return data.response.forEach(function (res, ind) {
                             if (_this._checkStatus(res.status)) {
@@ -78,7 +78,7 @@
                             }
                         });
                     } else {
-                        _this._rejectPromises(promises, 'Combined request failed')
+                        _this._rejectPromises(promises, 'Combined request failed');
                     }
                 }
             });
@@ -120,7 +120,7 @@
             var promise = Vow.promise().timeout(this._TIMEOUT),
                 blockName = this.getName(),
                 _this = this,
-                HTTPError = BEM.blocks['i-http']._HttpError,
+                HttpError = BEM.blocks['i-http']._HttpError,
                 requestData = {
                     url: '/' + AJAX_KEYWORD + '/' + blockName + '/' + methodName + '/',
                     data: {
@@ -135,22 +135,20 @@
                 jQuery.ajax(jQuery.extend(requestData, {
                     type: this._getRequestMethod(JSON.stringify(args).length),
                     complete: function (xhr) {
-                        var data, err;
+                        var data;
                         if (_this._checkStatus(xhr.status)) {
                             try {
                                 data = JSON.parse(xhr.responseText);
                             } catch (e) {
-                                err = new HTTPError(
-                                    xhr.status,
-                                    xhr.statusText,
-                                    xhr.responseText
-                                );
+                                return promise.reject(e);
                             }
-                            if (!err) {
-                                return promise.fulfill(data);
-                            }
+                            return promise.fulfill(data.data);
                         }
-                        return promise.reject(err);
+
+                        return promise.reject(new HttpError(
+                            xhr.status,
+                            'bad status'
+                        ));
                     }
                 }));
             }

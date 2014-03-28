@@ -9,7 +9,7 @@
      * @param {String} message
      * @param {String} responseBody
      */
-    var HttpError = function(status, message, responseBody) {
+    var HttpError = function (status, message, responseBody) {
         this.status = status;
         this.message = message;
         if (responseBody) {
@@ -20,7 +20,6 @@
         }
     };
     HttpError.prototype = Object.create(Error.prototype);
-    HttpError.prototype.message = 'Http Error';
     HttpError.prototype.name = 'E_HTTP_ERROR';
 
     BEM.decl('i-http', {}, {
