@@ -9,7 +9,7 @@
      * @param {String} message
      * @param {String} responseBody
      */
-    var HttpError = function(status, message, responseBody) {
+    var HttpError = function (status, message, responseBody) {
         this.status = status;
         this.message = message;
         if (responseBody) {

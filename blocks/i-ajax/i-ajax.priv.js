@@ -101,7 +101,7 @@ BEM.decl('i-ajax', {}, {
                 BEM.blocks['i-response'].json(data);
             });
         }
-        if (block && ~block._allowAjax.indexOf(methodName)) {
+        if (block && block[methodName] && ~block._allowAjax.indexOf(methodName)) {
             return block[methodName].apply(block, args || []).then(function (data) {
                 BEM.blocks['i-response'].json(data);
             });

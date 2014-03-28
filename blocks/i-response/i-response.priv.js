@@ -39,7 +39,7 @@ BEM.decl('i-response', null, {
                 res.writeHead(savedStatusCode || status, this._getResponseHeaders.apply(this, arguments));
                 res.end(body);
             } catch (err) {
-                console.error(err);
+                console.error(err.stack);
             }
         }
     },
@@ -89,7 +89,7 @@ BEM.decl('i-response', null, {
         var res = this._getResponse(),
             statusCode = err.status || 503,
             message = err.message || this.STATUS_CODES[statusCode];
-        console.error(err);
+        console.error(err.stack);
         res.writeHead(statusCode, message);
         res.end();
     },
