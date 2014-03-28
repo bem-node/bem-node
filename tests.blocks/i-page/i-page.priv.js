@@ -1,4 +1,7 @@
-/*global mocha, expect:true, chai:true, mochaPhantomJS*/
+/*global expect:true, chai:true, mocha, mochaPhantomJS*/
+var fs = require('fs'),
+    coverage = BEM.blocks['i-command'].get('coverage') || false;
+
 function script(url, content) {
     var tag = {
         tag: 'script',
@@ -18,7 +21,17 @@ function getTestName() {
 BEM.decl('i-page', null, {
     getPageJson: function (json) {
         var testName = getTestName(),
-            testPrefix = '/tests/' + testName + '/' + testName;
+            testPrefix = '/tests/' + testName + '/' + testName,
+            clientJs = coverage && fs.readFileSync('.' + testPrefix + '.js', 'utf8')
+                .split('\n')
+                .map(function (line) {
+                    var m = line.match(/include\('(.*)'\)/);
+                    return m && m[1];
+                })
+                .filter(Boolean)
+                .map(function (url) {
+                    return script(url);
+                });
         return {
             tag: 'html',
             content: [
@@ -47,13 +60,17 @@ BEM.decl('i-page', null, {
                             }
                         },
                         script('http://yandex.st/jquery/1.8.3/jquery.min.js'),
-                        script(testPrefix + '.js'),
+                        coverage ? clientJs : script(testPrefix + '.js'),
                         script(null, function () {
                             mocha.ui('bdd');
                             mocha.reporter('html');
                             expect = chai.expect;
                         }),
-                        script(testPrefix + '.client.tests.js'),
+                        !coverage && script(testPrefix + '.client.tests.js'),
+                        coverage && '<script src="https://rawgithub.com/alex-seville/blanket/master/dist/qunit/blanket.min.js"' +
+                            'data-cover-adapter="https://rawgithub.com/alex-seville/blanket/master/src/adapters/mocha-blanket.js"' +
+                            'data-cover-only="//blocks\/.*/"' +
+                        '</script>',
                         script(null, function () {
                             if (window.mochaPhantomJS) { mochaPhantomJS.run(); }
                             else { mocha.run(); }

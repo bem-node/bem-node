@@ -32,7 +32,7 @@
                 suffix = matches[1];
 
             if (suffix === 'css' || suffix === 'js') {
-                path = path.replace(/_([\w\.]+$)/, '$1');
+                path = path.replace(/\/_([\w\.]+$)/, '$1');
             }
 
             fs.stat(path, function (err, stat) {
