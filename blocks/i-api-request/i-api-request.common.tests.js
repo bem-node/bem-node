@@ -74,7 +74,7 @@ describe('i-api-request.common.js', function () {
         it('timeout', function () {
             return expect(env(function () {
                 return api.get('timeout');
-            })).to.be.rejectedWith(api._HttpError);
+            })).to.be.rejectedWith(api._HttpError, 'ETIMEDOUT');
         });
 
         it('bad resourse', function () {

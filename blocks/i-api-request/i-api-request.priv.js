@@ -121,7 +121,8 @@
 
             if (resource.indexOf('http') !== 0) {
                 if (!this._checkResource(resource)) {
-                    return Vow.reject(new this._HttpError(400, 'resource "' + resource + '" denier'));
+                    console.error('resource "' + resource + '" denier');
+                    return Vow.reject(new this._HttpError(400));
                 }
                 if (!this._apiHost) {
                     return Vow.reject(new Error('_apiHost is not specified; Define ._apiHost on your level first'));
@@ -129,6 +130,7 @@
                 requestUrl = this._apiHost.replace(/\/+$/, '') + '/' + resource;
             } else {
                 if (!this._checkResource(resource.replace(/https?\/\//, ''))) {
+                    console.error('resource "' + resource + '" denier');
                     return Vow.reject(new this._HttpError(400));
                 }
                 requestUrl = resource;
@@ -260,10 +262,10 @@
          * @returns {Vow.promise}
          * @private
          */
-        _checkResponse: function (err, res, options) {
+        _checkResponse: function (err, res) {
             if (err) {
-                if (err.code === 'ETIMEDOUT') {
-                    return Vow.reject(new this._HttpError(500, ['ETIMEDOUT', options.method, options.originalUrl].join(' ')));
+                if (err.code === 'ETIMEDOUT' || err.code === 'ESOCKETTIMEDOUT') {
+                    return Vow.reject(new this._HttpError(500, 'ETIMEDOUT'));
                 }
                 return Vow.reject(err);
             }
