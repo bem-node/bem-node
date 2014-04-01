@@ -5,7 +5,7 @@
 (function () {
 
     function getPathFromLocation() {
-        return decodeURIComponent(location.pathname + location.search);
+        return location.pathname + location.search;
     }
 
     /**
@@ -263,6 +263,9 @@
                             key = x.substr(0, idx);
                             val = x.substr(idx + 1);
                         } else {
+                            if (!x) {
+                                return null;
+                            }
                             key = x;
                             val = '';
                         }
@@ -274,7 +277,9 @@
                         return [key, val];
                     })
                     .reduce(function (p, sp) {
-                        p[sp[0]] = sp[1];
+                        if (sp) {
+                            p[sp[0]] = sp[1];
+                        }
                         return p;
                     }, {})
             );

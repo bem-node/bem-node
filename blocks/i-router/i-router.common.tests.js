@@ -13,6 +13,28 @@ describe('i-router.common', function () {
                 return Vow.fulfill();
             }
         });
+        describe('key-value pairs', function () {
+            it('empty', function () {
+                return env('/foo?', function () {
+                    expect(router.getParams()).deep.equal({});
+                });
+            });
+            it('=foo', function () {
+                return env('/foo?=foo', function () {
+                    expect(router.getParams()).deep.equal({'': 'foo'});
+                });
+            });
+            it('foo=', function () {
+                return env('/foo?foo=', function () {
+                    expect(router.getParams()).deep.equal({'foo': ''});
+                });
+            });
+            it('=', function () {
+                return env('/foo?=', function () {
+                    expect(router.getParams()).deep.equal({'': ''});
+                });
+            });
+        });
 
         it('simple', function () {
             return expect(env('/foo?qwe=123', function () {
@@ -37,7 +59,6 @@ describe('i-router.common', function () {
                 return router.getParams().bar;
             })).eventually.equal('%');
         });
-
 
 
     });

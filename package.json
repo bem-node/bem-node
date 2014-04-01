@@ -1,6 +1,6 @@
 {
     "name": "bem-node",
-    "version": "0.8.10",
+    "version": "0.8.11",
     "description": "",
     "keywords": [
         "bem",
@@ -15,7 +15,8 @@
     },
     "scripts": {
         "postinstall": "./bin/install.sh",
-        "test": "npm install --save-dev && ./tests.sh"
+        "test": "npm install --save-dev && ./tests.sh",
+        "start": "node tests/simple/simple.server.js"
     },
     "bundledDependencies": [
         "bh", "bem-json", "vow", "cookies", "request", "inherit", "borschik", "bem-bl"

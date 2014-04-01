@@ -1,6 +1,8 @@
 describe('i-router.js', function () {
     describe('define', function () {
+
         var router = BEM.blocks['i-router'];
+
         it('define after init', function () {
             var init = false,
                 update = false,
