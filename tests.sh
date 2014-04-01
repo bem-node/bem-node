@@ -1,29 +1,45 @@
 #!/bin/bash
-MOCHA=./node_modules/.bin/mocha
-PHANTOM=./node_modules/.bin/mocha-phantomjs
+MOCHA='./node_modules/.bin/mocha -R spec'
+PHANTOM='./node_modules/.bin/mocha-phantomjs http://127.0.0.1:3000/'
 ENB=./node_modules/.bin/enb
 JSHINT=./node_modules/.bin/jshint
+RUN_CLIENT=
+RUN_SERVER=
+RUN_LINT=
+TEST_NAME=
 
 function kn {
     killall node 2>/dev/null
 }
 function client {
     echo Client tests
-    for D in `find tests/*/*server.js -type f`; do
-        echo "  Testing $D"
+    if [ $1 ]; then
         kn
-        node $D & $PHANTOM http://127.0.0.1:3000/
+        node tests/$1/$1.server.js & $PHANTOM
         kn
-    done
+    else
+        for D in `find tests/*/*server.js -type f`; do
+            echo "  Testing $D"
+            kn
+            node $D & $PHANTOM
+            kn
+        done
+    fi;
 }
 function server {
     echo Server tests
-    for D in `find tests/*/*server.tests.js -type f`; do
-        echo "  Testing $D"
+    if [ $1 ]; then
         kn
-        $MOCHA -R spec $D
+        $MOCHA tests/$1/$1.server.tests.js
         kn
-    done
+    else
+        for D in `find tests/*/*server.tests.js -type f`; do
+            echo "  Testing $D"
+            kn
+            $MOCHA $D
+            kn
+        done
+    fi
 }
 
 function coverage {
@@ -41,31 +57,55 @@ function lint {
 if [ $1 ]; then
     while test $# -gt 0; do
         case "$1" in
+            -n|--name)
+                if [[ $2 =~ ^[a-z]+$ ]]; then
+                    TEST_NAME=$2;
+                else
+                    echo "Use: -n <name-of-test>"
+                fi;
+                shift;
+                ;;
             --coverage)
                 coverage
                 ;;
             -l|--lint|--jslint)
-                lint;
+                #lint;
+                RUN_LINT=true;
                 ;;
             -c|--client)
-                client
+                #client
+                RUN_CLIENT=true;
                 ;;
             -s|--server)
-                server
+                RUN_SERVER=true;
+                #server
                 ;;
             -b|--build)
-                $ENB make
+                RUN_MAKE=true;
                 ;;
             *)
                 echo Unknown option: "$1"
-                echo "Use -c (--client) -s (--server) -b (--build)"
+                echo "Use: -c (--client) -s (--server) -b (--build)"
                 ;;
         esac;
         shift;
     done;
 else
-    lint
-    enb make
-    server
-    client
+    RUN_LINT=true
+    RUN_CLIENT=true
+    RUN_SERVER=true
+fi;
+
+
+if [ $RUN_LINT ]; then
+    lint;
+fi;
+if [ $RUN_MAKE ]; then
+    $ENB make;
+fi;
+if [ $RUN_CLIENT ]; then
+    client $TEST_NAME
+fi;
+if [ $RUN_SERVER ]; then
+    server $TEST_NAME
 fi;

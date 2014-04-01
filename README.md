@@ -662,6 +662,7 @@ Triggered on client on xhr error.
 
     ./tests.sh -c #client tests only
     ./tests.sh -s #server tests only
+    ./tests.sh -s -n simple #run server tests only for 'simple' set
     ./tests.sh -b #rebuild tests
     ./tests.sh -b -s -c #rebuild, server, client
 
