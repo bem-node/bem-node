@@ -7,7 +7,6 @@ BEM.decl({name: 'i-www-server', baseBlock: 'i-server'}, null, {
         var cluster = require('cluster'),
             socket = BEM.blocks['i-command'].get('socket') || 3000,
             workers = Number(BEM.blocks['i-command'].get('workers')),
-            isTest = typeof global.describe === 'function' && typeof global.it === 'function',
             priv,
             number;
 
@@ -21,20 +20,7 @@ BEM.decl({name: 'i-www-server', baseBlock: 'i-server'}, null, {
         }
         if (!workers || !cluster.isMaster) {
             this._startHTTP(socket);
-
-
-            if (!isTest) {
-                priv = process.argv[1].replace('server.js', 'priv.js');
-            } else {
-
-                priv = process.argv.filter(function (path) {
-                    return path.indexOf('server.tests.js') !== -1;
-                })[0];
-
-                priv = process.cwd() + '/' +
-                    priv.replace('server.tests.js', 'priv.js');
-            }
-
+            priv = BEM.blocks['i-command'].getRunningFile().replace('server.js', 'priv.js');
             require(priv);
         }
     },

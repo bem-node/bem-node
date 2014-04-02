@@ -24,11 +24,18 @@
         }
         pushArg();
         return args;
-    }());
+    }()),
+        runningFile = Object.keys(require.cache).filter(function (path) {
+            return path.indexOf('server.js') !== -1;
+        })[0];
 
     BEM.decl('i-command', null, {
         get: function (key) {
             return key ? args[key] : args;
+        },
+
+        getRunningFile: function () {
+            return runningFile;
         }
     });
 }());

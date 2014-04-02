@@ -1,6 +1,5 @@
 /*global BEMHTML:true*/
-var script = process.argv[1],
-    base = script.replace('server.js', '');
+var base = BEM.blocks['i-command'].getRunningFile().replace('server.js', '');
 
 ['bemhtml.js', 'bemhtml'].some(function (suffix) {
     try {
