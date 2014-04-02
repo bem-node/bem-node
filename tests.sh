@@ -94,6 +94,7 @@ else
     RUN_LINT=true
     RUN_CLIENT=true
     RUN_SERVER=true
+    RUN_MAKE=true
 fi;
 
 
