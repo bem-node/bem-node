@@ -23,11 +23,11 @@ function createResponse(path, params) {
 
 
 function onRequest(req, res) {
-    var p = parse(req.url, true),
-        path = p.pathname.replace(/^\//, ''),
+    var url = req.url.replace(/^\/\:\:1/, ''), // TODO report nodejs bug
+        p = parse(url, true),
+        path = p.pathname ? p.pathname.replace(/^\//, '') : '',
         params = p.query,
         response = JSON.stringify(createResponse(path, params));
-
     if (path === 'timeout') {
         return setTimeout(res.end.bind(res, response), 600);
     }

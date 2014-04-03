@@ -16,13 +16,11 @@ function client {
     if [ $1 ]; then
         kn
         node tests/$1/$1.server.js & $PHANTOM
-        kn
     else
         for D in `find tests/*/*server.js -type f`; do
             echo "  Testing $D"
             kn
             node $D & $PHANTOM
-            kn
         done
     fi;
 }
@@ -31,13 +29,11 @@ function server {
     if [ $1 ]; then
         kn
         $MOCHA tests/$1/$1.server.tests.js
-        kn
     else
         for D in `find tests/*/*server.tests.js -type f`; do
             echo "  Testing $D"
             kn
             $MOCHA $D
-            kn
         done
     fi
 }
@@ -96,7 +92,6 @@ else
     RUN_SERVER=true
     RUN_MAKE=true
 fi;
-
 
 if [ $RUN_LINT ]; then
     lint;
