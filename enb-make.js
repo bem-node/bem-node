@@ -138,18 +138,26 @@ function enbMake(config) {
                 require('enb/techs/css-includes'),
                 server,
                 priv,
-                js,
-                tests
+                js
             ]);
-
 
             nodeConfig.addTargets([
                 '?.server.js',
                 '?.priv.js',
                 '_?.js',
-                '_?.css',
-                '?.tests.js'
+                '_?.css'
             ]);
+
+            if (makeTests) {
+                nodeConfig.addTechs([
+                    serverTests,
+                    clientTests
+                ]);
+                nodeConfig.addTargets([
+                    '?.server.tests.js',
+                    '?.client.tests.js'
+                ]);
+            }
 
             if (bemhtml) {
                 nodeConfig.addTechs([require('enb-bemhtml/techs/bemhtml')]);
