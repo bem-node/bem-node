@@ -442,7 +442,7 @@
 
                     if (newValue === undefined) {
                         binder.val(value);
-                    } else if (newValue !== value) {
+                    } else if (!$.equals(newValue, value)) {
                         binder.val(newValue);
                         BEM.dataBindVal(name, newValue);
                     }
