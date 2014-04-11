@@ -93,7 +93,6 @@ else
     RUN_MAKE=true
 fi;
 
-
 if [ $RUN_LINT ]; then
     lint;
 fi;
