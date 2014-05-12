@@ -117,14 +117,14 @@
                 id = $.identify(binder);
                 binding = this.getBinding(name, true);
                 binders[name] = binding.binders[id] = binder;
-            }
 
-            if (name.indexOf('.') > -1) {
-                binders = name.split('.');
-                while ((name = binders.pop()) && binders.length) {
-                    nsName = binders.join('.');
-                    this.getBinder(nsName, scope);
-                    this.getBinding(nsName).addProp(name);
+                if (name.indexOf('.') > -1) {
+                    binders = name.split('.');
+                    while ((name = binders.pop()) && binders.length) {
+                        nsName = binders.join('.');
+                        this.getBinder(nsName, scope);
+                        this.getBinding(nsName).addProp(name);
+                    }
                 }
             }
 
@@ -226,9 +226,76 @@
          * @param {Object} block Bem block
          */
         createDataBindings: function (block) {
-            if (block._getDataBindings && !block.hasOwnProperty(storageKey)) {
+            if (block._getDataBindings) {
                 block.bindToData(block._getDataBindings());
+                block._getDataBindings = false;
             }
+        },
+
+        /**
+         * Process init accessor
+         *
+         * @param {BD.Binder} binder
+         * @param {Object} opts
+         * @param {BEM} scope
+         */
+        runInitAccessor: function (binder, opts, scope) {
+            var accessor = opts.initAccessor,
+                name = binder.name,
+                value = BEM.dataBindVal(name),
+                fn, newValue;
+
+            // if 'initAccessor' is a function ..
+            if ((fn = createFn(accessor, scope))) {
+                // .. call it with current binding value
+                //  if it returns some value, then this value will be newValue value for binding
+                //  if it doesn't return value, then binding will keep current value
+                newValue = fn(value, binder.nameSufix, name);
+            // if 'initAccessor' is a string value - it is a path to property
+            } else if (typeof accessor === 'string') {
+                newValue = accessor.split('.').reduce(function (obj, part, idx, all) {
+                    if (idx === all.length - 1) {
+                        // if property is undefined ..
+                        // .. assign current binding value to this property
+                        // .. otherwise read newValue from this property
+                        return (obj[part] === undefined) ? (obj[part] = value) : obj[part];
+                    }
+                    return obj[part] || (obj[part] = {});
+                }, scope);
+            }
+
+            if (newValue !== undefined && !$.equals(newValue, value)) {
+                BEM.dataBindVal(name, newValue);
+            }
+        },
+
+        /**
+         * Binds to event to handle data change
+         * Checks is data getter given and make
+         *
+         * @param {BD.Binder} binder
+         * @param {Object} opts
+         * @param {BEM} scope
+         */
+        createGetter: function (binder, opts, scope) {
+            var accessor = opts.get || opts.accessor;
+
+            if (accessor) {
+                binder.get = createGetter(accessor, scope);
+            }
+            scope.on(binder.event = opts.event, binder.eventListener, binder);
+        },
+
+        /**
+         * Create 'set' method and setup data listener
+         *
+         * @param {BD.Binder} binder
+         * @param {Object} opts
+         * @param {BEM} scope
+         */
+        createSetter: function (binder, opts, scope) {
+            binder.set = createSetter(opts.set || opts.accessor, scope);
+            channel.on(binder.name, binder.dataListener, binder);
         },
 
 
@@ -266,58 +333,22 @@
     BD.Binding.prototype = {
 
         /**
-         * Reads/writes value from/to data binding
-         *
-         * @param {Mixed} [value] New value
-         * @returns {Mixed} If 'value' is undefined
-         */
-        val: function (value) {
-            var name = this.name,
-                idx;
-
-            // read value
-            if (value === undefined) {
-                if (this.ns) {
-                    value = {};
-                    Object.keys(this.props).forEach(function (key) {
-                        value[key] = BD.getBinding(name + '.' + key).val();
-                    }, this);
-                } else {
-                    value = JSON.parse(this.value);
-                }
-                return value;
-            // write value
-            } else {
-                if (this.ns) {
-                    value = value || {};
-                    Object.keys(this.props).forEach(function (key) {
-                        BD.getBinding(name + '.' + key).val(value[key] === undefined ? null : value[key]);
-                    });
-                } else {
-                    if (!$.equals(JSON.parse(this.value), value)) {
-                        this.value = JSON.stringify(value);
-                        this.trigger();
-                        while ((idx = name.lastIndexOf('.')) > 0) {
-                            name = name.slice(0, idx);
-                            BD.getBinding(name).trigger();
-                        }
-                    }
-                }
-            }
-        },
-
-        /**
          * Adds property to data binding ns
          *
          * @param {String} name Property name
          */
         addProp: function (name) {
-            this.props[name] = true;
             // must wait till all props change
             if (!this.ns) {
                 this.ns = true;
                 this.trigger = $.debounce(this.trigger, 50, this);
             }
+            // before adding new property to ns, set current value to new binding
+            if (!this.props[name]) {
+                BD.getBinding(this.name + '.' + name).set(this.get(name), true);
+                this.props[name] = 0;
+            }
+            this.props[name] ++;
         },
 
         /**
@@ -326,15 +357,72 @@
          * @param {String} name Property name
          */
         removeProp: function (name) {
-            delete this.props[name];
+            this.props[name] --;
+            if (!this.props[name]) {
+                delete this.props[name];
+            }
         },
 
         /**
          * Triggers data binding change event
          */
         trigger: function () {
-            var value = this.val();
-            channel.trigger(this.name, {originValue: value, stringValue: (this.ns) ? JSON.stringify(value) : this.value});
+            if (dataBindings[this.name]) {
+                channel.trigger(this.name, this.get());
+            }
+        },
+
+        /**
+         * Get current value
+         *
+         * @param {String} [property]
+         * @returns {Mixed}
+         */
+        get: function (property) {
+            var value = JSON.parse(this.value),
+                name = this.name;
+
+            if (property) {
+                value = (value || {})[property];
+                return value === undefined ? null : value;
+            }
+            if (this.ns) {
+                value = value || {};
+                Object.keys(this.props).forEach(function (key) {
+                    value[key] = BD.getBinding(name + '.' + key).get();
+                }, this);
+            }
+
+            return value;
+        },
+
+        /**
+         * Writes value to binding
+         *
+         * @param {Mixed} value
+         * @param {Boolean} [silent=false] Don't trigger event
+         */
+        set: function (value, silent) {
+            var name = this.name,
+                idx;
+
+            if ($.equals(this.get(), value)) {
+                return ;
+            }
+
+            this.value = JSON.stringify(value);
+            if (this.ns) {
+                value = value || {};
+                Object.keys(this.props).forEach(function (key) {
+                    BD.getBinding(name + '.' + key).set(value[key] === undefined ? null : value[key], silent);
+                });
+            } else if (!silent) {
+                this.trigger();
+                while ((idx = name.lastIndexOf('.')) > 0) {
+                    name = name.slice(0, idx);
+                    BD.getBinding(name).trigger();
+                }
+            }
         }
 
     };
@@ -342,34 +430,13 @@
     BD.Binder.prototype = {
 
         /**
-         * Accessor to binder value
-         *
-         * @param {Mixed} [value] New value
-         * @returns {Mixed} If 'value' is undefined
-         */
-        val: function (value) {
-            if (value === undefined) {
-                return JSON.parse(this.value);
-            }
-
-            this.value = JSON.stringify(value);
-        },
-
-        /**
          * Event listener for context: handles context event(s)
          * Sets new value from context to data binding if binder not suspended
          */
-        eventListener: function () {
-            var value;
-
-            if (this.suspended === true) {
-                return;
-            }
-
-            value = this.get(undefined, this.nameSufix, this.name);
-            if (!$.equals(this.value ? JSON.parse(this.value) : undefined, value)) {
-                this.value = JSON.stringify(value);
-                BEM.dataBindVal(this.name, value);
+        eventListener: function (e, data) {
+            if (this.suspended !== true) {
+                data = this.get ? this.get(undefined, this.nameSufix, this.name) : data;
+                BEM.dataBindVal(this.name, data);
             }
         },
 
@@ -378,14 +445,11 @@
          * Sets new value from data binding to context if binder not suspended
          *
          * @param {Event} e Data change event
-         * @param {Object} data New value
-         * @param {String} data.stringValue Stringified value
-         * @param {Mixed} data.originValue Original value
+         * @param {Mixed} data New value
          */
         dataListener: function (e, data) {
-            if (this.suspended !== true && this.value !== data.stringValue) {
-                this.value = data.stringValue;
-                this.set(data.originValue, this.nameSufix, this.name);
+            if (this.suspended !== true) {
+                this.set(data, this.nameSufix, this.name);
             }
         }
 
@@ -399,7 +463,7 @@
          *
          * @param {String|Object} name Data binding or ns name or list of data bindings: key - name, value - opts
          * @param {Object} opts Binding options
-         * @param {String} opts.event Event to handle for data change in context. Requires 'opts.accessor' or 'opts.get'
+         * @param {String} opts.event Event to handle for data change in context. Will take data from event if no opts.get or opts.accessor specified.
          * @param {String|Function} opts.accessor Method, method or property name in context for getting and setting value from/to context
          * @param {String|Function} opts.get Method, method or property name in context getting for value from context. Requires 'opts.event'
          * @param {String|Function} opts.set Method, method or property name in context setting for value to context
@@ -409,57 +473,23 @@
          * @returns {Object} self
          */
         bindToData: function (name, opts, scope) {
-            var binder, accessor, fn, value, newValue;
+            var binder;
 
             if (typeof name === 'string' && opts) {
                 scope = scope || this;
                 binder = BD.getBinder(name, scope);
-
                 if (typeof opts !== 'object') {
                     opts = {accessor: opts};
                 }
-
-                if ((accessor = opts.initAccessor)) {
-                    value = BEM.dataBindVal(name);
-                    // if 'initAccessor' is a function ..
-                    if ((fn = createFn(accessor, scope))) {
-                        // .. call it with current binding value
-                        //  if it returns some value, then this value will be newValue value for binding
-                        //  if it doesn't return value, then binding will keep current value
-                        newValue = fn(value, binder.nameSufix, name);
-                    // if 'initAccessor' is a string value - it is a path to property
-                    } else if (typeof accessor === 'string') {
-                        newValue = accessor.split('.').reduce(function (obj, part, idx, all) {
-                            if (idx === all.length - 1) {
-                                // if property is undefined ..
-                                // .. assign current binding value to this property
-                                // .. otherwise read newValue from this property
-                                return (obj[part] === undefined) ? (obj[part] = value) : obj[part];
-                            }
-                            return obj[part] || (obj[part] = {});
-                        }, scope);
-                    }
-
-                    if (newValue === undefined) {
-                        binder.val(value);
-                    } else if (!$.equals(newValue, value)) {
-                        binder.val(newValue);
-                        BEM.dataBindVal(name, newValue);
-                    }
+                if (opts.initAccessor) {
+                    BD.runInitAccessor(binder, opts, scope);
                 }
-
-                // create 'get' method and setup event listener
-                if (!binder.get && opts.event && (accessor = opts.get || opts.accessor)) {
-                    binder.get = createGetter(accessor, scope);
-                    scope.on(binder.event = opts.event, binder.eventListener, binder);
+                if (!binder.event && opts.event) {
+                    BD.createGetter(binder, opts, scope);
                 }
-
-                // create 'set' method and setup data listener
-                if (!binder.set && (accessor = opts.set || opts.accessor)) {
-                    binder.set = createSetter(accessor, scope);
-                    channel.on(name, binder.dataListener, binder);
+                if (!binder.set && (opts.set || opts.accessor)) {
+                    BD.createSetter(binder, opts, scope);
                 }
-
             } else if (typeof name === 'object') {
                 Object.keys(name).forEach(function (param) {
                     this.bindToData(param, name[param], scope || opts);
@@ -486,14 +516,15 @@
          *
          * @param {String} name Data binding name or data binding ns name
          * @param {Mixed} [value] If given, will set as new value to data binding
+         * @param {Boolean} [extend=false] If given, will extend current namespace params
          * @returns {Mixed} If 'value' is undefined return current value, othrwise return self
          */
-        dataBindVal: function (name, value) {
+        dataBindVal: function (name, value, extend) {
             var binding;
 
             if (typeof name !== 'string') {
                 Object.keys(name).forEach(function (key) {
-                    BEM.dataBindVal(key, name[key]);
+                    BEM.dataBindVal(key, name[key], value);
                 });
                 return this;
             }
@@ -501,7 +532,7 @@
             binding = BD.getBinding(name);
 
             if (value === undefined) {
-                return binding ? binding.val() : value;
+                return binding ? binding.get() : value;
             }
 
             if (!binding) {
@@ -509,7 +540,10 @@
             }
 
             // set new value to dataBindings
-            binding.val(value);
+            if (extend) {
+                value = $.extend(this.dataBindVal(name), value);
+            }
+            binding.set(value);
 
             return this;
         },
