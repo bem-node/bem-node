@@ -4,6 +4,5 @@ exports.blocks = [
     {block: 'i-api-request'},
     {block: 'i-ajax'},
     {block: 'i-page'},
-    {block: 'i-ycssjs'},
-    {block: 'i-bem', elem: 'data-bind'}
+    {block: 'i-ycssjs'}
 ]
