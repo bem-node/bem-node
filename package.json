@@ -35,7 +35,7 @@
     "dependencies": {
         "bh": "0.1.19",
         "bem-json": "0.1.6",
-        "vow": "0.3.0",
+        "vow": "0.3.12",
         "cookies": "0.3.0",
         "request": "2.12.0",
         "inherit": "*",
