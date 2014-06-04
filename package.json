@@ -28,7 +28,7 @@
         "mocha-phantomjs": "*",
         "enb": "0.8.48",
         "enb-bemhtml": "0.2.2",
-        "phantomjs": "1.9.7-1",
+        "phantomjs": "1.9.7-8",
         "jshint": "*",
         "blanket": "*"
     },
