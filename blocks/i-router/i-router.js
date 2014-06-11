@@ -42,6 +42,10 @@
                     _this._state.set('path', getPathFromLocation());
                     _this._onChange();
                 });
+
+                jQuery(window).bind('pageshow', function () {
+                    _this._prepearRoute();
+                });
             }
         },
 
