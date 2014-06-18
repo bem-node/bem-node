@@ -1,6 +1,6 @@
 {
     "name": "bem-node",
-    "version": "0.8.20",
+    "version": "0.8.21",
     "description": "",
     "keywords": [
         "bem",
@@ -35,7 +35,7 @@
     "dependencies": {
         "bh": "0.1.19",
         "bem-json": "0.1.6",
-        "vow": "0.3.9",
+        "vow": "0.3.0",
         "cookies": "0.3.0",
         "request": "2.12.0",
         "inherit": "*",
