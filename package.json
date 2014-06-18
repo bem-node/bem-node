@@ -1,6 +1,6 @@
 {
     "name": "bem-node",
-    "version": "0.8.19",
+    "version": "0.8.20",
     "description": "",
     "keywords": [
         "bem",
@@ -19,7 +19,7 @@
         "start": "node tests/simple/simple.server.js"
     },
     "bundledDependencies": [
-        "bh", "bem-json", "vow", "cookies", "request", "inherit", "borschik", "bem-bl"
+        "bem-bl"
     ],
     "devDependencies": {
         "mocha": "~1.18",
