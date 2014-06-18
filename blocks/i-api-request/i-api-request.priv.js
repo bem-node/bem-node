@@ -3,6 +3,7 @@
  */
 (function () {
     var request = require('request'), //@see https://github.com/mikeal/request/
+        net = require('net'),
         url = require('url'),
         dns = require('dns'),
         apiResolveCache = {},
@@ -38,10 +39,16 @@
 
         /**
          * Resolve ip address
-         * @param {String} host
+         * @param {Object} parsedUrl
+         * @param {String} parsedUrl.hostname
          * @return {Vow.promise}
          */
         _dnsResolve: function (parsedUrl) {
+
+            if (net.isIP(parsedUrl.hostname)) {
+                return Vow.fulfill(parsedUrl.hostname);
+            }
+
             var promises = ['resolve6', 'resolve4'].map(function (method) {
                 var promise = Vow.promise();
                 dns[method](parsedUrl.hostname, BEM.blocks['i-state'].bind(function (err, ips) {
