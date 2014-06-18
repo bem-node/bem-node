@@ -113,20 +113,21 @@
          * Remote call server realisation of block
          * @param methodName
          * @param args
+         * @param [optionalParams]
          * @returns {*}
          * @private
          */
-        _remoteCall: function (methodName, args) {
+        _remoteCall: function (methodName, args, optionalParams) {
             var promise = Vow.promise().timeout(this._TIMEOUT),
                 blockName = this.getName(),
                 _this = this,
                 HttpError = BEM.blocks['i-http']._HttpError,
                 requestData = {
                     url: '/' + AJAX_KEYWORD + '/' + blockName + '/' + methodName + '/',
-                    data: {
+                    data: jQuery.extend({
                         ts: Date.now(),
                         args: args
-                    }
+                    }, optionalParams || {})
                 };
 
             if (this._requestDebounce) {
@@ -168,13 +169,14 @@
         /**
          * Fabric method for create AJAX blocks
          * @param {Array} ajaxMethods
+         * @param {Object} [optionalParams]
          * @returns {Object}
          */
-        create: function (ajaxMethods) {
+        create: function (ajaxMethods, optionalParams) {
             var base = {};
             ajaxMethods.reduce(function (base, method) {
                 base[method] = function () {
-                    return this._remoteCall(method, this._prepareArgs(arguments));
+                    return this._remoteCall(method, this._prepareArgs(arguments), optionalParams);
                 };
                 return base;
             }, base);
