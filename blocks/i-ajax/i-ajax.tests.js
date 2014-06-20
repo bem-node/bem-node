@@ -22,22 +22,26 @@ describe('i-ajax.js', function () {
     var ajax = BEM.blocks['test-ajax'],
         notAllowed = BEM.blocks['ajax-block-2'];
 
-    it('allowed methods', function () {
-        expect(ajax.simple).a('function');
-        expect(ajax.double).a('function');
-        expect(notAllowed.simple).a('undefined');
-    });
+    describe('ajax interface check', function () {
+        it('allowed methods', function () {
+            return Vow.all([
+                expect(ajax.simple).a('function'),
+                expect(ajax.double).a('function'),
+                expect(notAllowed.simple).a('undefined')
+            ]);
+        });
 
-    it('interface', function () {
-        expect(Vow.isPromise(ajax.simple())).equal(true, 'allowed methods should retuns a promise');
-    });
+        it('interface', function () {
+            return expect(Vow.isPromise(ajax.simple())).equal(true, 'allowed methods should retuns a promise');
+        });
 
-    it('security policy', function () {
-        return Vow.all([
-            expect(ajax.simple()).to.be.fulfilled,
-            expect(ajax.allowedButNotExist()).to.be.rejectedWith(ajax._HttpError),
-            expect(ajax.existButNotAllowed).a('undefined'),
-        ]);
+        it('security policy', function () {
+            return Vow.all([
+                expect(ajax.simple()).to.be.fulfilled,
+                expect(ajax.allowedButNotExist()).to.be.rejectedWith(ajax._HttpError),
+                expect(ajax.existButNotAllowed).a('undefined')
+            ]);
+        });
     });
 
     describe('ajax methods use', function () {
@@ -73,7 +77,7 @@ describe('i-ajax.js', function () {
         });
     });
 
-    describe('debounce', function () {
+    describe('ajax debounce', function () {
         it('not debounced yet', function () {
             var timesCall = 0;
             extraLogic(jQuery, 'ajax', function () {
@@ -91,8 +95,6 @@ describe('i-ajax.js', function () {
 
 
         it('debounced', function () {
-
-
             var timesCall = 0;
             extraLogic(jQuery, 'ajax', function () {
                 timesCall ++;

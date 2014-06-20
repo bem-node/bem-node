@@ -6,11 +6,90 @@
 
     BEM.decl('i-ajax', {}, {
 
-        _TIMEOUT: 1000,
+        /**
+         * This value MUST be lower then browser network timeout
+         * Network timeouts for browsers:
+         * Firefox: ~115s
+         * IE: ~60s
+         * Chrome: ~300s
+         * Opera: ~120s
+         */
+        _TIMEOUT: 25000,
 
         _requestDebounce: false,
 
         _requestQueue: [],
+
+        /**
+         * Fabric method for create AJAX blocks
+         * @param {Array} ajaxMethods
+         * @returns {Object}
+         */
+        create: function (ajaxMethods) {
+            var base = {};
+
+            ajaxMethods.reduce(function (base, method) {
+                base[method] = function () {
+                    return this._addRequestToQueue(this.getName(), method, this._prepareArgs(arguments));
+                };
+                return base;
+            }, base);
+
+            return jQuery.extend(base, {
+                _allowAjax: ajaxMethods
+            });
+        },
+
+        /**
+         * Prepares AJAX options for request
+         * @param {Object} [request] Object with params for request (blockName, methodName, args, promise)
+         * @returns {*}
+         */
+        prepareAjaxOptions: function (request) {
+            var options = {
+                data: {
+                    args: ''
+                }
+            };
+
+            if (this._requestDebounce) {
+                options.data.combine = true;
+                options.url = '/' + AJAX_KEYWORD + '/';
+                options.data.args = JSON.stringify(this._requestQueue.map(function (req) {
+                    return {
+                        url: '/' + AJAX_KEYWORD + '/' + req.blockName + '/' + req.methodName + '/',
+                        args: req.args
+                    };
+                }));
+                options.type = this._getRequestMethod(options.data.args.length);
+            } else {
+                options.url = '/' + AJAX_KEYWORD + '/' + request.blockName + '/' + request.methodName + '/';
+                options.data.args = request.args;
+                options.type = this._getRequestMethod(JSON.stringify(options.data.args).length);
+            }
+
+            return Vow.fulfill(options);
+        },
+
+        /**
+         * Parse resonse from server
+         * @param {jqXHR} xhr
+         * @returns {*}
+         */
+        parseResponse: function (xhr) {
+            var data;
+
+            if (this._checkStatus(xhr.status)) {
+                try {
+                    data = JSON.parse(xhr.responseText);
+                } catch (e) {
+                    return Vow.reject({message: e});
+                }
+                return Vow.fulfill(data.response);
+            } else {
+                return Vow.reject({status: xhr.status, message: xhr.statusText});
+            }
+        },
 
         /**
          * Check HTTP status
@@ -24,65 +103,63 @@
 
         /**
          * Get request method
+         * @param {Number} length
          */
         _getRequestMethod: function (length) {
             return length < 800 ? 'get' : 'post';
         },
+
         /**
          * Send debounced queue
          */
         _sendQueueDebounce: jQuery.debounce(function () {
             this._sendQueue();
         }, 50),
+
         /**
          * Send queue
+         * @param {Object} [request] Object with params for request (blockName, methodName, args, promise)
          */
-        _sendQueue: function () {
-            var req,
-                _this = this,
+        _sendQueue: function (request) {
+            var _this = this,
                 promises = [],
-                args = [],
-                HTTPError = BEM.blocks['i-http']._HttpError,
-                data = {
-                    combine: true,
-                    ts: Date.now(),
-                    args: ''
-                };
+                HTTPError = BEM.blocks['i-http']._HttpError;
 
-            while (this._requestQueue.length) {
-                req = this._requestQueue.pop();
-                args.push(req.data);
-                promises.push(req.promise);
-            }
-
-            data.args = JSON.stringify(args);
-            jQuery.ajax({
-                url: '/' + AJAX_KEYWORD + '/',
-                type: this._getRequestMethod(data.args.length),
-                data: data,
-                complete: function (xhr) {
-                    if (_this._checkStatus(xhr.status)) {
-                        try {
-                            data = JSON.parse(xhr.responseText);
-                        } catch (e) {
-                            _this._rejectPromises(promises, 'Combined request failed');
-                        }
-                        return data.response.forEach(function (res, ind) {
-                            if (_this._checkStatus(res.status)) {
-                                promises[ind].fulfill(res.data);
-                            } else {
-                                promises[ind].reject(new HTTPError(
-                                    res.status,
-                                    res.error
-                                ));
-                            }
-                        });
-                    } else {
-                        _this._rejectPromises(promises, 'Combined request failed');
+            this.prepareAjaxOptions(request).then(function (options) {
+                if (request && request.promise) {
+                    promises = [request.promise];
+                } else {
+                    while (_this._requestQueue.length) {
+                        promises.push(_this._requestQueue.shift().promise);
                     }
                 }
+
+                jQuery.ajax(jQuery.extend(options, {
+                    cache: false,
+                    complete: function (xhr) {
+                        _this.parseResponse(xhr).always(function (p) {
+                            var data = p.isResolved() && p.valueOf();
+
+                            if (p.isRejected()) {
+                                _this._rejectPromises(promises, data.message);
+                            } else {
+                                data.forEach(function (res, ind) {
+                                    if (res.status && _this._checkStatus(res.status)) {
+                                        promises[ind].fulfill(res.data);
+                                    } else {
+                                        promises[ind].reject(new HTTPError(
+                                            res.status,
+                                            res.error
+                                        ));
+                                    }
+                                });
+                            }
+                        });
+                    }
+                }));
             });
         },
+
         /**
          * Reject array of promises
          * @param {Array} arr
@@ -95,93 +172,42 @@
             });
             throw new Error(message);
         },
-        /**
-         * Add request to queue of requests for combine
-         * @param data
-         * @param promise
-         * @private
-         */
-        _addRequestToQueue: function (data, promise) {
-            this._requestQueue.push({
-                data: data,
-                promise: promise
-            });
-            this._sendQueueDebounce();
-        },
 
         /**
-         * Remote call server realisation of block
-         * @param methodName
-         * @param args
+         * Add request to queue of requests for combine
+         * @param {String} blockName
+         * @param {String} methodName
+         * @param {String} args
          * @returns {*}
          * @private
          */
-        _remoteCall: function (methodName, args) {
+        _addRequestToQueue: function (blockName, methodName, args) {
             var promise = Vow.promise().timeout(this._TIMEOUT),
-                blockName = this.getName(),
-                _this = this,
-                HttpError = BEM.blocks['i-http']._HttpError,
-                requestData = {
-                    url: '/' + AJAX_KEYWORD + '/' + blockName + '/' + methodName + '/',
-                    data: {
-                        ts: Date.now(),
-                        args: args
-                    }
+                req = {
+                    blockName: blockName,
+                    methodName: methodName,
+                    args: args,
+                    promise: promise
                 };
 
             if (this._requestDebounce) {
-                this._addRequestToQueue(requestData, promise);
+                this._requestQueue.push(req);
+                this._sendQueueDebounce();
             } else {
-                jQuery.ajax(jQuery.extend(requestData, {
-                    type: this._getRequestMethod(JSON.stringify(args).length),
-                    complete: function (xhr) {
-                        var data;
-                        if (_this._checkStatus(xhr.status)) {
-                            try {
-                                data = JSON.parse(xhr.responseText);
-                            } catch (e) {
-                                return promise.reject(e);
-                            }
-                            return promise.fulfill(data.data);
-                        }
-
-                        return promise.reject(new HttpError(
-                            xhr.status,
-                            'bad status'
-                        ));
-                    }
-                }));
+                this._sendQueue(req);
             }
+
             return promise;
         },
 
         /**
          * Prepare
-         * @param args
-         * @returns {window.JSON.stringify|*}
+         * @param {Array} args
+         * @returns {String}
          * @private
          */
         _prepareArgs: function (args) {
             return JSON.stringify(Array.prototype.slice.call(args));
-        },
-
-        /**
-         * Fabric method for create AJAX blocks
-         * @param {Array} ajaxMethods
-         * @returns {Object}
-         */
-        create: function (ajaxMethods) {
-            var base = {};
-            ajaxMethods.reduce(function (base, method) {
-                base[method] = function () {
-                    return this._remoteCall(method, this._prepareArgs(arguments));
-                };
-                return base;
-            }, base);
-
-            return jQuery.extend(base, {
-                _allowAjax: ajaxMethods
-            });
         }
     });
 }());

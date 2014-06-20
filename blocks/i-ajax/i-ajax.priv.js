@@ -7,12 +7,89 @@ BEM.blocks['i-router'].define('GET,POST', new RegExp('^\\/' + AJAX_KEYWORD + '(?
 
 BEM.decl('i-ajax', {}, {
     /**
+     * Handler for each request for /api/:block/:method
+     * @param {Array} matchers
+     * @returns {*}
+     */
+    init: function (matchers) {
+        var _this = this,
+            blockName = matchers[1],
+            methodName = matchers[2],
+            block = BEM.blocks[blockName];
+
+        return this.parseRequestParams()
+            .then(function (params) {
+                if (!blockName && params.combine) {
+                    return _this._combine(params.args)
+                        .then(_this.responseData)
+                        .fail(_this._errorResponse);
+                }
+                if (block && block[methodName] && block._allowAjax.indexOf(methodName) !== -1) {
+                    return block[methodName].apply(block, params.args || [])
+                        .then(_this.responseData)
+                        .fail(_this._errorResponse);
+                } else {
+                    return _this._missingResponse();
+                }
+            })
+            .fail(function (err) {
+                return _this._errorResponse(err);
+            });
+    },
+
+    /**
+     * Fabric method for create AJAX blocks
+     * @param {Array} ajaxMethods
+     * @returns {Object}
+     */
+    create: function (ajaxMethods) {
+        return {
+            _allowAjax: ajaxMethods
+        };
+    },
+
+    /**
+     * Parse request parameters
+     * @returns {*}
+     */
+    parseRequestParams: function () {
+        var params = BEM.blocks['i-router'].getParams();
+
+        params.args = this._parseArgs(params.args);
+
+        return params.args !== false
+            ? Vow.fulfill(params)
+            : Vow.reject({status: 400, error: 'Arguments parsing error'});
+    },
+
+    /**
+     * Response data
+     * @param {*} data
+     */
+    responseData: function (data) {
+        return BEM.blocks['i-response'].json({
+            response: data.response ? data.response : [{status: 200, data: data}]
+        });
+    },
+
+    /**
      * Handle missing handler
      * @returns {*}
      * @private
      */
     _missingResponse: function () {
         BEM.blocks['i-response'].missing();
+        return Vow.fulfill('');
+    },
+
+    /**
+     * Handle errors
+     * @param {*} err
+     * @returns {*}
+     * @private
+     */
+    _errorResponse: function (err) {
+        BEM.blocks['i-response'].error(err);
         return Vow.fulfill('');
     },
 
@@ -30,7 +107,7 @@ BEM.decl('i-ajax', {}, {
     },
 
     /**
-     *
+     * Combine requests to API
      * @param {Array} reqs
      * @returns {*}
      */
@@ -43,10 +120,10 @@ BEM.decl('i-ajax', {}, {
                 blockName = matchers[1],
                 methodName = matchers[2],
                 HTTPError = BEM.blocks['i-http']._HttpError,
-                args = _this._parseArgs(req.data.args),
+                args = _this._parseArgs(req.args),
                 block = BEM.blocks[blockName];
 
-            if (block && ~block._allowAjax.indexOf(methodName)) {
+            if (block && block._allowAjax.indexOf(methodName) !== -1) {
                 req._blockName = blockName;
                 req._methodName = methodName;
                 promises.push(block[methodName].apply(block, args || []));
@@ -56,9 +133,10 @@ BEM.decl('i-ajax', {}, {
         });
 
         return Vow.all(promises).then(function (data) {
-            BEM.blocks['i-response'].json({
+            return {
                 response: data.map(function (res, i) {
                     var isHttpError = BEM.blocks['i-http'].isHttpError(res.valueOf());
+
                     if (Vow.isPromise(res) && res.isRejected()) {
                         return {
                             status: isHttpError ? res.valueOf().status : 500,
@@ -70,44 +148,7 @@ BEM.decl('i-ajax', {}, {
                         data: res
                     };
                 })
-            });
+            };
         });
-    },
-
-    /**
-     * Fabric method for create AJAX blocks
-     * @param {Array} ajaxMethods
-     * @returns {Object}
-     */
-    create: function (ajaxMethods) {
-        return {
-            _allowAjax: ajaxMethods
-        };
-    },
-
-    responseData: function (data) {
-        BEM.blocks['i-response'].json({data: data});
-    },
-
-    /**
-     * Handler for each request for /api/:block/:method
-     * @param {Array} matchers
-     * @returns {*}
-     */
-    init: function (matchers) {
-        var blockName = matchers[1],
-            methodName = matchers[2],
-            args = this._parseArgs(BEM.blocks['i-router'].getParams().args),
-            block = BEM.blocks[blockName];
-
-        if (!blockName) {
-            return this._combine(args).then(this.responseData);
-        }
-        if (block && block[methodName] && ~block._allowAjax.indexOf(methodName)) {
-            return block[methodName].apply(block, args || []).then(this.responseData);
-        } else {
-            return this._missingResponse();
-        }
     }
 });
-
