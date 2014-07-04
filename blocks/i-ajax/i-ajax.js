@@ -2,7 +2,8 @@
  * Block for create cross client-server block (with fabric method 'create')
  */
 (function () {
-    var AJAX_KEYWORD = BEM.blocks['i-ajax'].AJAX_KEYWORD;
+    var AJAX_KEYWORD = BEM.blocks['i-ajax'].AJAX_KEYWORD,
+        HTTPError = BEM.blocks['i-http'].HttpError;
 
     BEM.decl('i-ajax', {}, {
 
@@ -34,15 +35,45 @@
         _sendQueueDebounce: jQuery.debounce(function () {
             this._sendQueue();
         }, 50),
+
+        /**
+         * Handle combined request
+         * @param {Array} promises
+         * @param xhr
+         * @returns {*}
+         * @private
+         */
+        _onQueueRespond: function (promises, xhr) {
+            var data,
+                _this = this;
+
+            if (this._checkStatus(xhr.status)) {
+                try {
+                    data = JSON.parse(xhr.responseText);
+                } catch (e) {
+                    this._rejectPromises(promises, 'Combined request failed');
+                }
+                return data.response.forEach(function (res, ind) {
+                    if (_this._checkStatus(res.status)) {
+                        promises[ind].fulfill(res.data);
+                    } else {
+                        promises[ind].reject(new HTTPError(
+                            res.status,
+                            res.error
+                        ));
+                    }
+                });
+            } else {
+                this._rejectPromises(promises, 'Combined request failed');
+            }
+        },
         /**
          * Send queue
          */
         _sendQueue: function () {
             var req,
-                _this = this,
                 promises = [],
                 args = [],
-                HTTPError = BEM.blocks['i-http']._HttpError,
                 data = {
                     combine: true,
                     ts: Date.now(),
@@ -60,27 +91,7 @@
                 url: '/' + AJAX_KEYWORD + '/',
                 type: this._getRequestMethod(data.args.length),
                 data: data,
-                complete: function (xhr) {
-                    if (_this._checkStatus(xhr.status)) {
-                        try {
-                            data = JSON.parse(xhr.responseText);
-                        } catch (e) {
-                            _this._rejectPromises(promises, 'Combined request failed');
-                        }
-                        return data.response.forEach(function (res, ind) {
-                            if (_this._checkStatus(res.status)) {
-                                promises[ind].fulfill(res.data);
-                            } else {
-                                promises[ind].reject(new HTTPError(
-                                    res.status,
-                                    res.error
-                                ));
-                            }
-                        });
-                    } else {
-                        _this._rejectPromises(promises, 'Combined request failed');
-                    }
-                }
+                complete: this._onQueueRespond.bind(this, promises)
             });
         },
         /**
@@ -95,6 +106,7 @@
             });
             throw new Error(message);
         },
+
         /**
          * Add request to queue of requests for combine
          * @param data
@@ -110,6 +122,35 @@
         },
 
         /**
+         * Send and handle single request
+         * @param {Object} requestData
+         * @param {Promise} promise
+         * @param {Object} args
+         * @private
+         */
+        _sendSingleRequest: function (requestData, promise, args) {
+            jQuery.ajax(jQuery.extend({}, requestData, {
+                type: this._getRequestMethod(JSON.stringify(args).length),
+                complete: function (xhr) {
+                    var data;
+                    if (this._checkStatus(xhr.status)) {
+                        try {
+                            data = JSON.parse(xhr.responseText);
+                        } catch (e) {
+                            return promise.reject(e);
+                        }
+                        return promise.fulfill(data.data);
+                    }
+
+                    return promise.reject(new HTTPError(
+                        xhr.status,
+                        'bad status'
+                    ));
+                }.bind(this)
+            }));
+        },
+
+        /**
          * Remote call server realisation of block
          * @param methodName
          * @param args
@@ -119,8 +160,6 @@
         _remoteCall: function (methodName, args) {
             var promise = Vow.promise().timeout(this._TIMEOUT),
                 blockName = this.getName(),
-                _this = this,
-                HttpError = BEM.blocks['i-http']._HttpError,
                 requestData = {
                     url: '/' + AJAX_KEYWORD + '/' + blockName + '/' + methodName + '/',
                     data: {
@@ -132,25 +171,7 @@
             if (this._requestDebounce) {
                 this._addRequestToQueue(requestData, promise);
             } else {
-                jQuery.ajax(jQuery.extend(requestData, {
-                    type: this._getRequestMethod(JSON.stringify(args).length),
-                    complete: function (xhr) {
-                        var data;
-                        if (_this._checkStatus(xhr.status)) {
-                            try {
-                                data = JSON.parse(xhr.responseText);
-                            } catch (e) {
-                                return promise.reject(e);
-                            }
-                            return promise.fulfill(data.data);
-                        }
-
-                        return promise.reject(new HttpError(
-                            xhr.status,
-                            'bad status'
-                        ));
-                    }
-                }));
+                this._sendSingleRequest(requestData, promise, args);
             }
             return promise;
         },
@@ -166,22 +187,13 @@
         },
 
         /**
-         * Fabric method for create AJAX blocks
-         * @param {Array} ajaxMethods
-         * @returns {Object}
+         * Remote call for method
+         * @param {String} method name
+         * @param {Arguments|Array} args for method
+         * @returns {Promise}
          */
-        create: function (ajaxMethods) {
-            var base = {};
-            ajaxMethods.reduce(function (base, method) {
-                base[method] = function () {
-                    return this._remoteCall(method, this._prepareArgs(arguments));
-                };
-                return base;
-            }, base);
-
-            return jQuery.extend(base, {
-                _allowAjax: ajaxMethods
-            });
+        invoke: function (method, args) {
+            return this._remoteCall(method, this._prepareArgs(args));
         }
     });
 }());
