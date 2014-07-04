@@ -51,7 +51,7 @@
                 try {
                     data = JSON.parse(xhr.responseText);
                 } catch (e) {
-                    this._rejectPromises(promises, 'Combined request failed');
+                    return this._rejectPromises(promises, 'Combined request failed');
                 }
                 return data.response.forEach(function (res, ind) {
                     if (_this._checkStatus(res.status)) {
@@ -104,7 +104,6 @@
             arr.forEach(function (promise) {
                 promise.reject(message);
             });
-            throw new Error(message);
         },
 
         /**
