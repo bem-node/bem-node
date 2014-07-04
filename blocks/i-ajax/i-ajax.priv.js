@@ -75,16 +75,9 @@ BEM.decl('i-ajax', {}, {
     },
 
     /**
-     * Fabric method for create AJAX blocks
-     * @param {Array} ajaxMethods
-     * @returns {Object}
+     * Response with data as 'data' property of JSON response
+     * @param {Object} data
      */
-    create: function (ajaxMethods) {
-        return {
-            _allowAjax: ajaxMethods
-        };
-    },
-
     responseData: function (data) {
         BEM.blocks['i-response'].json({data: data});
     },
