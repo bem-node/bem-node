@@ -21,4 +21,3 @@ tests/*/*
 !pages/.gitignore
 
 npm-debug.log
-.idea

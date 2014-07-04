@@ -1,5 +1,7 @@
-BEM.decl({name: 'test-ajax', baseBlock: 'i-ajax'}, null, {
-    _allowAjax: [
+BEM.decl(
+    {name: 'test-ajax', baseBlock: 'i-ajax'},
+    null,
+    BEM.blocks['i-ajax'].create([
         'simple',
         'double',
         'pow',
@@ -8,5 +10,5 @@ BEM.decl({name: 'test-ajax', baseBlock: 'i-ajax'}, null, {
         'getString',
         'getArray',
         'getJSON'
-    ]
-});
+    ])
+);
