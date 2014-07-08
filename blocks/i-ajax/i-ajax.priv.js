@@ -7,16 +7,6 @@ BEM.blocks['i-router'].define('GET,POST', new RegExp('^\\/' + AJAX_KEYWORD + '(?
 
 BEM.decl('i-ajax', {}, {
     /**
-     * Handle missing handler
-     * @returns {*}
-     * @private
-     */
-    _missingResponse: function () {
-        BEM.blocks['i-response'].missing();
-        return Vow.fulfill('');
-    },
-
-    /**
      * Parse incoming arguments
      * @param args
      * @returns {*}
@@ -78,29 +68,18 @@ BEM.decl('i-ajax', {}, {
      * Response with data as 'data' property of JSON response
      * @param {Object} data
      */
-    responseData: function (data) {
+    _responseData: function (data) {
         BEM.blocks['i-response'].json({data: data});
     },
 
     /**
      * Handler for each request for /api/:block/:method
-     * @param {Array} matchers
      * @returns {*}
      */
-    init: function (matchers) {
-        var blockName = matchers[1],
-            methodName = matchers[2],
-            args = this._parseArgs(BEM.blocks['i-router'].getParams().args),
-            block = BEM.blocks[blockName];
+    init: function () {
+        var args = this._parseArgs(BEM.blocks['i-router'].getParams().args);
 
-        if (!blockName) {
-            return this._combine(args).then(this.responseData);
-        }
-        if (block && block[methodName] && ~block._allowAjax.indexOf(methodName)) {
-            return block[methodName].apply(block, args || []).then(this.responseData);
-        } else {
-            return this._missingResponse();
-        }
+        return this._combine(args).then(this._responseData);
     }
 });
 

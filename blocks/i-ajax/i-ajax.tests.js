@@ -13,10 +13,11 @@ describe('i-ajax.js', function () {
 
     BEM.decl(
         {name: 'ajax-block-2', baseBlock: 'i-ajax'},
-        null,
-        BEM.blocks['i-ajax'].create([
-            'anotherMethod'
-        ])
+        null, {
+            _allowAjax: [
+                'anotherMethod'
+            ]
+        }
     );
 
     var ajax = BEM.blocks['test-ajax'],
@@ -33,10 +34,11 @@ describe('i-ajax.js', function () {
     });
 
     it('security policy', function () {
+        ajax._requestDebounce = false;
         return Vow.all([
             expect(ajax.simple()).to.be.fulfilled,
             expect(ajax.allowedButNotExist()).to.be.rejectedWith(ajax._HttpError),
-            expect(ajax.existButNotAllowed).a('undefined'),
+            expect(ajax.existButNotAllowed).a('undefined')
         ]);
     });
 
@@ -76,6 +78,7 @@ describe('i-ajax.js', function () {
     describe('debounce', function () {
         it('not debounced yet', function () {
             var timesCall = 0;
+            ajax._requestDebounce = false;
             extraLogic(jQuery, 'ajax', function () {
                 timesCall ++;
             });
@@ -112,6 +115,46 @@ describe('i-ajax.js', function () {
                 expect(r3).equal(81);
             });
 
+        });
+
+    });
+
+    describe('decorators', function () {
+
+        it('should modify arguments for single request', function () {
+            ajax._requestDebounce = false;
+            return expect(ajax.double({foo: 100}).then(function (resp) {
+                return expect(resp.foo).equal(400);
+            })).be.fulfilled;
+        });
+
+        it('should modify arguments for multiple requests', function () {
+            ajax._requestDebounce = true;
+            return Vow.all([
+                ajax.double({foo: 100}),
+                ajax.double({foo: 200})
+            ]).spread(function (first, second) {
+                expect(first.foo).equal(400);
+                expect(second.foo).equal(600);
+            });
+        });
+
+        it('should add custom headers for single request', function () {
+            ajax._requestDebounce = false;
+            return expect(ajax.headers(100).then(function (resp) {
+                return expect(resp.foo).equal(200);
+            })).be.fulfilled;
+        });
+
+        it('should add custom headers for multiple requests', function () {
+            ajax._requestDebounce = true;
+            return Vow.all([
+                ajax.headers(100),
+                ajax.headers(200)
+            ]).spread(function (first, second) {
+                expect(first.foo).equal(200);
+                expect(second.foo).equal(400);
+            });
         });
 
     });

@@ -1,4 +1,22 @@
 BEM.decl('test-ajax', null, {
+    _decorators: [
+        function (method, args) {
+            if (method === 'double' && (args[0].foo === 100 || args[0].foo === 200)) {
+                args[0].foo += 100;
+            }
+            return Vow.fulfill();
+        },
+        function (method, args, requestOptions) {
+            if (method === 'headers') {
+                requestOptions.headers['x-user-num'] = 2;
+            }
+            return Vow.fulfill();
+        }
+    ],
+
+    headers: function () {
+        return this.invoke('headers', arguments);
+    },
 
     simple: function () {
         return this.invoke('simple', arguments);
