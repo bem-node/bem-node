@@ -44,12 +44,14 @@
          * @return {Vow.promise}
          */
         _dnsResolve: function (parsedUrl) {
+            var _this = this,
+                promises;
 
             if (net.isIP(parsedUrl.hostname)) {
                 return Vow.fulfill(parsedUrl.hostname);
             }
 
-            var promises = ['resolve6', 'resolve4'].map(function (method) {
+            promises = ['resolve6', 'resolve4'].map(function (method) {
                 var promise = Vow.promise();
                 dns[method](parsedUrl.hostname, BEM.blocks['i-state'].bind(function (err, ips) {
                     if (err) {
@@ -63,7 +65,10 @@
                             port: parsedUrl.port
                         });
 
-                    request(testUrl, function (err) {
+                    request({
+                        uri: testUrl,
+                        timeout: _this.TIMEOUT
+                    }, function (err) {
                         if (err) {
                             return promise.reject(err);
                         }
@@ -93,6 +98,11 @@
             return this._dnsResolve(parsedUrl).then(function (ip) {
                 apiResolveCache[host] = ip;
                 return apiResolveCache[host];
+            })
+            .fail(function (err) {
+                var message = 'Unable to resolve hostname for "' + parsedUrl.hostname + '"';
+                console.error(message, err);
+                return Vow.reject({status: 500, message: message});
             });
         },
 
