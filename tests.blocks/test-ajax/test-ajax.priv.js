@@ -28,6 +28,11 @@ BEM.decl('test-ajax', null, {
 
     getJSON: function (num) {
         return Vow.fulfill({foo: num});
+    },
+
+    headers: function (num) {
+        var headers = BEM.blocks['i-router'].getReq().headers;
+        return Vow.fulfill({foo: num * headers['x-user-num']});
     }
 
 });

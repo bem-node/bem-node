@@ -7,6 +7,7 @@ BEM.decl({name: 'test-ajax', baseBlock: 'i-ajax'}, null, {
         'getNumber',
         'getString',
         'getArray',
-        'getJSON'
+        'getJSON',
+        'headers'
     ]
 });
