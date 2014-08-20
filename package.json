@@ -26,13 +26,14 @@
         "chai": "~1.9",
         "chai-as-promised": "~4.1",
         "mocha-phantomjs": "*",
-        "enb": "0.8.48",
         "enb-bemhtml": "0.2.2",
         "phantomjs": "1.9.7-15",
         "jshint": "*",
         "blanket": "*"
     },
     "dependencies": {
+        "enb": "0.8.48",
+        "mime": "1.2.11",
         "bh": "0.1.19",
         "bem-json": "0.1.6",
         "vow": "0.3.0",

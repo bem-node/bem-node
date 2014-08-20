@@ -1,4 +1,4 @@
 exports.blocks = [
     {block: 'i-bem-node'},
-    {block: 'i-ycssjs'}
+    {block: 'i-enb'}
 ]

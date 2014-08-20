@@ -104,7 +104,7 @@ if [ $1 ]; then
         shift;
     done;
 else
-    RUN_LINT=true
+    RUN_LINT=false
     RUN_CLIENT=true
     RUN_SERVER=true
     RUN_MAKE=true
