@@ -12,7 +12,7 @@ function script(url, content) {
 }
 
 function getTestName() {
-    return process.argv[1].match(/\/(\w+)[^\/]+$/)[1];
+    return process.argv[1].match(/\/([\w\-]+)[^\/]+$/)[1];
 }
 
 BEM.decl('i-page', null, {
