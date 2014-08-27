@@ -54,10 +54,19 @@ if [ $1 ]; then
     while test $# -gt 0; do
         case "$1" in
             -n|--name)
-                if [[ $2 =~ ^[a-z]+$ ]]; then
+                if [[ $2 =~ ^[a-z\-]+$ ]]; then
                     TEST_NAME=$2;
                 else
                     echo "Use: -n <name-of-test>"
+                fi;
+                shift;
+                ;;
+            -g|--grep)
+                if [[ $2 =~ ^[^\-].*$ ]]; then
+                    MOCHA="$MOCHA -g $2";
+                    PHANTOM="$PHANTOM?grep=$2"
+                else
+                    echo "Use: -g <grep>"
                 fi;
                 shift;
                 ;;

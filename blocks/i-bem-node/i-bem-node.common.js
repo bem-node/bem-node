@@ -24,9 +24,11 @@
          * @private
          *
          * @param {String} blockName
+         * @param {Boolean} isJsInit
          */
-        addBHMatchers = function (blockName) {
-            var blockDataDeclName = '_data_' + blockName;
+        addBHMatchers = function (blockName, isJsInit) {
+            var blockDataDeclName = '_data_' + blockName,
+                blockJsInitDeclName = '_jsinit_' + blockName;
             //layout
             Object.keys(BEM.blocks[blockName])
                 .filter(RegExp.prototype.test.bind(/^_bh_/))
@@ -44,6 +46,16 @@
                         });
                     }
                 });
+            //add js=true for blocks with .init or .onSetMod.js
+            if (!bhMatchers[blockJsInitDeclName] && isJsInit) {
+                bhMatchers[blockJsInitDeclName] = true;
+                bh.match(blockName, function (ctx) {
+                    return ctx.applyBaseAsync().then(function (res) {
+                        ctx.js(true);
+                        return res;
+                    });
+                });
+            }
             //data
             if (BEM.blocks[blockName][blockDataDeclName] && !bhMatchers[blockDataDeclName]) {
                 bhMatchers[blockDataDeclName] = true;
@@ -272,7 +284,8 @@
                 instanceDecl = this._instanceProp || {},
                 declName = {
                     block: this._name
-                };
+                },
+                isJsInit;
             if (this._baseBlock) {
                 declName.baseBlock = this._baseBlock;
             }
@@ -292,7 +305,17 @@
                     _init: function () {
                         this.__self.__instances.push(this);
                         this.__self.__lastInstance = this;
-                        return this.__base();
+                        this.__base();
+                        if (jQuery.isFunction(this.init)) {
+                            try {
+                                this.init();
+                            } catch (err) {
+                                setTimeout(function () {
+                                    throw err;
+                                });
+                            }
+                        }
+                        return this;
                     },
                     destruct: function () {
                         var _this = this;
@@ -309,8 +332,13 @@
                 //prevent second declaration with base block
                 delete declName.baseBlock;
             }
+            isJsInit = instanceDecl.init ||
+                (instanceDecl.onSetMod && instanceDecl.onSetMod.js);
             bem.decl(declName, instanceDecl, staticDecl);
-            addBHMatchers(this._name);
+            addBHMatchers(
+                this._name,
+                isJsInit
+            );
         }
     };
 
