@@ -1,3 +1,6 @@
 ({
-    mustDeps: {block: 'i-bem', elems: ['internal']}
+    mustDeps: [
+        {block: 'i-bem', elems: ['internal']},
+        {block: 'i-bh'}
+    ]
 })
