@@ -3,7 +3,7 @@
  */
 (function () {
     var AJAX_KEYWORD = BEM.blocks['i-ajax'].AJAX_KEYWORD,
-        HTTPError = BEM.blocks['i-http'].HttpError,
+        HttpError = BEM.blocks['i-errors'].HttpError,
 
         /**
          * @typedef {Object} AjaxParams
@@ -140,27 +140,23 @@
          * @private
          */
         _onQueueRespond: function (promises, xhr) {
-            var data,
-                _this = this;
+            var data;
 
             if (this._checkStatus(xhr.status)) {
                 try {
                     data = JSON.parse(xhr.responseText);
                 } catch (e) {
-                    return this._rejectPromises(promises, 'Combined request failed — parse error');
+                    return this._rejectPromises(promises, new Error('Parse error in i-ajax'));
                 }
                 return data.response.forEach(function (res, ind) {
-                    if (_this._checkStatus(res.status)) {
-                        promises[ind].fulfill(res.data);
+                    if (res.result) {
+                        promises[ind].fulfill(res.result);
                     } else {
-                        promises[ind].reject(new HTTPError(
-                            res.status,
-                            res.error
-                        ));
+                        promises[ind].reject(BEM.blocks['i-errors'].createError(res.error));
                     }
                 });
             } else {
-                this._rejectPromises(promises, 'Combined request failed — error status: ' + xhr.status);
+                this._rejectPromises(promises, new HttpError(xhr.status));
             }
         },
 
@@ -211,12 +207,12 @@
         /**
          * Reject array of promises
          * @param {Array} arr
-         * @param {String} [message]
+         * @param {Error} error
          * @private
          */
-        _rejectPromises: function (arr, message) {
+        _rejectPromises: function (arr, error) {
             arr.forEach(function (promise) {
-                promise.reject(message);
+                promise.reject(error);
             });
         },
 

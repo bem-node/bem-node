@@ -4,28 +4,10 @@
 BEM.decl('i-api-request', null, {
 
     /**
-     * Http error constructor
-     *
-     * @param {Number} status
-     * @param {String} message
-     * @param {String} responseBody
+     * @type {HttpError}
      */
     _HttpError: (function () {
-        var HttpError = function (status, message, responseBody) {
-            this.status = status;
-            this.message = message;
-            if (responseBody) {
-                this.message += ' ' + String(responseBody).replace(/\n/g, '\\n');
-            }
-            if (Error.captureStackTrace) {
-                Error.captureStackTrace(this, HttpError);
-            }
-        };
-        HttpError.prototype = Object.create(Error.prototype);
-        HttpError.prototype.message = 'Http Error';
-        HttpError.prototype.name = 'E_HTTP_ERROR';
-
-        return HttpError;
+        return BEM.blocks['i-errors'].HttpError;
     }()),
 
     /**
@@ -71,13 +53,11 @@ BEM.decl('i-api-request', null, {
     },
 
     /**
-     * Check if error is Http error
-     *
-     * @param {Error} error
-     * @return {Boolean}
+     * @deprecated
      */
-    isHttpError: function (error) {
-        return error instanceof this._HttpError;
+    isHttpError: function () {
+        console.error('Deprecated use BEM.blocks.i-errors.isHttpError');
+        return BEM.blocks['i-errors'].apply(BEM.blocks['i-errors'], arguments);
     },
 
     /**

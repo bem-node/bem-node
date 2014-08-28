@@ -1,4 +1,6 @@
 ({
     mustDeps: [],
-    shouldDeps: []
+    shouldDeps: [
+        {block: 'i-errors'}
+    ]
 })

@@ -42,6 +42,10 @@ BEM.decl('test-ajax', null, {
         return this.invoke('getArray', arguments);
     },
 
+    getNotFound: function () {
+        return this.invoke('getNotFound', arguments);
+    },
+
     getJSON: function () {
         return this.invoke('getJSON', arguments);
     },

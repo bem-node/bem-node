@@ -3,7 +3,8 @@ var request = require('request'), //@see https://github.com/mikeal/request/
     dns = require('dns'),
     zlib = require('zlib'),
     net = require('net'),
-    apiResolveCache = {};
+    apiResolveCache = {},
+    HttpError =  BEM.blocks['i-errors'].HttpError;
 
 /**
  * Checking TCP cottent to socket
@@ -84,7 +85,7 @@ function requestApi(options) {
     request(options, function (err, res, responseBuffer) {
         if (err) {
             if (err.code === 'ETIMEDOUT' || err.code === 'ESOCKETTIMEDOUT') {
-                return promise.reject(new BEM.blocks['i-http'].HttpError(500, 'ETIMEDOUT'));
+                return promise.reject(new HttpError(504));
             }
             return promise.reject(err);
         }
@@ -157,7 +158,7 @@ function resolveHostNameOptions(options) {
  * @param {Buffer} response
  *
  * @return {Vow.promise} promise
- * @fulfill {Buffer} 
+ * @fulfill {Buffer}
  */
 function decodeResponse(res, response) {
     if (!response) {

@@ -75,22 +75,21 @@ BEM.decl('i-response', null, {
      * Response 404
      */
     missing: function () {
-        var res = this._getResponse();
-        res.writeHead(404, this.STATUS_CODES[404]);
-        res.end();
+        this.error(new BEM.blocks['i-errors'].HttpError(404));
     },
 
     /**
-     * Response 503 error
+     * Response 500 error
      *
      * @param {Error} err
      */
     error: function (err) {
         var res = this._getResponse(),
-            statusCode = err.status || 503,
-            message = err.message || this.STATUS_CODES[statusCode];
-        console.error(err.stack);
-        res.writeHead(statusCode, message);
+            statusCode = err.status || 500;
+        if (statusCode >= 500 && statusCode < 600) {
+            console.error(err);
+        }
+        res.writeHead(statusCode, err.message);
         res.end();
     },
 

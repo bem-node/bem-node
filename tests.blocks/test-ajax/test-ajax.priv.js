@@ -10,6 +10,10 @@ BEM.decl('test-ajax', null, {
         });
     },
 
+    getNotFound: function () {
+        return Vow.reject(new BEM.blocks['i-errors'].HttpError(404));
+    },
+
     pow: function (opts) {
         return Vow.fulfill(Math.pow(opts.a, opts.b));
     },

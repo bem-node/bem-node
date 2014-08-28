@@ -74,7 +74,7 @@
     "eqeqeq"        : true,   // Require triple equals i.e. `===`.
     "eqnull"        : true,   // Tolerate use of `== null`.
     "evil"          : true,   // Tolerate use of `eval`.
-    "expr"          : false,  // Tolerate `ExpressionStatement` as Programs.
+    "expr"          : true,  // Tolerate `ExpressionStatement` as Programs.
     "forin"         : true,  // Tolerate `for in` loops without `hasOwnPrototype`.
     "immed"         : true,   // Require immediate invocations to be wrapped in parens e.g. `( function(){}() );`
     "latedef"       : false,   // Prohipit variable use before definition.
