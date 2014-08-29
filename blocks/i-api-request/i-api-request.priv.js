@@ -272,7 +272,7 @@
         _checkResponse: function (err, res) {
             if (err) {
                 if (err.code === 'ETIMEDOUT' || err.code === 'ESOCKETTIMEDOUT') {
-                    return Vow.reject(new this._HttpError(500, 'ETIMEDOUT'));
+                    return Vow.reject(new this._HttpError(504));
                 }
                 return Vow.reject(err);
             }

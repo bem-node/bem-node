@@ -25,7 +25,7 @@ BEM.decl('i-ajax-proxy', {}, {
                 return {};
             }
         } catch (err) {
-            console.log(err);
+            console.error(err);
             return false;
         }
     },
@@ -44,10 +44,8 @@ BEM.decl('i-ajax-proxy', {}, {
      * @private
      */
     _failureResponse: function (err) {
-        if (BEM.blocks['i-api-request'].isHttpError(err)) {
-            BEM.blocks['i-response'].send(err.status, err.message);
-        } else {
-            BEM.blocks['i-response'].error(err);
+        BEM.blocks['i-response'].error(err);
+        if (!BEM.blocks['i-errors'].isHttpError(err)) {
             throw err;
         }
     },
@@ -62,7 +60,6 @@ BEM.decl('i-ajax-proxy', {}, {
     },
 
     _checkMethod: function (blockName, methodName) {
-
         return this._blockList.indexOf(blockName) !== -1 &&
             BEM.blocks[blockName] &&
             typeof BEM.blocks[blockName][methodName] === 'function';

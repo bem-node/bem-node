@@ -1,6 +1,6 @@
 #!/bin/bash
 MOCHA='./node_modules/.bin/mocha -R spec'
-PHANTOM='./node_modules/.bin/mocha-phantomjs http://127.0.0.1:3000/'
+PHANTOM='./node_modules/.bin/mocha-phantomjs --web-security=false http://127.0.0.1:3000/'
 ENB=./node_modules/.bin/enb
 JSHINT=./node_modules/.bin/jshint
 RUN_CLIENT=

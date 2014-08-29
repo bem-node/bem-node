@@ -1,5 +1,6 @@
 describe('i-ajax.common.js', function () {
     var ajax = BEM.blocks['test-ajax'];
+    var errors = BEM.blocks['i-errors'];
 
     describe('result type', function () {
         it('number', function () {
@@ -22,6 +23,14 @@ describe('i-ajax.common.js', function () {
 
         it('json', function () {
             expect(ajax.getJSON(123)).fulfilled.eventually.deep.equal({foo: 123});
+        });
+    });
+
+    describe('errors', function () {
+        it('error', function () {
+            return ajax.getNotFound().always(function (p) {
+                expect(p.valueOf() instanceof errors.HttpError).to.be.true;
+            });
         });
     });
 });

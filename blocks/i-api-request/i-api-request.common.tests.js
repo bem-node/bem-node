@@ -69,24 +69,25 @@ describe('i-api-request.common.js', function () {
         });
     });
 
+    //TODO: XMLHttpRequest status is 0  in phantom
     describe('errors', function () {
 
-        it('timeout', function () {
+        it('Request Time-out', function () {
             return expect(env(function () {
                 return api.get('timeout');
-            })).to.be.rejectedWith(api._HttpError, 'ETIMEDOUT');
+            })).to.be.rejectedWith(api._HttpError/*, 'Request Time-out'*/);
         });
 
-        it('bad resourse', function () {
+        it('Bad Request', function () {
             return expect(env(function () {
                 return api.get('secret?uid=123');
-            })).to.be.rejectedWith(api._HttpError);
+            })).to.be.rejectedWith(api._HttpError/*, 'Bad Request'*/);
         });
 
-        it('bad status', function () {
+        it('Internal Server Error', function () {
             return expect(env(function () {
                 return api.get('error');
-            })).to.be.rejectedWith(api._HttpError);
+            })).to.be.rejectedWith(api._HttpError/*, 'Internal Server Error'*/);
         });
 
     });

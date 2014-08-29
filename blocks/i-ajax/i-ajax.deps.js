@@ -1,6 +1,6 @@
 ({
     mustDeps: [
-        {block: 'i-http'},
+        {block: 'i-errors'},
         {block: 'i-router'}
     ],
     shouldDeps: [
