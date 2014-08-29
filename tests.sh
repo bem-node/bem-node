@@ -8,6 +8,12 @@ RUN_SERVER=
 RUN_LINT=
 TEST_NAME=
 
+function checkfail {
+    EXIT_CODE=$1
+    if [ $EXIT_CODE -gt 0 ]; then
+       exit $EXIT_CODE;
+    fi
+}
 function kn {
     killall node 2>/dev/null
 }
@@ -21,6 +27,7 @@ function client {
             echo "  Testing $D"
             kn
             node $D & $PHANTOM
+            checkfail $?
         done
     fi;
 }
@@ -34,6 +41,7 @@ function server {
             echo "  Testing $D"
             kn
             $MOCHA $D
+            checkfail $?
         done
     fi
 }
