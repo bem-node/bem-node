@@ -1,7 +1,7 @@
 (function () {
     var args = (function () {
         var i = 2,
-            reg = /^\-{1,2}(\w+)$/,
+            reg = /^\-{1,2}([^\s]+)$/,
             args = {},
             argVals = [],
             pushArg = function () {

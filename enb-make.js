@@ -23,7 +23,7 @@ function getLevels(config) {
 function makeIncludes() {
     return Array.prototype.map.call(arguments, function (arg) {
         if (typeof arg === 'string') {
-            return "include('" + arg.replace(cwd, '../..') + "');";
+            return 'include(\'' + arg.replace(cwd, '../..') + '\');';
         } else if (Array.isArray(arg)) {
             return makeIncludes.apply(null, arg.map(function (file) {
                 return file && file.fullname;
@@ -42,7 +42,7 @@ js = build.create()
     .name('js')
     .target('target', '?.js')
     .useFileList(['common.js', 'js'])
-    .builder(makeIncludes)
+    .justJoinFilesWithComments()
     .createTech();
 
 priv = build.create()
@@ -71,7 +71,7 @@ clientTests = build.create()
     .name('client.tests.js')
     .target('target', '?.client.tests.js')
     .useFileList(['common.tests.js', 'tests.js'])
-    .builder(makeIncludes)
+    .justJoinFilesWithComments()
     .createTech();
 
 function enbMake(config) {
@@ -89,7 +89,7 @@ function enbMake(config) {
                 [ require('enb/techs/file-provider'), { target: '?.bemdecl.js' } ],
                 require('enb/techs/deps-old'),
                 require('enb/techs/files'),
-                require('enb/techs/css-includes'),
+                require('enb/techs/css'),
                 server,
                 priv,
                 js

@@ -4,5 +4,5 @@ exports.blocks = [
     {block: 'i-api-request'},
     {block: 'i-ajax'},
     {block: 'i-page'},
-    {block: 'i-ycssjs'}
+    {block: 'i-enb'}
 ]
