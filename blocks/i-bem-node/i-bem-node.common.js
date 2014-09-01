@@ -36,9 +36,9 @@
                     if (!bhMatchers[methodName]) {
                         bhMatchers[methodName] = true;
                         var matcher = methodName.replace(/^_bh_/, '');
-                        bh.match(matcher, function (ctx) {
+                        bh.match(matcher, function (ctx, params) {
                             try {
-                                return BEM.blocks[blockName][methodName](ctx);
+                                return BEM.blocks[blockName][methodName](ctx, params);
                             } catch (err) {
                                 return BN._bhErrorReporter(matcher, err);
                             }
@@ -60,8 +60,8 @@
             if (BEM.blocks[blockName][blockDataDeclName] && !bhMatchers[blockDataDeclName]) {
                 bhMatchers[blockDataDeclName] = true;
                 setTimeout(function () {
-                    bh.match(blockName, function (ctx) {
-                        return Vow.promise(BEM.blocks[blockName][blockDataDeclName](ctx)).then(function () {
+                    bh.match(blockName, function (ctx, params) {
+                        return Vow.promise(BEM.blocks[blockName][blockDataDeclName](ctx, params)).then(function () {
                             return ctx.applyBaseAsync();
                         }).fail(BN._bhErrorReporter.bind(BN, blockName));
                     });

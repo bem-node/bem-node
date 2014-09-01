@@ -34,5 +34,25 @@
                 });
             });
         }
+        it('temaplte params', function () {
+            var bh = BEM.blocks['i-bh'].bh();
+            BN.addDecl('temaplte-params-test').blockTemplate(function (ctx, params) {
+                params.testDataCheck = params.testData;
+                ctx.content({
+                    elem: 'elem-1',
+                    content: {
+                        elem: 'elem-2'
+                    }
+                });
+            }).elemTemplate({
+                'elem-2': function (ctx, params) {
+                    params.testData = ctx.parentBlock().testData;
+                }
+            }).done();
+            var bemjson = bh.processBemJson({block: 'temaplte-params-test', testData: 'TEST_DATA'});
+            expect(bemjson.testData).equal('TEST_DATA');
+            expect(bemjson.testDataCheck).equal('TEST_DATA');
+            expect(bemjson.content.content.testData).equal('TEST_DATA');
+        });
     });
 }());

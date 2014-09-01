@@ -15,6 +15,17 @@
         }
 
         BH.prototype._init = function () {
+            this.utils.parentBlock = function () {
+                var blockName = this.ctx.block,
+                    node = this.node;
+                while (node.parentNode) {
+                    node = node.parentNode;
+                    if (!node.json.elem && node.json.block === blockName) {
+                        return node.json;
+                    }
+                }
+                return null;
+            };
             this.utils.applyBaseAsync = function (changes) {
                 var prevCtx = this.ctx,
                     prevNode = this.node,
