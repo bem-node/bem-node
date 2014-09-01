@@ -47,7 +47,7 @@ exports.blocks = [
 
     // bem-node part
     {block: 'i-console'}, //colorful console log
-    {block: 'i-ycssjs'}, //output static files
+    {block: 'i-enb'}, //output static files
     {block: 'i-bem-node'}, //bem-node api
 
     // pages
@@ -130,12 +130,6 @@ BN('example').someMethod(); //returns 'abc'
 
 #### BN.Generator.instanceProp(decl)
  * decl {Object} dom instances methods and properties
- * return {BN.Generator}
-
-Adds methods and properties for block dom instance ([i-bem.dom](https://github.com/bem-node/i-bem-doc#bemdom-i-bem__dom-api-reference))
-
-#### BN.Generator.onSetMod(decl)
- * decl {Object} define block dom instances behaviour on modification change (see [i-bem.dom](https://github.com/bem-node/i-bem-doc#bemdom-i-bem__dom-api-reference))
  * return {BN.Generator}
 
 Adds methods and properties for block dom instance ([i-bem.dom](https://github.com/bem-node/i-bem-doc#bemdom-i-bem__dom-api-reference))
@@ -526,6 +520,65 @@ BN.addDecl('example').dataTemplate(function(ctx){
 })
 ```
 
+### BN('i-errors')
+
+Create user errors
+
+#### new BN('i-errors').CommonError(message)
+ * message {String}
+
+Constructor for user errors
+
+
+#### new BN('i-errors').HttpError(status)
+ * status {Number} http status
+
+Https error.
+
+```js
+var Errors = BN('i-errors');
+var ApiError = function (status, debugInfo) {
+  HttpError.call(this, status);
+  this.name = 'ApiError';
+  this.debugInfo = debugInfo;
+}
+ApiError.prototype = new HttpError();
+ApiError.prototype.constructor = ApiError;
+
+var err = new ApiError(404, 'fail');
+Errors.isHttpError(err);//true
+err instanceof Error; //true
+err.message; //Not Found
+err.debugInfo; //fail
+
+```
+
+#### BN('i-errors').serialize(err)
+ * err {Error}
+
+Returns instance of object with error properties. Can be serialised to JSON
+
+#### BN('i-errors').createError(obj)
+ * obj {*}
+
+Returns error.
+
+```js
+//node
+var Errors = BEM.blocks['i-errors'];
+BEM.blocks['i-response'].json({
+  error: Errors.serialize(new Errors.HttpError(404))
+});
+```
+```js
+//browser
+var Errors = BEM.blocks['i-errors'];
+var data = JSON.parse(xhr.responseText);
+var err = Errors.createError(data.error);
+Errors.isHttpError(err);//true
+```
+
+
 ### BN('i-router')
 
 Manages page blocks and transitions between urls.
@@ -595,14 +648,10 @@ Use it to update static page content on client:
 
 ```js
 //example of static header that updates when page changing
-BN.addDecl('app-header').blockTemplate(function(ctx){
-    ctx.js(true); //enable creation of block instance in client
-    //..
-}).onSetMod({
-    'js': function () { //fires when block inits on client
+BN.addDecl('app-header').instanceProp({
+    init: function () { //fires when block inits on client
         BN('i-router').on('update', this._onPageUpdate); //listen to page updates
-    }
-}).instanceProp({
+    },
     _onPageUpdate: function () {
         this.elem('search-input').val( //change value of search input element
             BN.escapeHTML( //escape to prevent XSS
@@ -663,6 +712,7 @@ Triggered on client on xhr error.
     ./tests.sh -c #client tests only
     ./tests.sh -s #server tests only
     ./tests.sh -s -n simple #run server tests only for 'simple' set
+    ./tests.sh -s -n simple -g i-router #grep i-router tests
     ./tests.sh -b #rebuild tests
     ./tests.sh -b -s -c #rebuild, server, client
 
@@ -690,4 +740,4 @@ describe('i-api-request', function () {
 });
 ```
 
-You should use global ```env``` function to create page context 
+You should use global ```env``` function to create page context
