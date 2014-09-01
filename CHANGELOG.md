@@ -1,3 +1,74 @@
+0.9.0
+---------------
+
+ * `i-enb` middleware replaced `i-ycssjs`
+
+Now ` .bem/enb-make.js` config applies to static proxy.
+You can disable static proxy with `--no-static-proxy` option.
+
+* `i-errors` for user errors
+
+Create custom errors
+```js
+var Errors = BEM.blocks['i-errors'];
+var ApiError = function (status, debugInfo) {
+  HttpError.call(this, status);
+  this.name = 'ApiError';
+  this.debugInfo = debugInfo;
+}
+ApiError.prototype = new HttpError();
+ApiError.prototype.constructor = ApiError;
+
+var err = new ApiError(404, 'fail');
+Errors.isHttpError(err);//true
+err instanceof Error; //true
+err.debugInfo; //fail
+
+```
+
+Serialize and deserialize errors in json
+```js
+//node
+var Errors = BEM.blocks['i-errors'];
+BEM.blocks['i-response'].json({
+  error: Errors.serialize(new Errors.HttpError(404))
+});
+```
+```js
+//browser
+var Errors = BEM.blocks['i-errors'];
+var data = JSON.parse(xhr.responseText);
+var err = Errors.createError(data.error);
+Errors.isHttpError(err);//true
+```
+
+* `i-errors.isHttpError` instead of `i-api-request.isHttpError`
+
+
+* Magic `.init` in BN
+
+```js
+//example of static header that updates when page changing
+BN.addDecl('app-header').instanceProp({
+    //fires when block inits on client
+    //no need to add ctx.js(true) to template manually
+    init: function () {
+        BN('i-router').on('update', this._onPageUpdate); //listen to page updates
+    },
+    _onPageUpdate: function () {
+        this.elem('search-input').val( //change value of search input element
+            BN.escapeHTML( //escape to prevent XSS
+                BN('i-router').getParams().q //get param from url
+            )
+        );
+    }
+});
+```
+
+
+
+
+
 0.8.0
 ---------------
 new interface for ```_decodeBody``` method in ```i-api-request```
