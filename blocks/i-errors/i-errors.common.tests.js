@@ -34,19 +34,8 @@ describe('i-errors', function () {
         });
     });
 
-    describe('createError', function () {
-        it('create HttpError', function () {
-            var err = errors.createError({ name: 'HttpError', message: 'Not Found', status: 404 });
-            expect(err instanceof Error).to.be.true;
-            expect(err instanceof CommonError).to.be.true;
-            expect(err.name).to.be.equal('HttpError');
-            expect(err.status).to.be.equal(404);
-            expect(err.message).to.be.equal('Not Found');
-        });
-    });
-
-    describe('serialize', function () {
-        it('serialize HttpError', function () {
+    describe('serialize and create', function () {
+        it('HttpError', function () {
             var data = JSON.parse(JSON.stringify({
                 error: errors.serialize(new HttpError(404))
             }));
@@ -58,7 +47,7 @@ describe('i-errors', function () {
             expect(err.status).to.be.equal(404);
             expect(err.message).to.be.equal('Not Found');
         });
-        it('serialize Error', function () {
+        it('Error', function () {
             var data = JSON.parse(JSON.stringify({
                 error: errors.serialize(new Error('test'))
             }));
@@ -67,7 +56,7 @@ describe('i-errors', function () {
             expect(err instanceof Error).to.be.true;
             expect(err.message).to.be.equal('test');
         });
-        it('serialize runtime error', function () {
+        it('runtime error', function () {
             var data;
             try {
                 this.a();
