@@ -19,7 +19,7 @@
         }
     };
 
-    CommonError.prototype = Error.prototype;
+    CommonError.prototype = new Error();
     CommonError.prototype.constructor = CommonError;
 
     /**
@@ -136,7 +136,7 @@
          * @return {SerializedError}
          */
         serialize: function (err) {
-            if (this[err.name]) {
+            if (err instanceof CommonError) {
                 return err;
             } else {
                 return {
