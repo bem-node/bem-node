@@ -23,6 +23,23 @@
     CommonError.prototype.constructor = CommonError;
 
     /**
+     * @typedef {*} SerializedError
+     * @property {String} name
+     * @property {Array} args of constructor
+     */
+
+    /**
+     * serilize error to object
+     * @return {SerializedError}
+     */
+    CommonError.prototype.serialize = function () {
+        return {
+            name: this.name || 'Unknown',
+            args: [this.message || 'Unknown error']
+        };
+    };
+
+    /**
      * Http Error
      * @class
      * @extends CommonError
@@ -37,6 +54,15 @@
 
     HttpError.prototype = new CommonError();
     HttpError.prototype.constructor = HttpError;
+
+    /**
+     * @overide
+     */
+    HttpError.prototype.serialize = function () {
+        var obj = CommonError.prototype.serialize.call(this);
+        obj.args = [this.status];
+        return obj;
+    };
 
     /**
      * require('http').STATUS_CODES
@@ -125,24 +151,15 @@
         },
 
         /**
-         * @typedef {*} SerializedError
-         * @property {String} name
-         * @property {String} message
-         */
-
-        /**
          * Serialize error to object without unsafe info
          * @param  {Error} err
          * @return {SerializedError}
          */
         serialize: function (err) {
             if (err instanceof CommonError) {
-                return err;
+                return err.serialize();
             } else {
-                return {
-                    name: err.name || 'UnknownError',
-                    message: err.message || err.type || 'Unknown Error'
-                };
+                return CommonError.prototype.serialize.call(err);
             }
         },
 
@@ -152,21 +169,23 @@
          * @return {Error}
          */
         createError: function (obj) {
-            var err;
-            switch (obj.name) {
-                case 'CommonError':
-                    err = new CommonError(obj.message);
-                    break;
-                case 'HttpError':
-                    err = new HttpError(obj.status);
-                    break;
-                default:
-                    err = new Error();
-                    Object.keys(obj).forEach(function (k) {
-                        err[k] = obj[k];
-                    });
+            var error;
+            if (this[obj.name]) {
+                var ErrorClass = this[obj.name];
+                var BindClass = function () {
+                    ErrorClass.apply(this, obj.args);
+                };
+                BindClass.prototype = ErrorClass.prototype;
+                error = new BindClass();
+            } else {
+                if (obj.name) {
+                    console.error(obj.name + ' is not registered in i-errors');
+                }
+                error = new Error(obj.args ? obj.args[0] : 'Unknow error');
+                error.name = obj.name || error.name;
+                error.message = obj.message || error.message;
             }
-            return err;
+            return error;
         }
     });
 }());
