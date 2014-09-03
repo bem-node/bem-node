@@ -545,6 +545,14 @@ var ApiError = function (status, debugInfo) {
 ApiError.prototype = new HttpError();
 ApiError.prototype.constructor = ApiError;
 
+//to properly serialize
+Errors.ApiError = ApiError;
+ApiError.prototype.serialize = function () {
+    var errorObj = HttpError.prototype.serialize.call(this);
+    errorObj.args = [this.status, this.debugInfo];
+    return errorObj;
+}
+
 var err = new ApiError(404, 'fail');
 Errors.isHttpError(err);//true
 err instanceof Error; //true
