@@ -8,7 +8,7 @@ BEM.decl('i-content', null,
      *
      * @return {Vow.promise}
      */
-    ['prepend', 'update', 'append', 'before', 'replace'].reduce(function (stat, action) {
+    ['prepend', 'update', 'append', 'before', 'replace', 'after'].reduce(function (stat, action) {
         stat[action] = function (container, bemJson) {
             return this.html(bemJson)
                 .then(function (html) {
