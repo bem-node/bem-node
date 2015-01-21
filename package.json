@@ -38,7 +38,7 @@
         "bem-json": "0.1.6",
         "vow": "0.3.0",
         "cookies": "0.3.0",
-        "request": "2.12.0",
+        "request": "2.51.0",
         "inherit": "*",
         "borschik": "0.3.0",
         "bem-bl": "git://github.com/bem/bem-bl.git"

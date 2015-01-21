@@ -1,7 +1,7 @@
 describe('i-http.priv.js', function () {
 
     BEM.decl({block: 'i-test-http', baseBlock: 'i-http'}, null, {
-        _apiHost: 'http://localhost:3001',
+        _apiHost: 'http://127.0.0.1:3001',
         TIMEOUT: '500'
     });
 
