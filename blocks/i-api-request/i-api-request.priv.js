@@ -33,7 +33,7 @@
                 'Content-type': 'application/json',
                 'Accept-Encoding': 'gzip, deflate',
                 'host': hostname, //bug with Host when capitalized in https://github.com/mikeal/request/
-                'Connection': 'keep-alve'
+                'Connection': 'keep-alive'
             };
         },
 
