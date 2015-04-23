@@ -76,6 +76,8 @@ describe('i-errors', function () {
     describe('isHttpError', function () {
         it('true', function () {
             expect(errors.isHttpError(new HttpError())).to.be.true;
+            expect(errors.isHttpError(new HttpError(404))).to.be.true;
+            expect(errors.isHttpError(new HttpError(404), 404)).to.be.true;
         });
         it('false', function () {
             var err = new Error();
@@ -83,6 +85,8 @@ describe('i-errors', function () {
             err.name = 'HttpError';
             err.message = 'Not Found';
             expect(errors.isHttpError(err)).to.be.false;
+            expect(errors.isHttpError(new HttpError(), 404)).to.be.false;
+            expect(errors.isHttpError(new HttpError(403), 404)).to.be.false;
         });
     });
 
