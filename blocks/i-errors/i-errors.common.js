@@ -144,10 +144,11 @@
         /**
          * check if err is instance of HttpError
          * @param  {Error}  err
+         * @param  {Number} [status]
          * @return {Boolean}
          */
-        isHttpError: function (err) {
-            return err instanceof HttpError;
+        isHttpError: function (err, status) {
+            return err instanceof HttpError && (status ? err.status === status : true);
         },
 
         /**
