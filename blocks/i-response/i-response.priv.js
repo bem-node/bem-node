@@ -66,6 +66,12 @@ BEM.decl('i-response', null, {
      */
     redirect: function (path) {
         var res = this._getResponse();
+
+        if (res.finished) {
+            console.log('Cannot finish response. It is already finished.');
+            return;
+        }
+
         res.writeHead(302, {'Location': path});
         res.end();
     },
@@ -89,6 +95,11 @@ BEM.decl('i-response', null, {
         if (statusCode >= 500 && statusCode < 600) {
             console.error(err);
         }
+
+        if (res.finished) {
+            console.log('Cannot finish response. It is already finished.');
+        }
+
         res.writeHead(statusCode, err.message);
         res.end();
     },
