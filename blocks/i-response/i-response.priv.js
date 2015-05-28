@@ -98,6 +98,7 @@ BEM.decl('i-response', null, {
 
         if (res.finished) {
             console.log('Cannot finish response. It is already finished.');
+            return;
         }
 
         res.writeHead(statusCode, err.message);
