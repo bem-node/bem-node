@@ -3,14 +3,19 @@
  */
 (function () {
     var request = require('request'), //@see https://github.com/mikeal/request/
+        Agent = require('agentkeepalive'),
         net = require('net'),
         url = require('url'),
         dns = require('dns'),
         apiResolveCache = {},
         querystring = require('querystring'),
-        zlib = require('zlib');
-
-    require('http').globalAgent.maxSockets = 20;
+        zlib = require('zlib'),
+        keepaliveAgent = new Agent({
+            maxSockets: 100,
+            maxFreeSockets: 25,
+            timeout: 60000,
+            keepAliveTimeout: 30000
+        });
 
     BEM.decl('i-api-request', null, {
 
@@ -216,7 +221,8 @@
                 encoding: null,
                 forever: true,
                 headers: this._getRequestHeaders(parsedUrl.hostname),
-                timeout: this.TIMEOUT
+                timeout: this.TIMEOUT,
+                agent: keepaliveAgent
             };
         },
 
