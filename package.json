@@ -1,6 +1,6 @@
 {
     "name": "bem-node",
-    "version": "0.9.7",
+    "version": "0.9.8",
     "description": "",
     "keywords": [
         "bem",
@@ -41,7 +41,8 @@
         "request": "2.51.0",
         "inherit": "*",
         "borschik": "0.3.0",
-        "bem-bl": "git://github.com/bem/bem-bl.git"
+        "bem-bl": "git://github.com/bem/bem-bl.git",
+        "agentkeepalive": "2.0.2"
     },
     "main": "index",
     "engines": {
