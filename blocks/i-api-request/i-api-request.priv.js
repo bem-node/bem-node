@@ -2,14 +2,13 @@
  * Request rest api
  */
 (function () {
-    var request = require('request'), //@see https://github.com/mikeal/request/
+    var request = require('requestretry'), //@see https://github.com/mikeal/request/
         Agent = require('agentkeepalive'),
-        net = require('net'),
         url = require('url'),
-        dns = require('dns'),
-        apiResolveCache = {},
         querystring = require('querystring'),
         zlib = require('zlib'),
+        net = require('net'),
+        apiResolveCache = {},
         keepaliveAgent = new Agent({
             maxSockets: 100,
             maxFreeSockets: 25,
@@ -26,8 +25,27 @@
 
         /**
          * Default api timeout time in ms
+         * @type {Number}
          */
         TIMEOUT: 5000,
+
+        /**
+         * Maximum request retries count
+         * @type {Number}
+         */
+        RETRIES: 0,
+
+        /**
+         * Delay before retries
+         * @type {Number}
+         */
+        RETRY_DELAY: 0,
+
+        /**
+         * Dns cache time, ms
+         * @type {Number}
+         */
+        DNS_CACHE: 180000, // 3 min
 
         /**
          * Define request headers
@@ -43,51 +61,6 @@
         },
 
         /**
-         * Resolve ip address
-         * @param {Object} parsedUrl
-         * @param {String} parsedUrl.hostname
-         * @return {Vow.promise}
-         */
-        _dnsResolve: function (parsedUrl) {
-            var _this = this,
-                promises;
-
-            if (net.isIP(parsedUrl.hostname)) {
-                return Vow.fulfill(parsedUrl.hostname);
-            }
-
-            promises = ['resolve6', 'resolve4'].map(function (method) {
-                var promise = Vow.promise();
-                dns[method](parsedUrl.hostname, BEM.blocks['i-state'].bind(function (err, ips) {
-                    if (err) {
-                        return promise.reject(err);
-                    }
-
-                    var ip = ips[0],
-                        testUrl = url.format({
-                            protocol: parsedUrl.protocol,
-                            hostname: ip,
-                            port: parsedUrl.port
-                        });
-
-                    request({
-                        uri: testUrl,
-                        timeout: _this.TIMEOUT
-                    }, function (err) {
-                        if (err) {
-                            return promise.reject(err);
-                        }
-                        promise.fulfill(ip);
-                    });
-
-                }));
-                return promise;
-            });
-
-            return Vow.any(promises);
-        },
-
-        /**
          * Cachable resolve hostname in DNS.
          * Use cached ip if possible.
          * Maintain cache.
@@ -95,20 +68,25 @@
          * @returns {Vow}
          */
         _resolveHostname: function (parsedUrl) {
-            var host = parsedUrl.hostname;
-            if (apiResolveCache[host]) {
-                return Vow.fulfill(apiResolveCache[host]);
+            var hostname = parsedUrl.hostname,
+                cache;
+
+            if (net.isIP(hostname)) {
+                return Vow.fulfill(hostname);
             }
 
-            return this._dnsResolve(parsedUrl).then(function (ip) {
-                apiResolveCache[host] = ip;
-                return apiResolveCache[host];
-            })
-            .fail(function (err) {
-                var message = 'Unable to resolve hostname for "' + parsedUrl.hostname + '"';
-                console.error(message, err);
-                return Vow.reject({status: 500, message: message});
-            });
+            cache = apiResolveCache[hostname];
+            if (!cache || cache.timestamp < Date.now() || cache.promise.isRejected()) {
+                apiResolveCache[hostname] = cache = {
+                    timestamp: Date.now() + this.DNS_CACHE,
+                    promise: BEM.blocks['i-dns-lookup'].lookup(parsedUrl, {checkConnection: true})
+                        .then(function (ips) {
+                            return ips.pop();
+                        })
+                };
+            }
+
+            return cache.promise;
         },
 
         /**
@@ -131,6 +109,9 @@
          *  @param {Object} data
          *  @param {Object} [data.params] Get params
          *  @param {Object} [data.output=object] Output format
+         *  @param {Number} [data.timeout=this.TIMEOUT] Request timeout, ms
+         *  @param {Number} [data.retries=this.RETRIES] Request retries count
+         *  @param {Number} [data.retryDelay=this.RETRY_DELAY] Delay before retries, ms
          *  @return {Vow.Promise}
          */
         _request: function (method, resource, data) {
@@ -160,7 +141,7 @@
             parsedUrl = url.parse(requestUrl);
 
             return this._resolveHostname(parsedUrl).then(function (hostIp) {
-                return this._requestApi(method, parsedUrl, hostIp, data);
+                return this._requestApi(method, parsedUrl, hostIp, data || {});
             }.bind(this));
         },
 
@@ -215,15 +196,25 @@
          * @returns {Object}
          */
         _buildRequestOptions: function (method, parsedUrl, hostIp, data) {
-            return {
-                uri: this._getUri(parsedUrl, data && data.params, hostIp),
+            var options;
+
+            data = data || {};
+            options = {
+                uri: this._getUri(parsedUrl, data.params, hostIp),
                 method: method,
                 encoding: null,
                 forever: true,
                 headers: this._getRequestHeaders(parsedUrl.hostname),
-                timeout: this.TIMEOUT,
-                agent: keepaliveAgent
+                timeout: data.timeout || this.TIMEOUT,
+                agent: keepaliveAgent,
+                maxAttempts: data.hasOwnProperty('retries') ? data.retries : this.RETRIES,
+                retryDelay: data.hasOwnProperty('retryDelay') ? data.retryDelay : this.RETRY_DELAY
             };
+            if (data.body) {
+                options.body = this._normalizeBody(data.body);
+            }
+
+            return options;
         },
 
         /**
@@ -250,11 +241,7 @@
         _requestApi: function (method, parsedUrl, hostIp, data) {
             var _this = this,
                 requestOptions = this._buildRequestOptions(method, parsedUrl, hostIp, data),
-                originalUrl = this._getUri(parsedUrl, data && data.params);
-
-            if (data && data.body) {
-                requestOptions.body = this._normalizeBody(data.body);
-            }
+                originalUrl = this._getUri(parsedUrl, data.params);
 
             return this._makeRequest(requestOptions).then(function (info) {
                 return _this._checkResponse(info.err, info.res, {
