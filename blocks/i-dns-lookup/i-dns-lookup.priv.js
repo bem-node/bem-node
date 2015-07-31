@@ -51,6 +51,15 @@
             return promise;
         },
 
+        /**
+         * Resolves ip6 and ip4 addresses by given hostname
+         * Will return array with leading ip6 addresses
+         * Will return any addresses, if some family resolve fails
+         *
+         * @param {String} hostname
+         * @returns {Vow.promise}
+         * @returns {Vow.promise.fulfill(<Array>)}
+         */
         _dnsResolveIp: function (hostname) {
             return Vow.allResolved([
                 this._dnsResolveIpByFamily(hostname, 6),
@@ -58,7 +67,7 @@
             ])
             .spread(function (ip6, ip4) {
                 if (ip6.isRejected() && ip4.isRejected()) {
-                    return Vow.reject(new Error(ip6.valueOf().message + ' for ' + hostname));
+                    return Vow.reject(new Error(ip6.valueOf().message + '\r\n' + ip4.valueOf().message));
                 }
 
                 return (ip6.isFulfilled() ? ip6.valueOf() : [])
@@ -66,6 +75,14 @@
             });
         },
 
+        /**
+         * Resolves ip addresses for hostname by given family
+         *
+         * @param {String} hostname
+         * @param {(4|6} family
+         * @returns {Vow.promise}
+         * @returns {Vow.promise.fulfill(<Array>)}
+         */
         _dnsResolveIpByFamily: function (hostname, family, retry) {
             var promise = Vow.promise();
 
@@ -88,11 +105,21 @@
             }
 
             return promise.fail(function (err) {
-                console.error('DNS Resolve ip' + family + ' error for ' + hostname, err.message);
-                return Vow.reject(err);
+                return Vow.reject(new Error('DNS resolve ip' + family + ' ' + err.message + ' for ' + hostname));
             });
         },
 
+        /**
+         * Checks tcp connection for list of ips
+         * Use port (or port by protocol) from url to connect to ip
+         *
+         * @param {Object} parsedUrl Result of url.parse
+         * @param {Number} parsedUrl.port
+         * @param {String} parsedUrl.protocol
+         * @param {Array} ips
+         * @returns {Vow.promise}
+         * @returns {Vow.promise.fulfill(<Array>)}
+         */
         _checkTcpConnection: function (parsedUrl, ips) {
             var _this = this;
 
@@ -114,17 +141,19 @@
                     promise.fulfill(ip);
                 })
                 .on('error', function (err) {
-                    promise.reject(new Error('TCP Connect error for ' + parsedUrl.hostname
-                        + ' host ' + host + ' port ' + port + ' ' + err.message));
+                    promise.reject(err);
                 });
                 setTimeout(function () {
                     if (!promise.isResolved()) {
-                        promise.reject(new Error('TCP Connect error for ' + parsedUrl.hostname
-                            + ' host ' + host + ' port ' + port + ' TIMEOUT'));
+                        promise.reject(new Error('TIMEOUT'));
                     }
                 }, _this.TIMEOUT_TCP_CHECK);
 
-                return promise.always(function (promise) {
+                return promise.fail(function (err) {
+                    return Vow.reject(new Error('TCP connect ' + err.message +
+                        ' for ' + host + ':' + port + ' (' + parsedUrl.hostname + ')'));
+                })
+                .always(function (promise) {
                     connect.destroy();
                     return promise;
                 });
@@ -142,11 +171,9 @@
                     return ips;
                 }
 
-                all.forEach(function (promise) {
-                    console.error(promise.valueOf().message);
-                });
-
-                return Vow.reject(new Error('No valid ip found for ' + parsedUrl.hostname));
+                return Vow.reject(new Error(all.map(function (promise) {
+                    return promise.valueOf().message;
+                }).join('\r\n')));
             });
         }
 
