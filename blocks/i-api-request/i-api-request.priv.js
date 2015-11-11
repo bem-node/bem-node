@@ -140,9 +140,10 @@
             }
             parsedUrl = url.parse(requestUrl);
 
-            return this._resolveHostname(parsedUrl).then(function (hostIp) {
+            // Explicitly bind callback to domain as '_resolveHostname' may return cached promise
+            return this._resolveHostname(parsedUrl).then(BEM.blocks['i-state'].bind(function (hostIp) {
                 return this._requestApi(method, parsedUrl, hostIp, data || {});
-            }.bind(this));
+            }.bind(this)));
         },
 
         /**
