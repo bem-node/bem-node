@@ -30,8 +30,8 @@
             this._lastHandler = this._prepearRoute(this._lastPath);
             if (this._historyStateSupported()) {
                 jQuery(document).delegate('a', 'click', function (e) {
-                    if (!e.metaKey && !e.ctrlKey && (this.protocol === '' || this.protocol === location.protocol)
-                        && (this.host === '' || this.host === location.host) && !this.attributes.target) {
+                    if (!e.metaKey && !e.ctrlKey && this.protocol === location.protocol
+                        && this.host === location.host && !this.attributes.target) {
                         if (_this.setPath(this.pathname + this.search + this.hash)) {
                             e.preventDefault();
                         }
