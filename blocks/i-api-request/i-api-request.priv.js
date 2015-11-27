@@ -3,7 +3,7 @@
  */
 (function () {
     var request = require('requestretry'), //@see https://github.com/mikeal/request/
-        Agent = require('agentkeepalive'),
+        Agent = require('agentkeepalive').HttpsAgent,
         url = require('url'),
         querystring = require('querystring'),
         zlib = require('zlib'),
