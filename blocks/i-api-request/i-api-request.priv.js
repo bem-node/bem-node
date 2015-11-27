@@ -213,7 +213,7 @@
                 agent: parsedUrl.protocol === 'http:' ? keepaliveAgent : keepaliveHttpsAgent,
                 maxAttempts: data.hasOwnProperty('retries') ? data.retries : this.RETRIES,
                 retryDelay: data.hasOwnProperty('retryDelay') ? data.retryDelay : this.RETRY_DELAY,
-                strictSSL: false
+                rejectUnauthorized: false
             };
             if (data.body) {
                 options.body = this._normalizeBody(data.body);
