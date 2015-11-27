@@ -75,6 +75,8 @@ describe('i-api-request.common.js', function () {
             return apiHttps.get('source');
         }).then(function (response) {
             return expect(response.handle).equal('source');
+        }).fail(function (e) {
+            console.log(e);
         });
     });
 
