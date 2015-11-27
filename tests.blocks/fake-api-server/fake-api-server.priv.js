@@ -1,6 +1,11 @@
 var http = require('http'),
-    parse = require('url').parse;
-
+    https = require('https'),
+    parse = require('url').parse,
+    fs = require('fs'),
+    httpsOptions = {
+        key: fs.readFileSync(__dirname + '/key.pem'),
+        cert: fs.readFileSync(__dirname + '/cert.pem')
+    };
 
 function createResponse(path, params) {
     var response = {
@@ -40,3 +45,4 @@ function onRequest(req, res) {
 }
 
 http.createServer(onRequest).listen(3001, '127.0.0.1');
+https.createServer(httpsOptions, onRequest).listen(3002, '127.0.0.1');
