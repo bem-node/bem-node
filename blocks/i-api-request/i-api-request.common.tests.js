@@ -1,6 +1,7 @@
 describe('i-api-request.common.js', function () {
 
-    var api = BEM.blocks['i-test-api'];
+    var api = BEM.blocks['i-test-api'],
+        apiHttps = BEM.blocks['i-test-api-https'];
 
     it('resourse only', function () {
         return env(function () {
@@ -66,6 +67,14 @@ describe('i-api-request.common.js', function () {
                 .then(function (response) {
                     return expect(responseId).not.equal(response.responseId);
                 });
+        });
+    });
+
+    it('gets https', function () {
+        return env(function () {
+            return apiHttps.get('source');
+        }).then(function (response) {
+            return expect(response.handle).equal('source');
         });
     });
 

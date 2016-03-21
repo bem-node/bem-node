@@ -55,7 +55,7 @@ function coverage {
 }
 
 function lint {
-    find blocks tests.blocks -type f | grep -vEe 'deps.js' | xargs $JSHINT 1>&2
+    find blocks tests.blocks -type f | grep -vEe 'deps.js|pem|css' | xargs $JSHINT 1>&2
 }
 
 if [ $1 ]; then

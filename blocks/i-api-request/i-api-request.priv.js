@@ -4,17 +4,20 @@
 (function () {
     var request = require('requestretry'), //@see https://github.com/mikeal/request/
         Agent = require('agentkeepalive'),
+        HttpsAgent = require('agentkeepalive').HttpsAgent,
         url = require('url'),
         querystring = require('querystring'),
         zlib = require('zlib'),
         net = require('net'),
         apiResolveCache = {},
-        keepaliveAgent = new Agent({
+        keepaliveOptions = {
             maxSockets: 100,
             maxFreeSockets: 25,
             timeout: 60000,
             keepAliveTimeout: 30000
-        });
+        },
+        keepaliveAgent = new Agent(keepaliveOptions),
+        keepaliveHttpsAgent = new HttpsAgent(keepaliveOptions);
 
     BEM.decl('i-api-request', null, {
 
@@ -207,7 +210,7 @@
                 forever: true,
                 headers: this._getRequestHeaders(parsedUrl.hostname),
                 timeout: data.timeout || this.TIMEOUT,
-                agent: keepaliveAgent,
+                agent: parsedUrl.protocol === 'http:' ? keepaliveAgent : keepaliveHttpsAgent,
                 maxAttempts: data.hasOwnProperty('retries') ? data.retries : this.RETRIES,
                 retryDelay: data.hasOwnProperty('retryDelay') ? data.retryDelay : this.RETRY_DELAY
             };
