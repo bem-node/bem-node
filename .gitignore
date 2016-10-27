@@ -6,9 +6,7 @@ blocks/i-bem/__json/i-bem__json.priv.js
 blocks/i-bem/i-bem.server.js
 blocks/i-jquery/__identify/*server.js
 blocks/i-jquery/__inherit/*.server.js
-blocks/i-jquery/__is-empty-object/*server.js
 blocks/i-jquery/__observable/*server.js
-blocks/i-jquery/_dummy/
 blocks/i-promise/i-promise.js
 blocks/i-bh/i-bh.js
 tests.blocks/mocha/mocha.js

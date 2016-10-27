@@ -2,12 +2,13 @@
  * Static server with enb make on demand
  */
 if (!BEM.blocks['i-command'].get('no-static-proxy')) {
+    var urlParse = require('url').parse;
     var mime = require('mime');
     var cdir = process.cwd();
-    var enbServerMiddleware = require('enb/lib/server/server-middleware');
     var TargetNotFoundError = require('enb/lib/errors/target-not-found-error');
-    var builder = enbServerMiddleware.createBuilder({
-        noLog: true
+    var builder = require('enb/lib/server/middleware/enb')({
+        root: cdir,
+        log: false
     });
     var fs = require('fs');
     var HttpError = BEM.blocks['i-errors'].HttpError;
@@ -49,6 +50,7 @@ if (!BEM.blocks['i-command'].get('no-static-proxy')) {
         init: function () {
             var path = BEM.blocks['i-router'].getPath(),
                 mimeType = mime.lookup(path),
+                req = BEM.blocks['i-router'].getReq(),
                 res = BEM.blocks['i-router'].getRes(),
                 mimeCharset = mimeType === 'application/javascript' ?
                     'UTF-8' :
@@ -57,13 +59,22 @@ if (!BEM.blocks['i-command'].get('no-static-proxy')) {
 
             res.setHeader('Content-Type', mimeType + (mimeCharset ? '; charset=' + mimeCharset : ''));
 
+            // added "_parsedUrl" field into request to emulate "connect" behaivor (enb >= 0.13.4)
+            req._parsedUrl = urlParse(path);
+
             return this._checkAllowedFiles(path, mimeType).then(function () {
-                return builder(path).fail(function (err) {
-                    if (!(err instanceof TargetNotFoundError)) {
-                        console.error(err);
+                var promise = Vow.promise();
+
+                builder(req, res, function (err) {
+                    if (err && !(err instanceof TargetNotFoundError)) {
+                        console.log(err);
                     }
-                    return _this._getFilename(path);
+
+                    _this._getFilename(path).then(function (filename) {
+                        promise.fulfill(filename);
+                    });
                 });
+                return promise;
             }).then(function (filename) {
                 fs.createReadStream(filename).pipe(res);
                 return Vow.fulfill();

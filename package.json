@@ -14,7 +14,7 @@
         "url": "https://github.com/wtfil/bem-node.git"
     },
     "scripts": {
-        "postinstall": "./bin/install.sh",
+        "postinstall": "node ./bin/install.js",
         "test": "npm install --save-dev && ./tests.sh",
         "start": "node tests/simple/simple.server.js"
     },
@@ -32,17 +32,16 @@
         "blanket": "*"
     },
     "dependencies": {
-        "enb": "0.8.48",
-        "mime": "1.2.11",
-        "bh": "0.1.19",
-        "bem-json": "0.1.6",
+        "enb": "1.4.0",
+        "mime": "1.3.4",
+        "bh": "1.2.3",
+        "bem-json": "git://github.com/bem-node/bem-json.git#5b4dcb898d55d1db956eefe21a27e514ee22f3f1",
         "vow": "git://github.com/anton-kotenko/vow#42baf07fc8ca30865fc3b6f4a1b110ffe6635088",
-        "cookies": "0.3.0",
-        "requestretry": "1.4.0",
+        "cookies": "0.6.2",
+        "requestretry": "1.12.0",
         "inherit": "*",
-        "borschik": "0.3.0",
         "bem-bl": "git://github.com/bem/bem-bl.git",
-        "agentkeepalive": "2.0.2"
+        "agentkeepalive": "2.2.0"
     },
     "main": "index",
     "engines": {
