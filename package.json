@@ -14,7 +14,7 @@
         "url": "https://github.com/wtfil/bem-node.git"
     },
     "scripts": {
-        "postinstall": "./bin/install.sh",
+        "postinstall": "./bin/install.js",
         "test": "npm install --save-dev && ./tests.sh",
         "start": "node tests/simple/simple.server.js"
     },
