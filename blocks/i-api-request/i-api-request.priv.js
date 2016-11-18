@@ -134,6 +134,7 @@
                     return Vow.reject(new Error('_apiHost is not specified; Define ._apiHost on your level first'));
                 }
                 requestUrl = this._apiHost.replace(/\/+$/, '') + '/' + resource;
+                requestUrl = requestUrl.replace(/\/+$/, '');
             } else {
                 if (!this._checkResource(resource.replace(/https?\/\//, ''))) {
                     console.error('resource "' + resource + '" denier');
