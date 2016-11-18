@@ -1,6 +1,6 @@
 {
     "name": "bem-node",
-    "version": "0.9.14",
+    "version": "0.10.0",
     "description": "",
     "keywords": [
         "bem",
@@ -36,7 +36,7 @@
         "mime": "1.2.11",
         "bh": "0.1.19",
         "bem-json": "0.1.6",
-        "vow": "0.3.0",
+        "vow": "git://github.com/anton-kotenko/vow#42baf07fc8ca30865fc3b6f4a1b110ffe6635088",
         "cookies": "0.3.0",
         "requestretry": "1.4.0",
         "inherit": "*",
@@ -46,7 +46,7 @@
     },
     "main": "index",
     "engines": {
-        "node": ">= 0.8.0"
+        "node": ">= 4.0"
     },
     "config": {
         "blanket": {
