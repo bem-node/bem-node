@@ -133,8 +133,14 @@
                 if (!this._apiHost) {
                     return Vow.reject(new Error('_apiHost is not specified; Define ._apiHost on your level first'));
                 }
-                requestUrl = this._apiHost.replace(/\/+$/, '') + '/' + resource;
-                requestUrl = requestUrl.replace(/\/+$/, '');
+                if (resource && resource[0] !== '/') {
+                    resource = '/' + resource;
+                }
+                if (resource) {
+                    requestUrl = this._apiHost.replace(/\/+$/, '') + resource;
+                } else {
+                    requestUrl = this._apiHost;
+                }
             } else {
                 if (!this._checkResource(resource.replace(/https?\/\//, ''))) {
                     console.error('resource "' + resource + '" denier');
