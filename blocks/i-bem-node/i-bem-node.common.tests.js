@@ -19,6 +19,7 @@
             expect(g.done).to.be.an('function');
         });
         if (global.document) {
+
             describe('client tests', function () {
                 it('js true for blocks with init', function () {
                     BN.addDecl('tets-block-js-true').instanceProp({
@@ -31,6 +32,39 @@
                     }, true)).bem('tets-block-js-true');
                     expect(block).to.be.an('object');
                     expect(block.testField).to.be.equal('testField');
+                });
+
+                it('simple use with bem.json', function () {
+                    //outer bem.json
+                    BEM.JSON.decl('mix-use-outer-bem-json-block', {
+                        onBlock: function (ctx) {
+                            ctx.content({
+                                block: 'mix-use-bem-bn-block'
+                            });
+                        }
+                    });
+
+                    //inner bem.json
+                    BEM.JSON.decl('mix-use-inner-bem-json-block', {
+                        onBlock: function (ctx) {
+                            ctx.content('inner-content');
+                        }
+                    });
+
+                    //inner bn
+                    BN.addDecl('mix-use-bem-bn-block').blockTemplate(function (ctx) {
+                        ctx.content({
+                            block: 'mix-use-inner-bem-json-block'
+                        });
+                    }).done();
+
+                    var $node = jQuery(BN('i-content').html({
+                        block: 'mix-use-outer-bem-json-block'
+                    }, true));
+
+                    expect($node.hasClass('mix-use-outer-bem-json-block')).to.be.equal(true);
+                    expect($node.find('.mix-use-bem-bn-block .mix-use-inner-bem-json-block').text()).to.be.equal('inner-content');
+
                 });
             });
         }
