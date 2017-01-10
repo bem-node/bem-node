@@ -103,19 +103,33 @@ BEM.decl('i-router', null, {
      *
      * @param [{String|Array} reqMethod request method: 'get', 'post', 'get,post', 'delete' etc. or list of arguments
      *  To assign more than one method list with comma]
+     * @param {String|RegExp} reqHost hostname
      * @param {String|RegExp} reqPath request path matcher
      * @param {String} blockName block name
      */
-    define: function (reqMethod, reqPath, blockName) {
-        if (Array.isArray(reqMethod) && !reqPath) {
-            reqMethod.forEach(function (routeDefn) {
+    define: function (definitions) {
+        var blockName,
+            reqPath,
+            reqMethod = false,
+            reqHost = false;
+
+        if (Array.isArray(definitions) && arguments.length === 1) {
+            definitions.forEach(function (routeDefn) {
                 this.define.apply(this, routeDefn);
             }, this);
 
             return;
         }
+        blockName = [].pop.call(arguments);
+        reqPath = [].pop.call(arguments);
+        if (arguments.length > 0) {
+            reqMethod = [].pop.call(arguments);
+        }
+        if (arguments.length > 0) {
+            reqHost = [].pop.call(arguments);
+        }
 
-        if (blockName) {
+        if (reqMethod) {
             reqMethod = reqMethod.toUpperCase();
             reqMethod.split(',').every(function (method) {
                 if (-1 === this.REQUEST_METHODS.indexOf(method)) {
@@ -123,15 +137,12 @@ BEM.decl('i-router', null, {
                 }
                 return true;
             }, this);
-        } else {
-            blockName = reqPath;
-            reqPath = reqMethod;
-            reqMethod = false;
         }
 
         this._routeList.push({
             reqMethod: reqMethod,
             reqPath: reqPath,
+            reqHost: reqHost,
             reqHandler: this._createHandler(blockName)
         });
     },
@@ -145,7 +156,7 @@ BEM.decl('i-router', null, {
      * @return {Function} .handler request handler
      * @return {Array} .matchers
      */
-    _getRoute: function (path, method) {
+    _getRoute: function (path, method, hostName) {
         var route,
             matchers = [],
             pathNorm = path.replace(/\/{2,}/g, '/');
@@ -153,6 +164,13 @@ BEM.decl('i-router', null, {
         this._routeList.some(function (r) {
             if (method && r.reqMethod) {
                 if (-1 === r.reqMethod.indexOf(method)) {
+                    return false;
+                }
+            }
+            if (hostName && r.reqHost) {
+                if (typeof (r.reqHost) === 'string' && hostName !== r.hostName) {
+                    return false;
+                } else if (!hostName.match(r.reqHost)) {
                     return false;
                 }
             }

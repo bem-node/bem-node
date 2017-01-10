@@ -27,7 +27,8 @@
 
             this._state.set('path', getPathFromLocation());
             this._lastPath = this.getPath();
-            this._lastHandler = this._prepearRoute(this._lastPath);
+            this._lastHost = this.getHost();
+            this._lastHandler = this._prepearRoute(this._lastPath, this._lastHost);
             if (this._historyStateSupported()) {
                 jQuery(document).delegate('a', 'click', function (e) {
                     if (!e.metaKey && !e.ctrlKey && this.protocol === location.protocol
@@ -60,7 +61,8 @@
         define: function () {
             this.__base.apply(this, arguments);
             this._lastPath = this.getPath();
-            this._lastHandler = this._prepearRoute(this._lastPath);
+            this._lastHost = this.getHost();
+            this._lastHandler = this._prepearRoute(this._lastPath, this._lastHost);
         },
 
         /**
@@ -145,12 +147,14 @@
          * Process handler for given path
          */
         _onChange: function () {
-            var currentPath = this.getPath(), handler;
+            var currentPath = this.getPath(),
+                currentHost = this.getHost(),
+                handler;
 
-            if (this._lastPath !== currentPath) {
+            if (this._lastPath !== currentPath || this._lastHost !== currentHost) {
                 handler = this._prepearRoute();
-                BEM.channel('i-router').trigger('update', {path: currentPath}); //deprecated
-                this.trigger('update', {path: currentPath});
+                BEM.channel('i-router').trigger('update', {path: currentPath, host: currentHost}); //deprecated
+                this.trigger('update', {path: currentPath, host: currentHost});
                 if (handler) {
                     this._execHandler(handler)
                         .fail(this.reload)
@@ -159,7 +163,7 @@
                     this.missing();
                 }
                 this._lastPath = currentPath;
-
+                this._lastHost = currentHost;
             }
         },
 
@@ -171,8 +175,9 @@
          *
          * @return {Object} handler
          */
-        _prepearRoute: function (path) {
-            var routePath = path || (location.pathname + location.search),
+        _prepearRoute: function (path, host) {
+            var routePath = path || getPathFromLocation(),
+                routeHost = host || this.getHost(), 
                 idx = routePath.indexOf('?'),
                 pathName, search, routeInfo;
 
@@ -184,8 +189,8 @@
                 pathName = routePath;
                 search = '';
             }
-
-            routeInfo = this._getRoute(pathName);
+            //we are at client side, only GET method's are possible
+            routeInfo = this._getRoute(pathName, 'GET', routeHost);
 
             this._state.set('matchers', (routeInfo) ? routeInfo.matchers : []);
             this._state.set('path', routePath);
