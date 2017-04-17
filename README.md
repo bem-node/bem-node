@@ -20,24 +20,24 @@ https://github.com/delfrrr/bem-node-hello-world/commits/demo
 
 ### File extensions
 
-####js
+#### js
 
 Browser code
 
-####common.js
+#### common.js
 
 Common (client/server) code
 
-####priv.js
+#### priv.js
 
 Private (server) code
 
-####server.js
+#### server.js
 
 Builded node.js application (server)
 
 
-####bemdecl.js
+#### bemdecl.js
 
 Application declaration
 
@@ -55,7 +55,7 @@ exports.blocks = [
 ];
 ```
 
-####deps.js
+#### deps.js
 
 Block dependencies
 
@@ -709,13 +709,13 @@ Triggered on client on xhr error.
 
 ### Tests
 
-####run tests
+#### run tests
 
     git clone git@github.com:bem-node/bem-node.git
     cd bem-node
     npm test
 
-####quick tests
+#### quick tests
 
     ./tests.sh -c #client tests only
     ./tests.sh -s #server tests only
@@ -724,7 +724,7 @@ Triggered on client on xhr error.
     ./tests.sh -b #rebuild tests
     ./tests.sh -b -s -c #rebuild, server, client
 
-####create tests
+#### create tests
 You should use ```.common.test.js``` for tests common for client and server, ```.priv.tests.js``` for server tests only, and ```.tests.js``` for client tests only.
 
 Typical test looks like this
