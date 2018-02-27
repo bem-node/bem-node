@@ -33,7 +33,7 @@ BEM.DOM.decl('i-page', null, {
      */
     setTitle: function (title) {
         var oldTitleNode = jQuery('title'),
-            newTitle = jQuery('<title>' + title + '</title>');
+            newTitle = jQuery('<title>' + BEM.blocks['i-content'].escapeHTML(title) + '</title>');
 
         if (oldTitleNode) {
             newTitle.insertBefore(oldTitleNode);
