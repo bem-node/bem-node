@@ -1,8 +1,6 @@
 ({
     mustDeps: [
-        {block: 'i-bem'}
-    ],
-    shouldDeps: [
+        {block: 'i-bem'},
         {block: 'i-command'}
     ]
 })

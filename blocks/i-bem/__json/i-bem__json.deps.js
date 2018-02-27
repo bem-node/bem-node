@@ -1,3 +1,3 @@
 ({
-    mustDeps: {block: 'i-bem', elems: ['internal']}
+    mustDeps: {block: 'i-bem', elem: ['internal']}
 })

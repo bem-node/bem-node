@@ -19,7 +19,7 @@ BEM.decl('i-content', null, {
     },
 
     _htmlSync: function (json) {
-        return BEMHTML.call(BEM.JSON.build(json));
+        return BEMHTML.apply(BEM.JSON.build(json));
     },
 
     _htmlAsync: function (json) {
@@ -32,7 +32,7 @@ BEM.decl('i-content', null, {
             BEM.JSON.buildAsync(
                 json,
                 function (result) {
-                    promise.fulfill(BEMHTML.call(result));
+                    promise.fulfill(BEMHTML.apply(result));
                 }
             );
         }
