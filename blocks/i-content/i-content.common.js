@@ -46,7 +46,7 @@
                 .replace(/</g, '&lt;')
                 .replace(/>/g, '&gt;')
                 .replace(/"/g, '&quot;')
-                .replace(/'/g, '&apos;')
+                .replace(/'/g, '&#x27;')
                 .replace(/\//g, '&#x2F;');
         },
 
@@ -62,7 +62,6 @@
                 .replace(/&lt;/g, '<')
                 .replace(/&gt;/g, '>')
                 .replace(/&quot;/g, '"')
-                .replace(/&apos;/g, '\'')
                 .replace(/&#x27;/g, '\'')
                 .replace(/&#x2F;/g, '/');
         }
