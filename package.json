@@ -38,10 +38,11 @@
         "bem-json": "git://github.com/bem-node/bem-json.git#5b4dcb898d55d1db956eefe21a27e514ee22f3f1",
         "vow": "git://github.com/anton-kotenko/vow#42baf07fc8ca30865fc3b6f4a1b110ffe6635088",
         "cookies": "0.6.2",
-        "requestretry": "1.12.0",
+        "request": "2.88.0",
+        "requestretry": "3.0.2",
         "inherit": "*",
         "bem-bl": "git://github.com/bem/bem-bl.git",
-        "agentkeepalive": "2.2.0"
+        "agentkeepalive": "3.5.2"
     },
     "main": "index",
     "engines": {

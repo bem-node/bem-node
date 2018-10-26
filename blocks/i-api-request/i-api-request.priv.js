@@ -14,7 +14,7 @@
             maxSockets: 100,
             maxFreeSockets: 25,
             timeout: 60000,
-            keepAliveTimeout: 30000
+            freeSocketTimeout: 30000
         },
         keepaliveAgent = new Agent(keepaliveOptions),
         keepaliveHttpsAgent = new HttpsAgent(keepaliveOptions);
@@ -214,7 +214,7 @@
                 uri: this._getUri(parsedUrl, data.params, hostIp),
                 method: method,
                 encoding: null,
-                forever: true,
+                // forever: true,
                 headers: this._getRequestHeaders(parsedUrl.hostname),
                 timeout: data.timeout || this.TIMEOUT,
                 agent: parsedUrl.protocol === 'http:' ? keepaliveAgent : keepaliveHttpsAgent,
