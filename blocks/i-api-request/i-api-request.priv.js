@@ -9,6 +9,14 @@ const querystring = require('querystring');
 const zlib = require('zlib');
 const net = require('net');
 const apiResolveCache = {};
+const keepaliveOptions = {
+    maxSockets: 100,
+    maxFreeSockets: 25,
+    timeout: 60000,
+    freeSocketTimeout: 30000
+};
+const keepaliveAgent = new Agent(keepaliveOptions);
+const keepaliveHttpsAgent = new HttpsAgent(keepaliveOptions);
 
 BEM.decl('i-api-request', null, {
 
@@ -41,29 +49,12 @@ BEM.decl('i-api-request', null, {
      */
     DNS_CACHE: 180000, // 3 min
 
-    _getKeepAliveOptions() {
-        return {
-            maxSockets: 100,
-            maxFreeSockets: 25,
-            timeout: 60000,
-            freeSocketTimeout: 30000
-        };
-    },
-
     getHttpAgent() {
-        if (!this._httpAgent) {
-            this._httpAgent = new Agent(this._getKeepAliveOptions());
-        }
-
-        return this._httpAgent;
+        return keepaliveAgent;
     },
 
     getHttpsAgent() {
-        if (!this._httpsAgent) {
-            this._httpsAgent = new HttpsAgent(this._getKeepAliveOptions());
-        }
-
-        return this._httpsAgent;
+        return keepaliveHttpsAgent;
     },
 
     /**
