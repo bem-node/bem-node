@@ -60,7 +60,7 @@
          * @param {http.ServerResponse} res
          */
         _onRequest: function (req, res) {
-            var routeInfo = this._getRoute(url.parse(req.url).pathname, req.method),
+            var routeInfo = this._getRoute(url.parse(req.url).pathname, req.method, req.headers.host),
                 reqDomain = domain.create(),
                 _this = this;
 
