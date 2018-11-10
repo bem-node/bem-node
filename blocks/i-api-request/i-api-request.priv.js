@@ -222,7 +222,11 @@ BEM.decl('i-api-request', null, {
             method: method,
             encoding: null,
             // forever: true,
-            headers: this._getRequestHeaders(parsedUrl.hostname),
+            headers: Object.assign(
+                {},
+                this._getRequestHeaders(parsedUrl.hostname),
+                data.headers
+            ),
             timeout: data.timeout || this.TIMEOUT,
             agent: parsedUrl.protocol === 'http:' ? this.getHttpAgent() : this.getHttpsAgent(),
             maxAttempts: data.hasOwnProperty('retries') ? data.retries : this.RETRIES,
