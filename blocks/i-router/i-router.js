@@ -66,6 +66,14 @@
         },
 
         /**
+         * Get request's protocol (http/https)
+         * @returns {String} (http: or https:. Warning there will be column ":" symbol)
+         */
+        getProtocol () {
+            return window.document.location.protocol;
+        },
+
+        /**
          * Set path to url with history.pushState
          *
          * @param {String} path
@@ -147,21 +155,34 @@
          * Process handler for given path
          */
         _onChange: function () {
-            var currentPath = this.getPath(), handler;
+            var currentPath = this.getPath(),
+                shouldTriggerUpdate = this._lastPath !== currentPath,
+                handler,
+                params;
 
-            if (this._lastPath !== currentPath) {
+            if (shouldTriggerUpdate) {
                 handler = this._prepearRoute();
-                BEM.channel('i-router').trigger('update', {path: currentPath}); //deprecated
                 this.trigger('update', {path: currentPath});
                 if (handler) {
+                    params = this.getParams();
                     this._execHandler(handler)
-                        .fail(this.reload)
+                        .then(function (lastPath) {
+                            if (shouldTriggerUpdate) {
+                                this.trigger('clientUpdate', {
+                                    prevPath: lastPath,
+                                    prevPathname: lastPath.split('?')[0],
+                                    prevParams: params,
+                                    path: this.getPath(),
+                                    pathname: this.getPathname(),
+                                    params: this.getParams()
+                                });
+                            }
+                        }.bind(this, this._lastPath), this.reload)
                         .done();
                 } else {
                     this.missing();
                 }
                 this._lastPath = currentPath;
-
             }
         },
 
