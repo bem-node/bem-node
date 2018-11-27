@@ -27,7 +27,7 @@
 
             this._state.set('path', getPathFromLocation());
             this._lastPath = this.getPath();
-            this._lastHandler = this._prepearRoute(this._lastPath);
+            this._lastHandler = this._prepareRoute(this._lastPath);
             if (this._historyStateSupported()) {
                 jQuery(document).delegate('a', 'click', function (e) {
                     if (!e.metaKey && !e.ctrlKey && this.protocol === location.protocol
@@ -46,7 +46,7 @@
                 });
 
                 jQuery(window).bind('pageshow', function () {
-                    _this._prepearRoute();
+                    _this._prepareRoute();
                 });
             }
         },
@@ -62,7 +62,7 @@
         define: function () {
             this.__base.apply(this, arguments);
             this._lastPath = this.getPath();
-            this._lastHandler = this._prepearRoute(this._lastPath);
+            this._lastHandler = this._prepareRoute(this._lastPath);
         },
 
         /**
@@ -157,27 +157,27 @@
         _onChange: function () {
             var currentPath = this.getPath(),
                 shouldTriggerUpdate = this._lastPath !== currentPath,
-                handler,
-                params;
+                handler;
 
             if (shouldTriggerUpdate) {
-                handler = this._prepearRoute();
-                this.trigger('update', {path: currentPath});
+                handler = this._prepareRoute();
                 if (handler) {
-                    params = this.getParams();
                     this._execHandler(handler)
-                        .then(function (lastPath) {
-                            if (shouldTriggerUpdate) {
-                                this.trigger('clientUpdate', {
-                                    prevPath: lastPath,
-                                    prevPathname: lastPath.split('?')[0],
-                                    prevParams: params,
-                                    path: this.getPath(),
-                                    pathname: this.getPathname(),
-                                    params: this.getParams()
-                                });
-                            }
-                        }.bind(this, this._lastPath), this.reload)
+                        .then(
+                            function (lastPath, currentPath) {
+                                if (shouldTriggerUpdate) {
+                                    this.trigger('clientUpdate', {
+                                        prevPath: lastPath,
+                                        prevPathname: lastPath.split('?')[0],
+                                        prevParams: this._parseParams(lastPath.split('?')[1] || ''),
+                                        path: currentPath,
+                                        pathname: currentPath.split('?')[0],
+                                        params: this._parseParams(currentPath.split('?')[1] || '')
+                                    });
+                                }
+                            }.bind(this, this._lastPath, currentPath),
+                            this.reload
+                        )
                         .done();
                 } else {
                     this.missing();
@@ -190,11 +190,11 @@
          * Set path and matchers
          * Return handler by new path
          *
-         * @param {String} [path] If ommited, then use path from location
+         * @param {String} [path] If omitted, then use path from location
          *
          * @return {Object} handler
          */
-        _prepearRoute: function (path) {
+        _prepareRoute: function (path) {
             var routePath = path || (location.pathname + location.search),
                 idx = routePath.indexOf('?'),
                 pathName, search, routeInfo;
@@ -253,7 +253,6 @@
 
                 this._lastHandler = handler;
                 return before.then(handler.enter);
-
             } else {
                 return handler.update();
             }
@@ -276,41 +275,43 @@
          * @return {Object}
          */
         _readParams: function (search) {
-
             this._state.set(
                 'params',
-                String(arguments.length === 1 ? search : location.search)
-                    .split('&')
-                    .map(function (part) {
-                        var x = part.replace(/\+/g, '%20'),
-                            idx = x.indexOf('='),
-                            key, val;
-
-                        if (idx > -1) {
-                            key = x.substr(0, idx);
-                            val = x.substr(idx + 1);
-                        } else {
-                            if (!x) {
-                                return null;
-                            }
-                            key = x;
-                            val = '';
-                        }
-
-                        try {
-                            key = decodeURIComponent(key);
-                            val = decodeURIComponent(val);
-                        } catch (e) {}
-                        return [key, val];
-                    })
-                    .reduce(function (p, sp) {
-                        if (sp) {
-                            p[sp[0]] = sp[1];
-                        }
-                        return p;
-                    }, {})
+                this._parseParams(search)
             );
+        },
 
+        _parseParams: function (search) {
+            return String(arguments.length === 1 ? search : location.search)
+                .split('&')
+                .map(function (part) {
+                    var x = part.replace(/\+/g, '%20'),
+                        idx = x.indexOf('='),
+                        key, val;
+
+                    if (idx > -1) {
+                        key = x.substr(0, idx);
+                        val = x.substr(idx + 1);
+                    } else {
+                        if (!x) {
+                            return null;
+                        }
+                        key = x;
+                        val = '';
+                    }
+
+                    try {
+                        key = decodeURIComponent(key);
+                        val = decodeURIComponent(val);
+                    } catch (e) {}
+                    return [key, val];
+                })
+                .reduce(function (p, sp) {
+                    if (sp) {
+                        p[sp[0]] = sp[1];
+                    }
+                    return p;
+                }, {})
         },
 
         /**
