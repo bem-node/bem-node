@@ -161,6 +161,7 @@
 
             if (shouldTriggerUpdate) {
                 handler = this._prepareRoute();
+                this.trigger('update', {path: currentPath});
                 if (handler) {
                     this._execHandler(handler)
                         .then(
