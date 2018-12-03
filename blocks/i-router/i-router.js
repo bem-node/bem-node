@@ -31,7 +31,9 @@
             if (this._historyStateSupported()) {
                 jQuery(document).delegate('a', 'click', function (e) {
                     if (!e.metaKey && !e.ctrlKey && this.protocol === location.protocol
-                        && this.host === location.host && !this.attributes.target) {
+                        // If tag <a> has target or attribute 'data-react' i-router will not handle click
+                        // It's required for using react-router inside bem application
+                        && this.host === location.host && !this.attributes.target && !this.attributes['data-react']) {
                         if (_this.setPath(this.pathname + this.search + this.hash)) {
                             e.preventDefault();
                         }
