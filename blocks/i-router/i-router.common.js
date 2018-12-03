@@ -32,7 +32,7 @@ BEM.decl('i-router', null, {
      * @returns {String}
      */
     getUri: function () {
-        return this.getProtocol() + this.getHost() + this.getPath();
+        return this.getProtocol() + '//' + this.getHost() + this.getPath();
     },
 
     /**
@@ -75,7 +75,7 @@ BEM.decl('i-router', null, {
         return this._state.get('path').replace(/^\/+/, '/');
     },
 
-    getPathname () {
+    getPathname: function () {
         var path = this.getPath();
 
         return path.split('?')[0];

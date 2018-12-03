@@ -69,7 +69,7 @@
          * Get request's protocol (http/https)
          * @returns {String} (http: or https:. Warning there will be column ":" symbol)
          */
-        getProtocol () {
+        getProtocol: function () {
             return window.document.location.protocol;
         },
 
