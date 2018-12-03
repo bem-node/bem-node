@@ -89,6 +89,30 @@ BEM.decl('i-router', null, {
         return this._state.get('matchers');
     },
 
+    getTld: function () {
+        var currentTld = this._state.get('tld');
+        if (currentTld) {
+            return currentTld;
+        }
+
+        var escapedTlds = this._getAvailableTlds().map(function (tld) {
+            return tld.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+        });
+        var regexp = new RegExp('\\.(' + escapedTlds.join('|') + ')$');
+        var tldMatch = String(this.getHost()).match(regexp);
+
+        if (tldMatch && tldMatch[1]) {
+            this._state.set('tld', tldMatch[1]);
+            return tldMatch[1];
+        } else {
+            throw new Error('Unsupported host ' + this.getHost());
+        }
+    },
+
+    _getAvailableTlds: function () {
+        return ['com.tr', 'com', 'ru', 'ua', 'kz', 'by'];
+    },
+
     /**
      * List of allowed http methods
      *
@@ -216,25 +240,7 @@ BEM.decl('i-router', null, {
      * @abstract
      * @param {Mixed} reqHandler request handler created by i-router._createHandler
      */
-    _execHandler: function () {},
-
-    /**
-    * @deprecated
-    */
-    escapeHTML: function (html) {
-        console.error(new Error('i-router.escapeHTML deprecated use BN(\'i-content\').escapeHTML()'));
-        this.escapeHTML = BEM.blocks['i-content'].escapeHTML;
-        return this.escapeHTML(html);
-    },
-
-    /**
-    * @deprecated
-    */
-    unescapeHTML: function (text) {
-        console.error(new Error('i-router.unescapeHTML deprecated use BN(\'i-content\').unescapeHTML()'));
-        this.unescapeHTML = BEM.blocks['i-content'].unescapeHTML;
-        return this.unescapeHTML(text);
-    }
+    _execHandler: function () {}
 
 
 });
