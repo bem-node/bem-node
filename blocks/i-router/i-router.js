@@ -143,6 +143,16 @@
             });
         },
 
+        immediateReload: function (path, e) {
+            if (e) {
+              console.error(e instanceof Error ? e.stack : e);
+            }
+            if (!this.stopImmediateReload) {
+              this.stopImmediateReload = true;
+              window.location = path;
+            }
+        },
+
         /**
          * Handles 404 page
          */
@@ -177,7 +187,9 @@
                                     });
                                 }
                             }.bind(this, this._lastPath, currentPath),
-                            this.reload
+                            function (path, e) {
+                              this.immediateReload(path, e);
+                            }.bind(this, currentPath)
                         )
                         .done();
                 } else {
