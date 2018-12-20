@@ -18,9 +18,6 @@
         "test": "npm install --save-dev && ./tests.sh",
         "start": "node tests/simple/simple.server.js"
     },
-    "bundledDependencies": [
-        "bem-bl"
-    ],
     "devDependencies": {
         "mocha": "~1.18",
         "chai": "~1.9",
@@ -32,17 +29,14 @@
         "blanket": "*"
     },
     "dependencies": {
-        "enb": "1.4.0",
-        "mime": "1.3.4",
-        "bh": "1.2.3",
+        "agentkeepalive": "3.5.2",
+        "bem-bl": "git://github.com/bem/bem-bl.git",
         "bem-json": "git://github.com/bem-node/bem-json.git#5b4dcb898d55d1db956eefe21a27e514ee22f3f1",
-        "vow": "git://github.com/anton-kotenko/vow#42baf07fc8ca30865fc3b6f4a1b110ffe6635088",
         "cookies": "0.6.2",
+        "inherit": "*",
         "request": "2.88.0",
         "requestretry": "3.0.2",
-        "inherit": "*",
-        "bem-bl": "git://github.com/bem/bem-bl.git",
-        "agentkeepalive": "3.5.2"
+        "vow": "git://github.com/anton-kotenko/vow#42baf07fc8ca30865fc3b6f4a1b110ffe6635088"
     },
     "main": "index",
     "engines": {
@@ -50,7 +44,10 @@
     },
     "config": {
         "blanket": {
-            "pattern": ["common.js", "priv.js"]
+            "pattern": [
+                "common.js",
+                "priv.js"
+            ]
         }
     }
 }
