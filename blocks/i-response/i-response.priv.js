@@ -51,11 +51,18 @@ BEM.decl('i-response', null, {
      */
     json: function (json) {
         var outputJson;
-        if (typeof json === 'object') {
-            outputJson = JSON.stringify(json);
-        } else {
-            outputJson = String(json);
+
+        try {
+            if (typeof json === 'object') {
+                outputJson = JSON.stringify(json);
+            } else {
+                outputJson = String(json);
+            }
+        } catch (e) {
+            console.error(e);
+            outputJson = '';
         }
+
         this.send(200, outputJson, 'application/json');
     },
 

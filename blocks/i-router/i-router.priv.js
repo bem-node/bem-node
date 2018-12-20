@@ -198,8 +198,16 @@
          */
         getHost: function () {
             return this._state.get('req').headers.host;
-        }
+        },
 
+        /**
+         * Get request's protocol (http/https)
+         * @returns {String} (http: or https:. Warning there will be column ":" symbol)
+         */
+        getProtocol () {
+            var headers = this.getReq().headers;
+            return (headers['x-forwarded-protocol'] || 'http') + ':';
+        }
 
     });
 

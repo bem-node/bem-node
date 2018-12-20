@@ -1,12 +1,9 @@
-bem-bl
+#bem-bl
 node_modules
-blocks/i-bem/__html/
-blocks/i-bem/__json/_async/
-blocks/i-bem/__json/i-bem__json.priv.js
-blocks/i-bem/i-bem.server.js
-blocks/i-jquery/__identify/*server.js
-blocks/i-jquery/__inherit/*.server.js
-blocks/i-jquery/__observable/*server.js
+#blocks/i-bem/__html/
+#blocks/i-bem/__json/_async/
+#blocks/i-bem/__json/i-bem__json.priv.js
+#blocks/i-bem/i-bem.server.js
 blocks/i-promise/i-promise.js
 blocks/i-bh/i-bh.js
 tests.blocks/mocha/mocha.js
