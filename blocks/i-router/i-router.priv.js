@@ -177,7 +177,11 @@
                     }
                 }));
                 req.on('end', BEM.blocks['i-state'].bind(function () {
-                    callback(qs.parse(body));
+                    if (req.headers['content-type'] === 'application/json') {
+                        callback(body);
+                    } else {
+                        callback(qs.parse(body));
+                    }
                 }));
             }
         },
